@@ -1,4 +1,4 @@
-FROM krmp-d2hub-idock.9rum.cc/goorm/gradle:8.5-jdk17
+FROM gradle:8.5-jdk17
 
 LABEL authors="keon"
 
