@@ -1,0 +1,42 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+# 이 워크플로우는 main 브랜치에 push 되거나 pull request 이벤트가 발생했을 때 실행됩니다.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# 워크플로우는 여러 잡(job)으로 구성될 수 있습니다. 이 예시에서는 "build"라는 하나의 잡을 정의했습니다.
+jobs:
+  build:
+
+    # 이 잡은 GitHub 호스티드 러너에서 실행됩니다. 여기서는 Ubuntu 최신 버전을 사용합니다.
+    runs-on: ubuntu-latest
+
+    # 작업 순서를 정의합니다. 각 단계는 의존성 설치, 빌드, 테스트 등의 작업을 수행할 수 있습니다.
+    steps:
+      - uses: actions/checkout@v3
+        # 코드 체크아웃 액션을 사용하여 리포지토리의 코드를 가져옵니다.
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+        # Java 개발 키트(JDK)를 설정합니다. 여기서는 버전 17을 사용합니다.
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        # Gradle 래퍼 스크립트에 실행 권한을 부여합니다.
+
+      - name: Build with Gradle
+        run: ./gradlew build
+        # Gradle 래퍼를 사용하여 프로젝트를 빌드합니다.
