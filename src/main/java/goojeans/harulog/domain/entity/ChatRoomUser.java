@@ -1,8 +1,10 @@
 package goojeans.harulog.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "ChatRoom_User")
 public class ChatRoomUser {
 
