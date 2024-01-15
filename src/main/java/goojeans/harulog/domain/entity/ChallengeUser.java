@@ -1,5 +1,6 @@
 package goojeans.harulog.domain.entity;
 
+import goojeans.harulog.util.ChallengeRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
