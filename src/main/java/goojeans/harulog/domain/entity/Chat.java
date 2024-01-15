@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class Chat extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chat_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

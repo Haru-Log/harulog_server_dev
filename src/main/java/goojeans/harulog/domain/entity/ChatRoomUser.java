@@ -9,6 +9,7 @@ import lombok.Getter;
 public class ChatRoomUser {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chatroom_user_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

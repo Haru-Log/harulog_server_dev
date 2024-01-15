@@ -1,9 +1,6 @@
 package goojeans.harulog.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @Entity
@@ -11,5 +8,6 @@ import lombok.Getter;
 public class ChatRoom extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chatroom_id")
     private Long id;
 }
