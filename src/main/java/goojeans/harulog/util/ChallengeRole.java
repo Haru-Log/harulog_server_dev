@@ -1,4 +1,4 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.util;
 
 public enum ChallengeRole {
     LEADER, PARTICIPANT
