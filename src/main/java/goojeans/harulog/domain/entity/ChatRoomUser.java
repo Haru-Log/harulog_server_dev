@@ -1,11 +1,18 @@
 package goojeans.harulog.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @Table(name = "ChatRoom_User")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatRoomUser {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,15 +21,11 @@ public class ChatRoomUser {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
+    @NotNull
     private ChatRoom chatRoom;
 
-    // todo: User Entity 생성 후, 사용자-채팅방 관계 매핑 예정.
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    private User user;
-//
-//    public ChatRoomUser(ChatRoom chatRoom, User user) {
-//        this.chatRoom = chatRoom;
-//        this.user = user;
-//    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @NotNull
+    private User user;
 }
