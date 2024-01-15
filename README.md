@@ -23,14 +23,16 @@
 ### Git branch 전략
 - Github Flow 전략 채택
 - main 브랜치는 안정된 코드 조각의 모음
-- **feature/기능이름-GJNS-이슈번호** 형식의 브랜치 사용
-  - ex) feature/login-GJNS-7
+- **feature/GJNS-이슈번호-기능이름** 형식의 브랜치 사용
+  - ex) feature/GJNS-7-user-entity
+  - 하위 이슈 번호 사용
 - **기능 단위의 커밋 필수**
   - 몰아서 커밋 지양하기
 - 브랜치 push 후 main 브랜치로 pull request
 
 ### 커밋 메세지
 - 커밋 메세지 형식은 다음과 같습니다.
+
 > type(타입) : title(제목)
 >
 > body(본문, 생략 가능)
@@ -38,6 +40,7 @@
 > Resolves : #issueNo, ...(해결한 이슈 , 생략 가능)
 >
 > See also : #issueNo, ...(참고 이슈, 생략 가능)
+
 - feat : 새로운 기능을 추가하거나, 기존 기능을 요구사항 변경으로 인해 변경한 경우
 - fix : 버그를 수정한 경우
 - remove : 파일 혹은 코드를 삭제한 경우
