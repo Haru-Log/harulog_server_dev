@@ -16,20 +16,26 @@ import lombok.NoArgsConstructor;
 public class User extends BaseEntity{
 
     @Id @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
     private String email;
+
     @NotNull
     private String password;
+
     @NotNull
     private String userName;
+
     @NotNull
     private String nickname;
-    private String contactNumber;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    private String contactNumber;
+
 
 }
