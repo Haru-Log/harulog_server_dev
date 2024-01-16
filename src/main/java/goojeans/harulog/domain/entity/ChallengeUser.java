@@ -19,6 +19,16 @@ public class ChallengeUser extends BaseEntity{
     @Column(name = "challenge_user_PK")
     private ChallengeUserPK challengeUserPK;
 
+    @MapsId("challengeId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_id")
+    private Challenge challenge;
+
+    @MapsId("userId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Enumerated(EnumType.STRING)
     private ChallengeRole role;
 }
