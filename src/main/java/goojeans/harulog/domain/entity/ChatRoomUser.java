@@ -15,15 +15,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatRoomUser {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EmbeddedId
     @Column(name = "chatroom_user_id")
-    private Long id;
+    private ChatRoomUserId id;
 
+    @MapsId("chatRoomId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     @NotNull
     private ChatRoom chatRoom;
 
+    @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
