@@ -30,15 +30,14 @@ public class Challenge extends BaseEntity {
 
     private Timestamp endDate;
 
-    //TODO: category 엔티티 매핑
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "category_id")
-//    private Category categoryId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     private ChatRoom chatroom;
 
-    @OneToMany(mappedBy = "challengeUserPK")
+    @OneToMany(mappedBy = "challenge")
     private List<ChallengeUser> challengeUserList;
 }
