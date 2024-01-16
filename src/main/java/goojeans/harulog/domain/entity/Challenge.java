@@ -32,12 +32,12 @@ public class Challenge extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category categoryId;
+    private Category category;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     private ChatRoom chatroom;
 
-    @OneToMany(mappedBy = "challengeUserPK")
+    @OneToMany(mappedBy = "challenge")
     private List<ChallengeUser> challengeUserList;
 }
