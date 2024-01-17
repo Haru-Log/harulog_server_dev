@@ -1,5 +1,6 @@
 package goojeans.harulog.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,17 +16,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatRoomUser {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EmbeddedId
     @Column(name = "chatroom_user_id")
-    private Long id;
+    private ChatRoomUserId id;
 
+    @MapsId("chatRoomId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     @NotNull
     private ChatRoom chatRoom;
 
+    @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference // 순환 참조 방지
     @NotNull
     private User user;
 }

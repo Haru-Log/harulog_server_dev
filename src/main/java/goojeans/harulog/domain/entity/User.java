@@ -1,5 +1,6 @@
 package goojeans.harulog.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import goojeans.harulog.util.SocialType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -45,4 +46,9 @@ public class User extends BaseEntity{
 
     @OneToMany(mappedBy = "follower")
     private List<Follow> followers;
+
+    // [채팅방 목록]을 위한 양방향 매핑
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ChatRoomUser> chatRoomUsers;
 }

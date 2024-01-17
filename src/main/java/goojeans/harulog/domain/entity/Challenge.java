@@ -1,6 +1,7 @@
 package goojeans.harulog.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -18,24 +19,32 @@ public class Challenge extends BaseEntity {
     @Column(name = "challenge_id")
     private Long challengeId;
 
+    @NotNull
     private String challengeTitle;
 
+    @NotNull
     private String challengeContent;
 
+    @NotNull
     private String challengeGoal;
 
+    @NotNull
     private String submission;
 
+    @NotNull
     private Timestamp startDate;
 
+    @NotNull
     private Timestamp endDate;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @NotNull
     private Category category;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
+    @NotNull
     private ChatRoom chatroom;
 
     @OneToMany(mappedBy = "challenge")
