@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Follow {
+public class Follow extends BaseEntity {
 
     @EmbeddedId
     private FollowId id;

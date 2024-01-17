@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserGoal {
+public class UserGoal extends BaseEntity {
 
     @EmbeddedId
     private UserGoalId userGoalId;
