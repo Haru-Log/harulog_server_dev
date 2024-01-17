@@ -40,9 +40,9 @@ public class User extends BaseEntity{
     private String contactNumber;
 
     //TODO: 순환 참조 일어나지 않는지 확인 필요
-    @OneToMany(mappedBy = "following")
+    @OneToMany(mappedBy = "following", fetch = FetchType.LAZY)
     private List<Follow> followings;
 
-    @OneToMany(mappedBy = "follower")
+    @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
     private List<Follow> followers;
 }
