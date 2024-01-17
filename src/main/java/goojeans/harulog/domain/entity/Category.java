@@ -1,6 +1,7 @@
 package goojeans.harulog.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 
@@ -16,5 +17,6 @@ public class Category {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @NotNull
     private String categoryName;
 }
