@@ -16,6 +16,15 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(
+        name = "user",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "Email",
+                        columnNames = {"email"}
+                )
+        }
+)
 public class Users extends BaseEntity{
 
     @Id @Column(name = "user_id")
