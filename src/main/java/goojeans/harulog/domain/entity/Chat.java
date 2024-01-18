@@ -27,7 +27,7 @@ public class Chat extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
-    private User user;
+    private Users user;
 
     @NotNull
     private String content;

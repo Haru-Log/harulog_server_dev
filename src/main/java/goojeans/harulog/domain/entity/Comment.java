@@ -17,7 +17,7 @@ public class Comment extends BaseEntity{
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
-    private User user;
+    private Users user;
 
     @JoinColumn(name = "post_id", nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)

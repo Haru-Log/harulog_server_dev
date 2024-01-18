@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends BaseEntity{
+public class Users extends BaseEntity{
 
     @Id @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,6 @@ public class User extends BaseEntity{
 
     private String contactNumber;
 
-    //TODO: 순환 참조 일어나지 않는지 확인 필요
     @OneToMany(mappedBy = "following", fetch = FetchType.LAZY)
     private List<Follow> followings;
 
