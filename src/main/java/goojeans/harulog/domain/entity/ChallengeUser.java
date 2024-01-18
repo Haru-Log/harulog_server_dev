@@ -30,7 +30,7 @@ public class ChallengeUser extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
-    private User user;
+    private Users user;
 
     @Enumerated(EnumType.STRING)
     @NotNull

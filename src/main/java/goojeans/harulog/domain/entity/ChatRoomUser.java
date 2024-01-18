@@ -31,5 +31,5 @@ public class ChatRoomUser {
     @JoinColumn(name = "user_id")
     @JsonBackReference // 순환 참조 방지
     @NotNull
-    private User user;
+    private Users user;
 }

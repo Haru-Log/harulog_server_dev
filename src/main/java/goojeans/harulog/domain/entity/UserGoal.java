@@ -19,7 +19,7 @@ public class UserGoal extends BaseEntity {
     @MapsId("userId")
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users user;
 
     @MapsId("categoryId")
     @ManyToOne

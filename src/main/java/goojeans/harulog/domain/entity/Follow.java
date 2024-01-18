@@ -19,11 +19,11 @@ public class Follow extends BaseEntity {
     @MapsId("followerId")
     @ManyToOne
     @JoinColumn(name = "follower_id")
-    private User following;
+    private Users following;
 
     @MapsId("followingId")
     @ManyToOne
     @JoinColumn(name = "following_id")
-    private User follower;
+    private Users follower;
 
 }
