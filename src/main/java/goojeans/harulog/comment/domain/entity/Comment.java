@@ -1,6 +1,9 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.comment.domain.entity;
 
 
+import goojeans.harulog.domain.entity.BaseEntity;
+import goojeans.harulog.domain.entity.Users;
+import goojeans.harulog.post.domain.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment extends BaseEntity{
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
