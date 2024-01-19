@@ -1,5 +1,6 @@
 package goojeans.harulog.domain.entity;
 
+import goojeans.harulog.util.MessageType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Chat extends BaseEntity{
+public class Message extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_id")
+    @Column(name = "message_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,11 +24,14 @@ public class Chat extends BaseEntity{
     @NotNull
     private ChatRoom chatRoom;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @NotNull
-    private Users user;
+    private Users sender; // 보낸 사람
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private MessageType type;
 
     @NotNull
     private String content;
