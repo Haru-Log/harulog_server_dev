@@ -2,7 +2,7 @@ package goojeans.harulog.likes.domain.entity;
 
 
 import goojeans.harulog.domain.entity.BaseEntity;
-import goojeans.harulog.domain.entity.Users;
+import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.post.domain.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;

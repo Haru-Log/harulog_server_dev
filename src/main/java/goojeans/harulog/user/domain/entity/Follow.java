@@ -1,5 +1,6 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.user.domain.entity;
 
+import goojeans.harulog.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,5 +1,6 @@
 package goojeans.harulog.domain.entity;
 
+import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.util.ChallengeRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

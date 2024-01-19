@@ -4,6 +4,7 @@ package goojeans.harulog.post.domain.entity;
 import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.domain.entity.*;
 import goojeans.harulog.likes.domain.entity.Likes;
+import goojeans.harulog.user.domain.entity.Users;
 import jakarta.persistence.*;
 import lombok.*;
 
