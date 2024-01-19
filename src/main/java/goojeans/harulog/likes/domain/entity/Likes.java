@@ -1,6 +1,9 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.likes.domain.entity;
 
 
+import goojeans.harulog.domain.entity.BaseEntity;
+import goojeans.harulog.domain.entity.Users;
+import goojeans.harulog.post.domain.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Builder
-public class Likes extends BaseEntity{
+public class Likes extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

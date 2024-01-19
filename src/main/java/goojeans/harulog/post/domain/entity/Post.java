@@ -1,6 +1,9 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.post.domain.entity;
 
 
+import goojeans.harulog.comment.domain.entity.Comment;
+import goojeans.harulog.domain.entity.*;
+import goojeans.harulog.likes.domain.entity.Likes;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity(name = "post")
-public class Post extends BaseEntity{
+public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
