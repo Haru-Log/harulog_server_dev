@@ -1,5 +1,6 @@
 package goojeans.harulog.domain.entity;
 
+import goojeans.harulog.chat.domain.entity.ChatRoom;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

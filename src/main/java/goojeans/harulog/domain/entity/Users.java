@@ -1,6 +1,7 @@
 package goojeans.harulog.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.util.SocialType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
