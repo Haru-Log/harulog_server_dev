@@ -1,7 +1,7 @@
 package goojeans.harulog.chat.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import goojeans.harulog.domain.entity.Users;
+import goojeans.harulog.user.domain.entity.Users;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
