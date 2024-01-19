@@ -1,6 +1,8 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.chat.domain.entity;
 
-import goojeans.harulog.util.MessageType;
+import goojeans.harulog.domain.entity.BaseEntity;
+import goojeans.harulog.domain.entity.Users;
+import goojeans.harulog.chat.util.MessageType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message extends BaseEntity{
+public class Message extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id")
