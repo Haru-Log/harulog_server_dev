@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Challenge extends BaseEntity {
 
@@ -40,7 +40,7 @@ public class Challenge extends BaseEntity {
     @NotNull
     private Timestamp endDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @NotNull
     private Category category;
@@ -52,4 +52,8 @@ public class Challenge extends BaseEntity {
 
     @OneToMany(mappedBy = "challenge")
     private List<ChallengeUser> challengeUserList;
+
+    public void assignToCategory(Category category) {
+        this.category = category;
+    }
 }
