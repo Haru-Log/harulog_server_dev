@@ -1,4 +1,4 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.user.domain.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;

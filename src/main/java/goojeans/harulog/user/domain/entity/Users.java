@@ -1,8 +1,9 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.user.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
-import goojeans.harulog.util.SocialType;
+import goojeans.harulog.domain.entity.BaseEntity;
+import goojeans.harulog.user.util.SocialType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ import java.util.List;
                 )
         }
 )
-public class Users extends BaseEntity{
+public class Users extends BaseEntity {
 
     @Id @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

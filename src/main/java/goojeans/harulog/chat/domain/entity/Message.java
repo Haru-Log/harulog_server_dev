@@ -1,7 +1,7 @@
 package goojeans.harulog.chat.domain.entity;
 
 import goojeans.harulog.domain.entity.BaseEntity;
-import goojeans.harulog.domain.entity.Users;
+import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.chat.util.MessageType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
