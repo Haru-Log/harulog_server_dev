@@ -1,4 +1,4 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.category.domain.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

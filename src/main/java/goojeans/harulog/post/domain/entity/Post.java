@@ -1,6 +1,7 @@
 package goojeans.harulog.post.domain.entity;
 
 
+import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.domain.entity.*;
 import goojeans.harulog.likes.domain.entity.Likes;

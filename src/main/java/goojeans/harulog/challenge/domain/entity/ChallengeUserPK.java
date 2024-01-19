@@ -1,4 +1,4 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.challenge.domain.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
