@@ -34,6 +34,9 @@ public class Challenge extends BaseEntity {
     @NotNull
     private String submission;
 
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl;
+
     @NotNull
     private Timestamp startDate;
 

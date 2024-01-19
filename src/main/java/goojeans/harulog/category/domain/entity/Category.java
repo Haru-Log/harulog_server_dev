@@ -27,7 +27,7 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Challenge> challengeList;
 
-    //양방향 연관관계 편의 메서리
+    //양방향 연관관계 편의 메서드
     public void addChallenge(Challenge challenge) {
         if (!this.categoryName.equals(challenge.getCategory().categoryName)) {
             challenge.getCategory().challengeList.remove(challenge);
