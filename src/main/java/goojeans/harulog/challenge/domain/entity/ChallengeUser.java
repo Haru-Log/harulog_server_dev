@@ -1,7 +1,8 @@
-package goojeans.harulog.domain.entity;
+package goojeans.harulog.challenge.domain.entity;
 
+import goojeans.harulog.domain.entity.BaseEntity;
 import goojeans.harulog.user.domain.entity.Users;
-import goojeans.harulog.util.ChallengeRole;
+import goojeans.harulog.challenge.util.ChallengeRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "challenge_user")
-public class ChallengeUser extends BaseEntity{
+public class ChallengeUser extends BaseEntity {
 
     @EmbeddedId
     @Column(name = "challenge_user_PK")
