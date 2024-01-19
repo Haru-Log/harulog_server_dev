@@ -22,7 +22,7 @@ class CategoryRepositoryTest {
     @Test
     @DisplayName("카테고리 이름으로 조회하기")
     void getCategory() {
-        Category category = categoryRepository.findByCategoryName("운동");
+        Category category = categoryRepository.findByCategoryName("운동").orElse(null);
 
         Assertions.assertThat(category).isNotNull();
         Assertions.assertThat(category.getCategoryName()).isEqualTo("운동");
