@@ -12,6 +12,14 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Builder
+@Table(
+        uniqueConstraints={
+                @UniqueConstraint(
+                        name = "likes_uk",
+                        columnNames={"post_id","user_id"}
+                )
+        }
+)
 public class Likes extends BaseEntity {
 
     @Id

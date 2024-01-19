@@ -42,5 +42,7 @@ public class Post extends BaseEntity {
 
     private Long likeCount;
 
+    private Long commentCount;
+
     private String imgUrl;
 }
