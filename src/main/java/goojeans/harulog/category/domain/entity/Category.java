@@ -1,10 +1,12 @@
 package goojeans.harulog.category.domain.entity;
 
 import goojeans.harulog.challenge.domain.entity.Challenge;
+import goojeans.harulog.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -13,7 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Category {
+public class Category extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +27,7 @@ public class Category {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
-    private List<Challenge> challengeList;
+    private List<Challenge> challengeList = new ArrayList<>();
 
     //양방향 연관관계 편의 메서드
     public void addChallenge(Challenge challenge) {
