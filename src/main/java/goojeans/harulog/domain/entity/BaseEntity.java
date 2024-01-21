@@ -1,12 +1,11 @@
 package goojeans.harulog.domain.entity;
 
 
-import goojeans.harulog.util.ActiveStatus;
+import goojeans.harulog.domain.ActiveStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
