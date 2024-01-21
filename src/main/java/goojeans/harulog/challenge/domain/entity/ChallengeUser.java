@@ -37,4 +37,13 @@ public class ChallengeUser extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @NotNull
     private ChallengeRole role;
+
+    public void addUser(Users user) {
+        if (this.user != user) {
+            this.user = user;
+        }
+        if (!user.getChallengeUsers().contains(this)) {
+            user.addChallengeUser(this);
+        }
+    }
 }

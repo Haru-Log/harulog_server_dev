@@ -46,4 +46,13 @@ public class Post extends BaseEntity {
     private int activityTime;
 
     private String imgUrl;
+
+    public void addUser(Users user) {
+        if (this.user != user) {
+            this.user = user;
+        }
+        if (!user.getPosts().contains(this)){
+            user.addPost(this);
+        }
+    }
 }
