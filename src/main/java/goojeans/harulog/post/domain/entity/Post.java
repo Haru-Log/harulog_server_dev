@@ -7,6 +7,7 @@ import goojeans.harulog.domain.entity.*;
 import goojeans.harulog.likes.domain.entity.Likes;
 import goojeans.harulog.user.domain.entity.Users;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
@@ -40,6 +41,9 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private String content;
+
+    @NotNull
+    private int activityTime;
 
     private String imgUrl;
 }
