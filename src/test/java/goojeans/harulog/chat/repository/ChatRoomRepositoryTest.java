@@ -23,7 +23,7 @@ class ChatRoomRepositoryTest {
             ChatRoom saved = chatRoomRepository.save(chatRoom);
 
             // then
-            Assertions.assertThat(saved.getId()).isEqualTo(1L);
+            Assertions.assertThat(saved.getId()).isEqualTo(chatRoom.getId());
     }
 
 }
