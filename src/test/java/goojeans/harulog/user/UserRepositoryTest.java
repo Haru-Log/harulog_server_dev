@@ -3,8 +3,6 @@ package goojeans.harulog.user;
 import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
-import goojeans.harulog.challenge.domain.entity.ChallengeUserPK;
-import goojeans.harulog.challenge.util.ChallengeRole;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.repository.UserRepository;
@@ -17,16 +15,15 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Commit;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Slf4j
 @Transactional
+@Slf4j
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
 
@@ -72,8 +69,8 @@ class UserRepositoryTest {
                 .challengeTitle(testString)
                 .submission(testString)
                 .imageUrl(testString)
-                .startDate(new Timestamp(System.currentTimeMillis()))
-                .endDate(new Timestamp(System.currentTimeMillis()))
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now())
                 .chatroom(testChatroom)
                 .category(findCategory)
                 .build();
@@ -82,25 +79,20 @@ class UserRepositoryTest {
 
         testChallengeId = testChallenge.getChallengeId();
 
-        testChallengeUser = ChallengeUser.builder()
-                .challenge(testChallenge)
-                .challengeUserPK(new ChallengeUserPK(testChallengeId, testId1))
-                .role(ChallengeRole.PARTICIPANT)
-                .build();
+        testChallengeUser = ChallengeUser.create(testUser, testChallenge);
 
         //양방향 맵핑
         testUser.addChallengeUser(testChallengeUser);
 
         em.persist(testChallengeUser);
-
         testId1 = testUser.getId();
     }
 
     @AfterEach
     void afterEach() {
-        em.remove(testChallengeUser);
-        em.remove(testChallenge);
-        userHardDelete(testId1);
+        if (em.find(Users.class, testId1) != null){
+            userHardDelete(testId1, testChallengeId);
+        }
     }
 
     @Test
@@ -124,7 +116,7 @@ class UserRepositoryTest {
 
         assertThat(findUser).isEqualTo(save);
 
-        userHardDelete(findUser.getId());
+        userHardDelete(findUser.getId(), null);
     }
 
     @Test
@@ -190,7 +182,6 @@ class UserRepositoryTest {
     }
 
     @Test
-    @Commit
     @DisplayName("이메일과 유저 이름으로 엔티티 찾기")
     void findUsersByEmailAndUserName() {
         try {
@@ -208,10 +199,8 @@ class UserRepositoryTest {
     @DisplayName("엔티티 삭제")
     void deleteUser() {
         repository.deleteById(testId1);
-
         Users findUser = em.find(Users.class, testId1);
         assertThat(findUser).isNull();
-
     }
 
     @Test
@@ -225,11 +214,17 @@ class UserRepositoryTest {
 
     /**
      * method that helps hard delete user from users table with id.
-     * @param id : id that you are going to erase
      */
-    private void userHardDelete(Long id) {
-        em.createNativeQuery("delete from users where user_id = :id")
-                .setParameter("id", id)
+    private void userHardDelete(Long userId, Long challengeId) {
+        em.createNativeQuery("delete from challenge_user where challenge_id=:challengeId and user_id=:userId")
+                .setParameter("userId", userId)
+                .setParameter("challengeId", challengeId)
+                .executeUpdate();
+        em.createNativeQuery("delete from challenge where challenge_id=:challengeId")
+                .setParameter("challengeId", challengeId)
+                .executeUpdate();
+        em.createNativeQuery("delete from users where user_id = :userId")
+                .setParameter("userId", userId)
                 .executeUpdate();
     }
 }
