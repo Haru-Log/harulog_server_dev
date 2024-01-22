@@ -1,6 +1,7 @@
 package goojeans.harulog.user.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.domain.entity.BaseEntity;
 import goojeans.harulog.user.util.SocialType;
@@ -11,7 +12,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 @Getter
