@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE challenge SET activeStatus = 'DELETED' WHERE id = ?")
+@SQLDelete(sql = "UPDATE challenge SET activeStatus = 'DELETED' WHERE challenge_id = ?")
 @SQLRestriction("active_status = 'ACTIVE'")
 public class Challenge extends BaseEntity {
 
