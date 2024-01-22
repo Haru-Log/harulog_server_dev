@@ -6,8 +6,11 @@ import goojeans.harulog.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,6 +18,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE challenge SET activeStatus = 'DELETED' WHERE id = ?")
+@SQLRestriction("active_status = 'ACTIVE'")
 public class Challenge extends BaseEntity {
 
     @Id
@@ -34,14 +39,13 @@ public class Challenge extends BaseEntity {
     @NotNull
     private String submission;
 
-    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 
     @NotNull
-    private Timestamp startDate;
+    private LocalDateTime startDate;
 
     @NotNull
-    private Timestamp endDate;
+    private LocalDateTime endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -53,8 +57,38 @@ public class Challenge extends BaseEntity {
     @NotNull
     private ChatRoom chatroom;
 
-    @OneToMany(mappedBy = "challenge")
-    private List<ChallengeUser> challengeUserList;
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<ChallengeUser> challengeUserList = new ArrayList<>();
+
+    //연관관계 편의 메서드
+    public void addChallengeUser(ChallengeUser challengeUser) {
+        //ChallengeUserList를 가지고 있는 Challenge, User에 모두 ChallengeUser 추가
+        this.challengeUserList.add(challengeUser);
+        challengeUser.getUser().getChallengeUsers().add(challengeUser);
+
+        challengeUser.assignToChallenge(this);
+    }
+
+    public void updateChallengeTitle(String title) {
+        this.challengeTitle = title;
+    }
+
+    public void updateChallengeContent(String content) {
+        this.challengeContent = content;
+    }
+
+    public void updateChallengeGoal(String goal) {
+        this.challengeGoal = goal;
+    }
+
+    public void updateSubmission(String submission) {
+        this.submission = submission;
+    }
+
+    public void updateImage(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public void assignToCategory(Category category) {
         this.category = category;
