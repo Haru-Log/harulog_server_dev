@@ -18,6 +18,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     @Query("select c from Challenge c where c.category.categoryName = :categoryName")
     List<Challenge> findAllByCategoryName(@Param("categoryName") String categoryName);
 
-    @Query("select c from Challenge c join c.challengeUserList cu where cu.challengeUserPK.userId = :userId")
+    @Query("select c from Challenge c join fetch c.challengeUserList cu where cu.challengeUserPK.userId = :userId")
     List<Challenge> findAllByUserId(@Param("userId") Long userId);
 }
