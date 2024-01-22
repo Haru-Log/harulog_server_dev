@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE challenge_user SET activeStatus = 'DELETED' WHERE (challenge_id = ? AND user_id = ? )")
+@SQLDelete(sql = "UPDATE challenge_user SET active_status = 'DELETED' WHERE (challenge_id = ? AND user_id = ?)")
 @SQLRestriction("active_status = 'ACTIVE'")
 @Table(name = "challenge_user")
 public class ChallengeUser extends BaseEntity {
