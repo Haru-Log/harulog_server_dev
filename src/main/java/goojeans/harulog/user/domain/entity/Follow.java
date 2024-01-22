@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE follow SET active_status = 'DELETED' WHERE (follwer_id = ? AND follwing_id = ?)")
+@SQLDelete(sql = "UPDATE follow SET active_status = 'DELETED' WHERE (follower_id = ? AND following_id = ?)")
 @SQLRestriction("active_status <> 'DELETED'")
 public class Follow extends BaseEntity {
 
@@ -31,7 +31,7 @@ public class Follow extends BaseEntity {
     private Users following;
 
     @Builder
-    public static Follow create(Users follower, Users following) {
+    public static Follow of(Users follower, Users following) {
         Follow follow = new Follow();
         follow.id = new FollowId(follower.getId(), following.getId());
         follow.follower = follower;
