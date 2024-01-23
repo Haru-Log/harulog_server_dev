@@ -1,8 +1,6 @@
 package goojeans.harulog.chat.repository;
 
 import goojeans.harulog.chat.domain.entity.ChatRoom;
-
-
 import goojeans.harulog.domain.ActiveStatus;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
