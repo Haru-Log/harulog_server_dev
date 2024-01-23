@@ -14,7 +14,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.context.event.EventListener;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,11 +70,6 @@ public class Users extends BaseEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<Post> posts = new HashSet<>();
-
-    // [채팅방 목록]을 위한 양방향 매핑
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<ChatRoomUser> chatRoomUsers;
 
     // 연관 관계 편의 메서드
     public void addChallengeUser(ChallengeUser challengeUser) {
