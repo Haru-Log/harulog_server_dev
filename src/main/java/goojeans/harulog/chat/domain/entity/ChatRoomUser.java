@@ -40,7 +40,7 @@ public class ChatRoomUser extends BaseEntity {
     private Users user;
 
     // 정적 팩토리 메서드
-    private static ChatRoomUser create(ChatRoom chatRoom, Users user) {
+    public static ChatRoomUser create(ChatRoom chatRoom, Users user) {
         ChatRoomUserId chatRoomUserId = new ChatRoomUserId(chatRoom.getId(), user.getId());
 
         ChatRoomUser chatRoomUser = ChatRoomUser.builder()
