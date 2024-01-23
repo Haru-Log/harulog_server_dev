@@ -67,17 +67,8 @@ class ChatRoomUserRepositoryTest {
     @DisplayName("유저가 참여하고 있는 채팅방 목록 조회")
     void findByUser() {
         // given
-        ChatRoomUser chatRoomUser1 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom1.getId(), user1.getId()))
-                .chatRoom(chatRoom1)
-                .user(user1)
-                .build();
-
-        ChatRoomUser chatRoomUser2 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom2.getId(), user1.getId()))
-                .chatRoom(chatRoom2)
-                .user(user1)
-                .build();
+        ChatRoomUser chatRoomUser1 = ChatRoomUser.create(chatRoom1, user1);
+        ChatRoomUser chatRoomUser2 = ChatRoomUser.create(chatRoom2, user1);
 
         chatRoomUserRepository.save(chatRoomUser1);
         chatRoomUserRepository.save(chatRoomUser2);
@@ -96,17 +87,8 @@ class ChatRoomUserRepositoryTest {
     void findByChatRoom() {
 
         // given
-        ChatRoomUser chatRoomUser1 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom1.getId(), user1.getId()))
-                .chatRoom(chatRoom1)
-                .user(user1)
-                .build();
-
-        ChatRoomUser chatRoomUser2 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom1.getId(), user2.getId()))
-                .chatRoom(chatRoom1)
-                .user(user2)
-                .build();
+        ChatRoomUser chatRoomUser1 = ChatRoomUser.create(chatRoom1, user1);
+        ChatRoomUser chatRoomUser2 = ChatRoomUser.create(chatRoom1, user2);
 
         chatRoomUserRepository.save(chatRoomUser1);
         chatRoomUserRepository.save(chatRoomUser2);
