@@ -60,7 +60,6 @@ class ChatRoomUserRepositoryTest {
         em.persist(chatRoom2);
         em.persist(user1);
         em.persist(user2);
-        em.flush();
     }
 
     @Test
@@ -134,14 +133,6 @@ class ChatRoomUserRepositoryTest {
                 .getSingleResult();
         Assertions.assertThat(deleted).isNotNull();
         Assertions.assertThat(deleted.getActiveStatus()).isEqualTo(ActiveStatus.DELETED);
-
-    }
-
-    @Test
-    @DisplayName("유저가 삭제되면 채팅방-유저도 같이 삭제")
-    void deleteChatRoomUserByUser(){
-
-        // todo: Users pr되면 같이 수정.
 
     }
 }
