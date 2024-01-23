@@ -5,7 +5,7 @@ import goojeans.harulog.chat.domain.entity.ChatRoomUserId;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
-import goojeans.harulog.util.ActiveStatus;
+import goojeans.harulog.domain.ActiveStatus;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
