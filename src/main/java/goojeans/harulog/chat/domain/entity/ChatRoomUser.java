@@ -38,4 +38,17 @@ public class ChatRoomUser extends BaseEntity {
     @JsonBackReference // 순환 참조 방지
     @NotNull
     private Users user;
+
+    // 정적 팩토리 메서드
+    public static ChatRoomUser create(ChatRoom chatRoom, Users user) {
+        ChatRoomUserId chatRoomUserId = new ChatRoomUserId(chatRoom.getId(), user.getId());
+
+        ChatRoomUser chatRoomUser = ChatRoomUser.builder()
+                .id(chatRoomUserId)
+                .chatRoom(chatRoom)
+                .user(user)
+                .build();
+
+        return chatRoomUser;
+    }
 }
