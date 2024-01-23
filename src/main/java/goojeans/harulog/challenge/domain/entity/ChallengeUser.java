@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE ChallengeUser SET activeStatus = 'DELETED' WHERE id = ?")
+@SQLDelete(sql = "UPDATE challenge_user SET active_status = 'DELETED' WHERE (challenge_id = ? AND user_id = ?)")
 @SQLRestriction("active_status = 'ACTIVE'")
 @Table(name = "challenge_user")
 public class ChallengeUser extends BaseEntity {
@@ -39,7 +39,7 @@ public class ChallengeUser extends BaseEntity {
     private ChallengeRole role = ChallengeRole.PARTICIPANT;
 
     //정적 팩토리 메서드
-    public static ChallengeUser createChallengeUser(Users user, Challenge challenge) {
+    public static ChallengeUser create(Users user, Challenge challenge) {
         ChallengeUserPK challengeUserPK = new ChallengeUserPK(user.getId(), challenge.getChallengeId());
 
         ChallengeUser challengeUser = new ChallengeUser();
@@ -60,6 +60,16 @@ public class ChallengeUser extends BaseEntity {
             this.role = ChallengeRole.PARTICIPANT;
         } else {
             this.role = ChallengeRole.LEADER;
+        }
+    }
+
+    // 연관 관계 편의 메서드
+    public void addUser(Users user) {
+        if (this.user != user) {
+            this.user = user;
+        }
+        if (!user.getChallengeUsers().contains(this)) {
+            user.addChallengeUser(this);
         }
     }
 }

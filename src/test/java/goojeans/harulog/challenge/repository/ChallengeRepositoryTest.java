@@ -4,9 +4,11 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.List;
 
 @Slf4j
 @DataJpaTest
+@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ChallengeRepositoryTest {
 
@@ -91,9 +95,9 @@ class ChallengeRepositoryTest {
     @DisplayName("챌린지 내 참여자 수 조회하기")
     void getChallengeUserCount() {
         //challenge1 - user1 & user2, challenge2 - user3
-        ChallengeUser challengeUser1 = ChallengeUser.createChallengeUser(user1, challenge1);
-        ChallengeUser challengeUser2 = ChallengeUser.createChallengeUser(user2, challenge1);
-        ChallengeUser challengeUser3 = ChallengeUser.createChallengeUser(user3, challenge2);
+        ChallengeUser challengeUser1 = ChallengeUser.create(user1, challenge1);
+        ChallengeUser challengeUser2 = ChallengeUser.create(user2, challenge1);
+        ChallengeUser challengeUser3 = ChallengeUser.create(user3, challenge2);
 
         challenge1.addChallengeUser(challengeUser1);
         challengeRepository.save(challenge1);
@@ -115,14 +119,14 @@ class ChallengeRepositoryTest {
     @DisplayName("한 사람이 여러 챌린지 참여하기")
     void joinChallenges() {
         //user1 - challenge1, challenge2
-        ChallengeUser challengeUser1 = ChallengeUser.createChallengeUser(user1, challenge1);
-        ChallengeUser challengeUser2 = ChallengeUser.createChallengeUser(user1, challenge2);
+        em.find(Challenge.class, challenge1.getChallengeId());
+        em.find(Challenge.class, challenge2.getChallengeId());
+
+        ChallengeUser challengeUser1 = ChallengeUser.create(user1, challenge1);
+        ChallengeUser challengeUser2 = ChallengeUser.create(user1, challenge2);
 
         challenge1.addChallengeUser(challengeUser1);
-        challengeRepository.save(challenge1);
-
         challenge2.addChallengeUser(challengeUser2);
-        challengeRepository.save(challenge2);
 
         Assertions.assertThat(challenge1.getChallengeUserList()).hasSize(1);
         Assertions.assertThat(user1.getChallengeUsers()).hasSize(2);
@@ -135,8 +139,8 @@ class ChallengeRepositoryTest {
     @DisplayName("챌린지 삭제 시 챌린지 참여자 함께 삭제되기")
     void deleteChallenge() {
         //challenge1에 user1, user2 존재
-        ChallengeUser challengeUser1 = ChallengeUser.createChallengeUser(user1, challenge1);
-        ChallengeUser challengeUser2 = ChallengeUser.createChallengeUser(user2, challenge1);
+        ChallengeUser challengeUser1 = ChallengeUser.create(user1, challenge1);
+        ChallengeUser challengeUser2 = ChallengeUser.create(user2, challenge1);
 
         challenge1.addChallengeUser(challengeUser1);
         challengeRepository.save(challenge1);
