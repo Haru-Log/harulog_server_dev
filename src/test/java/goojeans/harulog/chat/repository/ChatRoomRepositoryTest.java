@@ -23,14 +23,14 @@ class ChatRoomRepositoryTest {
     @Test
     @DisplayName("채팅방 생성")
     void create() {
-            // given
-            ChatRoom chatRoom = new ChatRoom();
+        // given
+        ChatRoom chatRoom = new ChatRoom();
 
-            // when
-            ChatRoom saved = chatRoomRepository.save(chatRoom);
+        // when
+        ChatRoom saved = chatRoomRepository.save(chatRoom);
 
-            // then
-            Assertions.assertThat(saved.getId()).isEqualTo(chatRoom.getId());
+        // then
+        Assertions.assertThat(saved.getId()).isEqualTo(chatRoom.getId());
     }
 
     @Test

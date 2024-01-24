@@ -43,7 +43,7 @@ class ChatRoomUserRepositoryTest {
         user1 = Users.builder()
                 .userName(test)
                 .email("test1")
-                .nickname(test)
+                .nickname("test1")
                 .password(test)
                 .socialType(SocialType.HARU)
                 .build();
@@ -51,7 +51,7 @@ class ChatRoomUserRepositoryTest {
         user2 = Users.builder()
                 .userName(test)
                 .email("test2")
-                .nickname(test)
+                .nickname("test2")
                 .password(test)
                 .socialType(SocialType.HARU)
                 .build();
