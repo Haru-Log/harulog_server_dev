@@ -11,18 +11,20 @@ import lombok.*;
 public class Response<T> {
     @NotNull
     private Integer status;
+    @NotNull
     private String code;
+    @NotNull
     private String message;
     private T data;
 
     /**
      * 성공 응답에 대한 정적 팩토리 메서드
      */
-    public static <T> Response<T> ok (T data, ResponseCode responseCode) {
+    public static <T> Response<T> ok (T data) {
         Response<T> response = new Response<T>();
-        response.status = responseCode.getStatus();
-        response.code = responseCode.getCode();
-        response.message = responseCode.getMessage();
+        response.status = ResponseCode.SUCCESS.getStatus();
+        response.code = ResponseCode.SUCCESS.getCode();
+        response.message = ResponseCode.SUCCESS.getMessage();
         response.data = data;
         return response;
     }
