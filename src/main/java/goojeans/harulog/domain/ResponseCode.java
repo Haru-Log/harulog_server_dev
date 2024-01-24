@@ -30,7 +30,7 @@ public enum ResponseCode {
 
     // 채팅 : CHT
     CHAT_TRANSMISSION_FAIL(400, "CHT-001", "채팅 전송에 실패했습니다.", HttpStatus.BAD_REQUEST),
-    CHAT_AUTEHNTICATION_FAIL(400, "CHT-101", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    CHAT_AUTHENTICATION_FAIL(400, "CHT-101", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
     CHAT_NO_PERMISSION(400, "CHT-102", "채팅방에 참여하지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
     CHAT_NOT_FOUND(400, "CHT-201", "채팅방을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
 
