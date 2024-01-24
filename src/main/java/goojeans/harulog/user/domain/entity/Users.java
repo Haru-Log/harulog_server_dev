@@ -32,7 +32,12 @@ import java.util.Set;
                 @UniqueConstraint(
                         name = "Email",
                         columnNames = {"email"}
+                ),
+                @UniqueConstraint(
+                        name = "Nickname",
+                        columnNames = {"nickname"}
                 )
+
         }
 )
 @SQLDelete(sql = "UPDATE users SET active_status = 'DELETED' WHERE user_id = ?")
