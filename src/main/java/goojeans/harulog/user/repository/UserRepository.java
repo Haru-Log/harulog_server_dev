@@ -13,6 +13,8 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     public Optional<Users> findUsersByEmailAndUserName(String email, String userName);
 
+    public Optional<Users> findUsersByNickname(String nickname);
+
     //TODO: paging (cursor or offset)
     /**
      * Based on input username, find user by cursor pagination with like.
