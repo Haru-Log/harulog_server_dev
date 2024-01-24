@@ -6,15 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE follow SET active_status = 'DELETED' WHERE (follower_id = ? AND following_id = ?)")
-@SQLRestriction("active_status <> 'DELETED'")
 public class Follow extends BaseEntity {
 
     @EmbeddedId
