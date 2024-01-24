@@ -1,11 +1,10 @@
-package goojeans.harulog.user;
+package goojeans.harulog.user.repository;
 
 import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.post.domain.entity.Post;
-import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
 import jakarta.persistence.EntityManager;
@@ -103,7 +102,7 @@ class UserRepositoryTest {
                 .socialType(SocialType.HARU)
                 .userName(testString)
                 .password(testString)
-                .nickname(testString)
+                .nickname("test2")
                 .email("testString")
                 .contactNumber(testString)
                 .build();
@@ -210,6 +209,20 @@ class UserRepositoryTest {
         List<Users> users = repository.searchUsersByNickname(searchKeyword);
 
         assertThat(users).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("유저 닉네임으로 찾아오기")
+    void findUserByNickname() {
+        try {
+            Users findUser = repository.findUsersByNickname(testString).stream()
+                    .findAny()
+                    .orElseThrow(() -> new RuntimeException("no such entity"));
+
+            assertThat(findUser).isEqualTo(testUser);
+        } catch (Exception e) {
+            Assertions.fail();
+        }
     }
 
     /**

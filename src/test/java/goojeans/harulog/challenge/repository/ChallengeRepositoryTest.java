@@ -51,9 +51,9 @@ class ChallengeRepositoryTest {
         challenge2 = createChallenge("Test Challenge2", category1, chatRoom2);
         challenge3 = createChallenge("Test Challenge3", category2, chatRoom3);
 
-        user1 = createUser("user1@test.com");
-        user2 = createUser("user2@test.com");
-        user3 = createUser("user3@test.com");
+        user1 = createUser("user1@test.com", "test1");
+        user2 = createUser("user2@test.com", "test2");
+        user3 = createUser("user3@test.com", "test3");
     }
 
     @Test
@@ -159,12 +159,12 @@ class ChallengeRepositoryTest {
         Assertions.assertThat(findChallengeUser2).isNull();
     }
 
-    Users createUser(String email) {
+    Users createUser(String email, String nickname) {
         Users user = Users.builder()
                 .email(email)
                 .password("test")
                 .userName("test")
-                .nickname("test")
+                .nickname(nickname)
                 .socialType(SocialType.HARU)
                 .build();
         em.persist(user);
