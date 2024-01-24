@@ -1,8 +1,6 @@
 package goojeans.harulog.user.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
-import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.domain.entity.BaseEntity;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.util.SocialType;
@@ -14,11 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.context.event.EventListener;
-
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Builder
