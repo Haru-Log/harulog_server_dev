@@ -3,6 +3,8 @@ package goojeans.harulog.chat.service;
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
+import goojeans.harulog.domain.BusinessException;
+import goojeans.harulog.domain.ResponseCode;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +37,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         } catch (EntityNotFoundException e){
             log.error("Error finding ChatRoom Id: " + roomId);
-            throw e; // todo : custom exception (일단 GlobalExceptionHandler에서 404 처리)
+            throw new BusinessException(ResponseCode.CHAT_NOT_FOUND);
         } catch (Exception e){
-            log.error("findByRoomId Error : {}", e.getMessage());
+            log.error("findByRoomId() : {}", e.getMessage());
             throw e;
         }
     }
@@ -48,13 +50,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         try{
             ChatRoom find = chatRoomRepository.findById(roomId)
                     .orElseThrow(() -> new EntityNotFoundException("ChatRoom not found for id: " + roomId));
+            log.trace("find.id : {}", find.getId());
             chatRoomRepository.deleteById(roomId);
 
         } catch (EntityNotFoundException e){
             log.error("Error finding ChatRoom Id: " + roomId);
-            throw e; // todo : custom exception (일단 GlobalExceptionHandler에서 404 처리)
+            throw new BusinessException(ResponseCode.CHAT_NOT_FOUND);
         } catch (Exception e){
-            log.error("deleteChatRoom Error : {}", e.getMessage());
+            log.error("deleteChatRoom(): {}", e.getMessage());
             throw e;
         }
     }
