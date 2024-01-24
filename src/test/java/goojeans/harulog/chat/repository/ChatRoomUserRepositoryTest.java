@@ -3,9 +3,9 @@ package goojeans.harulog.chat.repository;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUserId;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
+import goojeans.harulog.domain.ActiveStatus;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
-import goojeans.harulog.domain.ActiveStatus;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -60,24 +60,14 @@ class ChatRoomUserRepositoryTest {
         em.persist(chatRoom2);
         em.persist(user1);
         em.persist(user2);
-        em.flush();
     }
 
     @Test
     @DisplayName("유저가 참여하고 있는 채팅방 목록 조회")
     void findByUser() {
         // given
-        ChatRoomUser chatRoomUser1 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom1.getId(), user1.getId()))
-                .chatRoom(chatRoom1)
-                .user(user1)
-                .build();
-
-        ChatRoomUser chatRoomUser2 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom2.getId(), user1.getId()))
-                .chatRoom(chatRoom2)
-                .user(user1)
-                .build();
+        ChatRoomUser chatRoomUser1 = ChatRoomUser.create(chatRoom1, user1);
+        ChatRoomUser chatRoomUser2 = ChatRoomUser.create(chatRoom2, user1);
 
         chatRoomUserRepository.save(chatRoomUser1);
         chatRoomUserRepository.save(chatRoomUser2);
@@ -96,17 +86,8 @@ class ChatRoomUserRepositoryTest {
     void findByChatRoom() {
 
         // given
-        ChatRoomUser chatRoomUser1 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom1.getId(), user1.getId()))
-                .chatRoom(chatRoom1)
-                .user(user1)
-                .build();
-
-        ChatRoomUser chatRoomUser2 = ChatRoomUser.builder()
-                .id(new ChatRoomUserId(chatRoom1.getId(), user2.getId()))
-                .chatRoom(chatRoom1)
-                .user(user2)
-                .build();
+        ChatRoomUser chatRoomUser1 = ChatRoomUser.create(chatRoom1, user1);
+        ChatRoomUser chatRoomUser2 = ChatRoomUser.create(chatRoom1, user2);
 
         chatRoomUserRepository.save(chatRoomUser1);
         chatRoomUserRepository.save(chatRoomUser2);
@@ -152,14 +133,6 @@ class ChatRoomUserRepositoryTest {
                 .getSingleResult();
         Assertions.assertThat(deleted).isNotNull();
         Assertions.assertThat(deleted.getActiveStatus()).isEqualTo(ActiveStatus.DELETED);
-
-    }
-
-    @Test
-    @DisplayName("유저가 삭제되면 채팅방-유저도 같이 삭제")
-    void deleteChatRoomUserByUser(){
-
-        // todo: Users pr되면 같이 수정.
 
     }
 }
