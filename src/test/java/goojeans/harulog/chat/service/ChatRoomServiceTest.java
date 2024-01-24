@@ -3,6 +3,7 @@ package goojeans.harulog.chat.service;
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
+import goojeans.harulog.domain.BusinessException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -73,7 +74,7 @@ class ChatRoomServiceTest {
 
         // then
         Assertions.assertThatThrownBy(() -> chatRoomService.findByRoomId(roomId))
-                .isInstanceOf(Exception.class);
+                .isInstanceOf(BusinessException.class);
         verify(chatRoomRepository).findById(roomId);
     }
 
@@ -103,7 +104,6 @@ class ChatRoomServiceTest {
 
         // then
         Assertions.assertThatThrownBy(() -> chatRoomService.deleteChatRoom(roomId))
-                .isInstanceOf(Exception.class);
-        verify(chatRoomRepository).findById(roomId);
+                .isInstanceOf(BusinessException.class);
     }
 }
