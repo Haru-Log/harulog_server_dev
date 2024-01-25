@@ -16,9 +16,9 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Chat
 
     // 유저 ID를 기반으로 참여하고 있는 채팅방 목록 조회
     @Query("SELECT c FROM ChatRoomUser cu JOIN FETCH ChatRoom c on cu.chatRoom = c WHERE cu.user.id = :userId AND cu.activeStatus <> 'DELETED'")
-    public List<ChatRoom> findChatRoomsByUserId(Long userId);
+    public List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
 
     // 채팅방 ID를 기반으로 참여하고 있는 유저 목록 조회
     @Query("SELECT u FROM ChatRoomUser cu JOIN FETCH Users u ON cu.user = u WHERE cu.chatRoom.id = :roomId AND cu.activeStatus = 'ACTIVE'")
-    public List<Users> findUserByChatroomId(Long roomId);
+    public List<Users> findUserByChatroomId(@Param("roomId") Long roomId);
 }
