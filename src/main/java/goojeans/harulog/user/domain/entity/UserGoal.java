@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-@Builder
 @Getter
 @Entity
 @AllArgsConstructor
@@ -33,5 +32,15 @@ public class UserGoal extends BaseEntity {
     private Category category;
 
     private String goal;
+
+    @Builder
+    public static UserGoal of(Users user, Category category, String goal) {
+        UserGoal userGoal = new UserGoal();
+        userGoal.userGoalId = new UserGoalId(user.getId(), category.getCategoryId());
+        userGoal.user = user;
+        userGoal.category = category;
+        userGoal.goal = goal;
+        return userGoal;
+    }
 
 }
