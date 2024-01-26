@@ -4,11 +4,9 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
-import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -184,7 +182,7 @@ class ChallengeRepositoryTest {
         Challenge challenge = Challenge.builder()
                 .challengeTitle(challengeTitle)
                 .challengeContent("test")
-                .challengeGoal("test success")
+                .challengeGoal(3)
                 .submission("test submit")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(1))

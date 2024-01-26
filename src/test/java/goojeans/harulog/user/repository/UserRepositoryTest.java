@@ -64,7 +64,7 @@ class UserRepositoryTest {
         //challenge 생성
         testChallenge = Challenge.builder()
                 .challengeContent(testString)
-                .challengeGoal(testString)
+                .challengeGoal(3)
                 .challengeTitle(testString)
                 .submission(testString)
                 .imageUrl(testString)
