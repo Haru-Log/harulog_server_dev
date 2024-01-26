@@ -34,7 +34,7 @@ public class Challenge extends BaseEntity {
     private String challengeContent;
 
     @NotNull
-    private String challengeGoal;
+    private int challengeGoal;
 
     @NotNull
     private String submission;
@@ -52,7 +52,7 @@ public class Challenge extends BaseEntity {
     @NotNull
     private Category category;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "chatroom_id")
     @NotNull
     private ChatRoom chatroom;
@@ -78,7 +78,7 @@ public class Challenge extends BaseEntity {
         this.challengeContent = content;
     }
 
-    public void updateChallengeGoal(String goal) {
+    public void updateChallengeGoal(int goal) {
         this.challengeGoal = goal;
     }
 
