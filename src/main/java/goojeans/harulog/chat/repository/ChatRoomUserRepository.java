@@ -10,9 +10,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, ChatRoomUserId> {
+
+    public Optional<ChatRoomUser> findByChatRoomIdAndUserId(Long chatRoomId, Long userId);
 
     // 유저 ID를 기반으로 참여하고 있는 채팅방 목록 조회
     @Query("SELECT c FROM ChatRoomUser cu JOIN FETCH ChatRoom c on cu.chatRoom = c WHERE cu.user.id = :userId AND cu.activeStatus <> 'DELETED'")
