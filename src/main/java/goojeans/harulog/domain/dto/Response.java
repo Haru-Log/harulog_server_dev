@@ -20,6 +20,14 @@ public class Response<T> {
     /**
      * 성공 응답에 대한 정적 팩토리 메서드
      */
+    public static <T> Response<T> ok () {
+        Response<T> response = new Response<T>();
+        response.status = ResponseCode.SUCCESS.getStatus();
+        response.code = ResponseCode.SUCCESS.getCode();
+        response.message = ResponseCode.SUCCESS.getMessage();
+        return response;
+    }
+
     public static <T> Response<T> ok (T data) {
         Response<T> response = new Response<T>();
         response.status = ResponseCode.SUCCESS.getStatus();
