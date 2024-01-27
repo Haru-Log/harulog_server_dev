@@ -2,8 +2,6 @@ package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 
-import java.util.Collection;
-
 public interface ChatRoomService {
 
     // 채팅방 생성

@@ -43,12 +43,10 @@ public class ChatRoomUser extends BaseEntity {
     public static ChatRoomUser create(ChatRoom chatRoom, Users user) {
         ChatRoomUserId chatRoomUserId = new ChatRoomUserId(chatRoom.getId(), user.getId());
 
-        ChatRoomUser chatRoomUser = ChatRoomUser.builder()
+        return ChatRoomUser.builder()
                 .id(chatRoomUserId)
                 .chatRoom(chatRoom)
                 .user(user)
                 .build();
-
-        return chatRoomUser;
     }
 }

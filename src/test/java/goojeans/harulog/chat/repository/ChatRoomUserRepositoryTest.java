@@ -74,10 +74,10 @@ class ChatRoomUserRepositoryTest {
 
 
         // when
-        List<ChatRoomUser> findChatRoomByUser = chatRoomUserRepository.findByUser(user1);
+        List<ChatRoom> findRooms = chatRoomUserRepository.findChatRoomsByUserId(user1.getId());
 
         // then
-        Assertions.assertThat(findChatRoomByUser.size()).isEqualTo(2);
+        Assertions.assertThat(findRooms.size()).isEqualTo(2);
 
     }
 
@@ -93,10 +93,10 @@ class ChatRoomUserRepositoryTest {
         chatRoomUserRepository.save(chatRoomUser2);
 
         // when
-        List<ChatRoomUser> findUsersByChatRoom = chatRoomUserRepository.findByChatRoom(chatRoom1);
+        List<Users> participants = chatRoomUserRepository.findUserByChatroomId(chatRoom1.getId());
 
         //then
-        Assertions.assertThat(findUsersByChatRoom.size()).isEqualTo(2);
+        Assertions.assertThat(participants.size()).isEqualTo(2);
 
     }
 
