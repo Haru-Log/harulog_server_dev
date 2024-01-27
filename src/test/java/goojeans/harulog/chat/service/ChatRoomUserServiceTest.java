@@ -4,6 +4,7 @@ import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
+import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.entity.Users;
@@ -54,21 +55,52 @@ class ChatRoomUserServiceTest {
 
     @Test
     @DisplayName("채팅방에 참여 중인 유저 삭제")
-    void delete() {
+    void deleteSuccess() {
 
         // given
-        ChatRoom chatRoom = new ChatRoom();
-        Users user = new Users();
+        Long roomId = 1L;
+        Long userId = 1L;
+        ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
+        Users user = Users.builder().id(userId).build();
+
         ChatRoomUser chatRoomUser = ChatRoomUser.create(chatRoom, user);
-        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
                 .thenReturn(Optional.of(chatRoomUser));
 
         // when
-        chatRoomUserService.delete(chatRoom.getId(), user.getId());
+        chatRoomUserService.delete(roomId, userId);
 
         // then
-        verify(chatRoomUserRepository).delete(any(ChatRoomUser.class));
+        /**
+         * chatRoomUserRepository.delete 메서드가 호출되었는지 검증
+         * chatRoomUserRepository.delete 메서드의 인자로 ChatRoomUser 객체가 전달되었는지 검증
+         */
+        verify(chatRoomUserRepository).delete(argThat(a ->
+                a.getChatRoom().getId().equals(chatRoom.getId()) &&
+                a.getUser().getId().equals(user.getId())
+        ));
+    }
 
+    @Test
+    @DisplayName("존재하지 않는 채팅방-유저 삭제 시 예외 발생")
+    void deleteFail() {
+
+        // given
+        Long roomId = 1L;
+        Long userId = 1L;
+
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
+                .thenReturn(Optional.empty());
+
+        // when
+        // then
+        BusinessException exception = Assertions.catchThrowableOfType(
+                () -> chatRoomUserService.delete(roomId, userId),
+                BusinessException.class
+        );
+
+        Assertions.assertThat(exception).isNotNull();
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.CHAT_NO_PERMISSION);
     }
 
     @Test
@@ -76,17 +108,18 @@ class ChatRoomUserServiceTest {
     void findByChatRoomSuccess() {
 
         // given
+        Long roomId = 1L;
         Users user1 = new Users();
         Users user2 = new Users();
-        when(chatRoomUserRepository.findUserByChatroomId(anyLong())).thenReturn(List.of(user1, user2));
+        when(chatRoomUserRepository.findUserByChatroomId(roomId)).thenReturn(List.of(user1, user2));
 
         // when
-        Response response = chatRoomUserService.findByChatRoom(1L);
+        Response response = chatRoomUserService.findByChatRoom(roomId);
 
         // then
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getData()).isNotNull();
-        verify(chatRoomUserRepository).findUserByChatroomId(anyLong());
+        verify(chatRoomUserRepository).findUserByChatroomId(roomId);
     }
 
     @Test
@@ -95,7 +128,7 @@ class ChatRoomUserServiceTest {
 
         // given
         Long userId = 1L;
-        when(chatRoomUserRepository.findChatRoomsByUserId(anyLong())).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
+        when(chatRoomUserRepository.findChatRoomsByUserId(userId)).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
 
         // when
         Response response = chatRoomUserService.findByUser(userId);
