@@ -37,4 +37,13 @@ public class Message extends BaseEntity {
 
     @NotNull
     private String content;
+
+    public static Message create(ChatRoom chatRoom, Users sender, MessageType type, String content) {
+        return Message.builder()
+                .chatRoom(chatRoom)
+                .sender(sender)
+                .type(type)
+                .content(content)
+                .build();
+    }
 }
