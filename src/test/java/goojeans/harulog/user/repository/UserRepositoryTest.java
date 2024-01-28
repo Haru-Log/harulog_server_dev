@@ -52,7 +52,7 @@ class UserRepositoryTest {
         em.persist(testUser);
 
         //chatroom 생성
-        ChatRoom testChatroom = new ChatRoom();
+        ChatRoom testChatroom = ChatRoom.create(testString);
         em.persist(testChatroom);
 
         //category 찾아오기

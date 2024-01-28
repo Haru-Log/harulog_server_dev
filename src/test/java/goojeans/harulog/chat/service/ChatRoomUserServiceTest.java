@@ -1,5 +1,7 @@
 package goojeans.harulog.chat.service;
 
+import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
+import goojeans.harulog.chat.domain.dto.ChatUserDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -58,7 +61,7 @@ class ChatRoomUserServiceTest {
     void deleteSuccess() {
 
         // given
-        Long roomId = 1L;
+        String roomId = UUID.randomUUID().toString();
         Long userId = 1L;
         ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
         Users user = Users.builder().id(userId).build();
@@ -86,7 +89,7 @@ class ChatRoomUserServiceTest {
     void deleteFail() {
 
         // given
-        Long roomId = 1L;
+        String roomId = UUID.randomUUID().toString();
         Long userId = 1L;
 
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
@@ -108,17 +111,17 @@ class ChatRoomUserServiceTest {
     void findByChatRoomSuccess() {
 
         // given
-        Long roomId = 1L;
+        String roomId = UUID.randomUUID().toString();
         Users user1 = new Users();
         Users user2 = new Users();
         when(chatRoomUserRepository.findUserByChatroomId(roomId)).thenReturn(List.of(user1, user2));
 
         // when
-        Response response = chatRoomUserService.findByChatRoom(roomId);
+        Response<List<ChatUserDTO>> response = chatRoomUserService.findByChatRoom(roomId);
 
         // then
         Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(response.getData()).hasSize(2);
         verify(chatRoomUserRepository).findUserByChatroomId(roomId);
     }
 
@@ -131,11 +134,11 @@ class ChatRoomUserServiceTest {
         when(chatRoomUserRepository.findChatRoomsByUserId(userId)).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
 
         // when
-        Response response = chatRoomUserService.findByUser(userId);
+        Response<List<ChatRoomDTO>> response = chatRoomUserService.findByUser(userId);
 
         // then
         Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(response.getData()).hasSize(2);
         verify(chatRoomUserRepository).findChatRoomsByUserId(userId);
 
     }
