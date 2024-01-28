@@ -20,11 +20,13 @@ class ChatRoomRepositoryTest {
     @Autowired
     private EntityManager em;
 
+    private String test = "test";
+
     @Test
     @DisplayName("채팅방 생성")
     void create() {
         // given
-        ChatRoom chatRoom = new ChatRoom();
+        ChatRoom chatRoom = ChatRoom.create(test);
 
         // when
         ChatRoom saved = chatRoomRepository.save(chatRoom);
@@ -38,7 +40,7 @@ class ChatRoomRepositoryTest {
     void delete(){
 
         // given
-        ChatRoom chatRoom = new ChatRoom();
+        ChatRoom chatRoom = ChatRoom.create(test);
         ChatRoom saved = chatRoomRepository.save(chatRoom);
 
         // when

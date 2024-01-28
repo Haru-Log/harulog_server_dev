@@ -38,8 +38,8 @@ class ChatRoomUserRepositoryTest {
      */
     @BeforeEach
     void setUp(){
-        chatRoom1 = new ChatRoom();
-        chatRoom2 = new ChatRoom();
+        chatRoom1 = ChatRoom.create(test);
+        chatRoom2 = ChatRoom.create(test);
         user1 = Users.builder()
                 .userName(test)
                 .email("test1")

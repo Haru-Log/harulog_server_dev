@@ -42,7 +42,7 @@ class MessageRepositoryTest {
                 .socialType(SocialType.HARU)
                 .build();
 
-        chatRoom1 = new ChatRoom();
+        chatRoom1 = ChatRoom.create(test);
 
         em.persist(user1);
         em.persist(chatRoom1);

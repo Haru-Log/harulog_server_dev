@@ -4,6 +4,7 @@ import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.domain.BusinessException;
+import goojeans.harulog.domain.dto.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,10 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
-
-import static org.mockito.Mockito.verify;
 
 /**
  * ChatRoomService 단위 테스트
@@ -40,10 +40,11 @@ class ChatRoomServiceTest {
 //        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
         // when
-        ChatRoomDTO created = chatRoomService.createChatRoom();
+        Response<ChatRoomDTO> created = chatRoomService.create();
 
         // then
-        Assertions.assertThat(created).isNotNull();
+        Assertions.assertThat(created).isNotNull(); // response가 null이 아닌지 확인
+        Assertions.assertThat(created.getData()).isNotNull(); // response의 data(ChatRoomDTO)가 null이 아닌지 확인
         verify(chatRoomRepository).save(any(ChatRoom.class));
     }
 
@@ -51,15 +52,16 @@ class ChatRoomServiceTest {
     @DisplayName("채팅방이 존재할 때 조회")
     void findByRoomIdSuccess() {
         // given
-        Long roomId = 1L;
+        String roomId = UUID.randomUUID().toString();
         ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
         doReturn(Optional.of(chatRoom)).when(chatRoomRepository).findById(roomId);
 
         // when
-        ChatRoomDTO found = chatRoomService.findByRoomId(roomId);
+        Response<ChatRoomDTO> found = chatRoomService.findByRoomId(roomId);
 
         // then
         Assertions.assertThat(found).isNotNull();
+        Assertions.assertThat(found.getData()).isNotNull();
         verify(chatRoomRepository).findById(roomId);
     }
 
@@ -67,7 +69,7 @@ class ChatRoomServiceTest {
     @DisplayName("채팅방이 존재하지 않을 때 조회")
     void findByRoomIdFail() {
         // given
-        Long roomId = 1L;
+        String roomId = UUID.randomUUID().toString();
         doReturn(Optional.empty()).when(chatRoomRepository).findById(roomId);
 
         // when
@@ -79,31 +81,16 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방이 존재할 때 삭제")
-    void deleteChatRoomSuccess() {
+    @DisplayName("채팅방 삭제")
+    void delete() {
         // given
-        Long roomId = 1L;
-        ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
-        doReturn(Optional.of(chatRoom)).when(chatRoomRepository).findById(roomId);
+        String roomId = UUID.randomUUID().toString();
 
         // when
-        chatRoomService.deleteChatRoom(roomId);
+        Response<Void> response = chatRoomService.delete(roomId);
 
         // then
+        Assertions.assertThat(response).isNotNull();
         verify(chatRoomRepository).deleteById(roomId);
-    }
-
-    @Test
-    @DisplayName("채팅방이 존재하지 않을 때 삭제")
-    void deleteChatRoomFail() {
-        // given
-        Long roomId = 1L;
-        doReturn(Optional.empty()).when(chatRoomRepository).findById(roomId);
-
-        // when
-
-        // then
-        Assertions.assertThatThrownBy(() -> chatRoomService.deleteChatRoom(roomId))
-                .isInstanceOf(BusinessException.class);
     }
 }

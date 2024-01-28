@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class ChatRoomUserId implements Serializable {
 
     @NotNull
-    private Long chatRoomId;
+    private String chatRoomId;
 
     @NotNull
     private Long userId;

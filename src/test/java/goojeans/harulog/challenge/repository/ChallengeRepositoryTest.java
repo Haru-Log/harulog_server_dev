@@ -171,8 +171,7 @@ class ChallengeRepositoryTest {
     }
 
     private ChatRoom createChatRoom() {
-        ChatRoom chatRoom = ChatRoom.builder()
-                .build();
+        ChatRoom chatRoom = ChatRoom.create("test");
         em.persist(chatRoom);
 
         return chatRoom;

@@ -10,6 +10,6 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     // 채팅방 전체 메세지 조회
-    // todo: 페이징 방식으로 변경 예정 -> 후순위
-    public List<Message> findByChatRoomId(Long chatroomId);
+    // todo: 커서 방식으로 변경 예정 -> 후순위
+    public List<Message> findByChatRoomId(String roomId);
 }
