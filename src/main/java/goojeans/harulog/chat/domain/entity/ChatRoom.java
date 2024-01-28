@@ -19,11 +19,18 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "chatroom")
 public class ChatRoom extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "chatroom_id")
-    private Long id;
+    private String id; // uuid
 
     @Column(name = "chatroom_name")
     private String name;
 
+    // 채팅방 생성 - 정적 팩토리 메서드
+    public static ChatRoom create(String name) {
+        return ChatRoom.builder()
+                .id(java.util.UUID.randomUUID().toString())
+                .name(name)
+                .build();
+    }
 }
