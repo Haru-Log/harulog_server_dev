@@ -5,11 +5,13 @@ import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
-import jakarta.persistence.EntityNotFoundException;
+import goojeans.harulog.domain.dto.Response;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -21,44 +23,43 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     // 채팅방 생성
     @Override
-    public ChatRoomDTO createChatRoom() {
-        ChatRoom chatRoom = new ChatRoom();
+    public Response<ChatRoomDTO> create() {
+        log.trace("create() execute");
+
+        String uuid = UUID.randomUUID().toString();
+        ChatRoom chatRoom = ChatRoom.builder()
+                .id(uuid)
+                .name(uuid)
+                .build();
         chatRoomRepository.save(chatRoom);
-        return ChatRoomDTO.of(chatRoom);
+        return Response.ok(ChatRoomDTO.of(chatRoom));
+    }
+
+    @Override
+    public Response<ChatRoomDTO> create(String name) {
+        log.trace("create(name) execute");
+
+        ChatRoom chatRoom = ChatRoom.create(name);
+        chatRoomRepository.save(chatRoom);
+        return Response.ok(ChatRoomDTO.of(chatRoom));
     }
 
     // 채팅방 조회
     @Override
-    public ChatRoomDTO findByRoomId(Long roomId) {
-        try{
-            ChatRoom find = chatRoomRepository.findById(roomId)
-                    .orElseThrow(() -> new EntityNotFoundException("ChatRoom not found for id: " + roomId));
-            return ChatRoomDTO.of(find);
+    public Response<ChatRoomDTO> findByRoomId(String roomId) {
+        log.trace("findByRoomId() execute");
 
-        } catch (EntityNotFoundException e){
-            log.error("Error finding ChatRoom Id: " + roomId);
-            throw new BusinessException(ResponseCode.CHAT_NOT_FOUND);
-        } catch (Exception e){
-            log.error("findByRoomId() : {}", e.getMessage());
-            throw e;
-        }
+        ChatRoom find = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NOT_FOUND));
+        return Response.ok(ChatRoomDTO.of(find));
     }
 
     // 채팅방 삭제 (soft delete)
     @Override
-    public void deleteChatRoom(Long roomId) {
-        try{
-            ChatRoom find = chatRoomRepository.findById(roomId)
-                    .orElseThrow(() -> new EntityNotFoundException("ChatRoom not found for id: " + roomId));
-            log.trace("find.id : {}", find.getId());
-            chatRoomRepository.deleteById(roomId);
+    public Response<Void> delete(String roomId) {
+        log.trace("deleteChatRoom() execute");
 
-        } catch (EntityNotFoundException e){
-            log.error("Error finding ChatRoom Id: " + roomId);
-            throw new BusinessException(ResponseCode.CHAT_NOT_FOUND);
-        } catch (Exception e){
-            log.error("deleteChatRoom(): {}", e.getMessage());
-            throw e;
-        }
+        chatRoomRepository.deleteById(roomId);
+        return Response.ok();
     }
 }
