@@ -27,7 +27,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService{
     private final UserRepository userRepository;
 
     @Override
-    public Response<Void> create(Long roomId, Long userId) {
+    public Response<Void> create(String roomId, Long userId) {
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NOT_FOUND));
@@ -40,18 +40,17 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService{
     }
 
     @Override
-    public Response<Void> delete(Long roomId, Long userId) {
+    public Response<Void> delete(String roomId, Long userId) {
 
         ChatRoomUser chatRoomUser = chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NO_PERMISSION));
         chatRoomUserRepository.delete(chatRoomUser);
 
         return Response.ok();
-
     }
 
     @Override
-    public Response<List<ChatUserDTO>> findByChatRoom(Long roomId) {
+    public Response<List<ChatUserDTO>> findByChatRoom(String roomId) {
 
         List<Users> userList = chatRoomUserRepository.findUserByChatroomId(roomId);
         List<ChatUserDTO> userDTOList = userList.stream()

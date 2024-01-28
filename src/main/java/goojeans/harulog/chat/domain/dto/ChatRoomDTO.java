@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ChatRoomDTO {
-    private Long id;
+    private String id;
     private String name;
 
     public static ChatRoomDTO of(ChatRoom chatRoom){
