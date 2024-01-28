@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ChatRoomUserDTO {
-    private Long chatroomId;
+    private String chatroomId;
     private Long userId;
 
     public static ChatRoomUserDTO of(ChatRoom chatRoom, Users user){
