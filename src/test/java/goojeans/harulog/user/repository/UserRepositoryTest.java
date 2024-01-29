@@ -4,6 +4,8 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.domain.BusinessException;
+import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
@@ -41,6 +43,7 @@ class UserRepositoryTest {
             .nickname(testString)
             .password(testString)
             .socialType(SocialType.HARU)
+            .refreshToken(testString)
             .build();
 
     private Challenge testChallenge;
@@ -223,6 +226,39 @@ class UserRepositoryTest {
         } catch (Exception e) {
             Assertions.fail();
         }
+    }
+
+    @Test
+    @DisplayName("유저 이메일로 찾아오기")
+    void findUsersByEmail() {
+        try {
+            Users findUser = repository.findUsersByEmail(testString).stream().findAny()
+                    .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+            assertThat(findUser).isEqualTo(testUser);
+
+        } catch (BusinessException e){
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    @DisplayName("닉네임으로 리프레쉬 토큰 업데이트")
+    void updateRefreshToken() {
+        // Given
+        String updateToken = "test for update";
+
+        // When
+        repository.updateRefreshToken(updateToken, testString);
+
+        // Then
+        // 영속성 컨텍스트에 남아있지 않고 새로 찾아온 엔티티 체크
+        em.flush();
+        em.clear();
+
+        Users findUser = em.find(Users.class, testId1);
+
+        assertThat(findUser.getRefreshToken()).isEqualTo(updateToken);
     }
 
     /**
