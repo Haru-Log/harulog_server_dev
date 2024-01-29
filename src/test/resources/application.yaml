@@ -2,3 +2,10 @@ spring:
   profiles:
     active:
       - prod
+    group:
+      local:
+        - local
+        - jwt
+      prod:
+        - local
+        - jwt
