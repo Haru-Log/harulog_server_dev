@@ -35,8 +35,14 @@ public enum ResponseCode {
     CHAT_AUTHENTICATION_FAIL(400, "CHT-101", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
     CHAT_NO_PERMISSION(400, "CHT-102", "채팅방에 참여하지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
     CHAT_NOT_FOUND(400, "CHT-201", "채팅을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    CHATROOM_NOT_FOUND(400, "CHT-202", "채팅방을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+    CHATROOM_NOT_FOUND(400, "CHT-202", "채팅방을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
+    //챌린지 : CHL
+    CHALLENGE_NOT_FOUND(400, "CHL-001", "챌린지를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    CHALLENGE_ALREADY_JOIN(400, "CHL-002", "이미 해당 카테고리의 챌린지에 참여 중입니다.", HttpStatus.BAD_REQUEST),
+
+    //카테고리 : CAT
+    CATEGORY_NOT_FOUND(400, "CAT-001", "카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
 
     final Integer status;
     final String code;
