@@ -70,6 +70,12 @@ public class Challenge extends BaseEntity {
         challengeUser.assignToChallenge(this);
     }
 
+    public void removeChallengeUser(ChallengeUser challengeUser) {
+        //ChallengeUserList를 가지고 있는 Challenge, User에 모두 ChallengeUser 제거
+        this.challengeUserList.remove(challengeUser);
+        challengeUser.getUser().getChallengeUsers().remove(challengeUser);
+    }
+
     public void updateChallengeTitle(String title) {
         this.challengeTitle = title;
     }
