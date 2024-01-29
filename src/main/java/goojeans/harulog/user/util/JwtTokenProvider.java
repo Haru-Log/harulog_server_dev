@@ -95,6 +95,7 @@ public class JwtTokenProvider {
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
         JwtUserDetail jwtUserDetail = JwtUserDetail.userDetailBuilder()
+                .id(user.getId())
                 .username(user.getUserName())
                 .password(user.getPassword())
                 .email(user.getEmail())
@@ -112,6 +113,7 @@ public class JwtTokenProvider {
         List<GrantedAuthority> auth = List.of(new SimpleGrantedAuthority("ROLE_" + user.getUserRole().getRole()));
 
         JwtUserDetail jwtUserDetail = JwtUserDetail.userDetailBuilder()
+                .id(user.getId())
                 .username(user.getUserName())
                 .password(user.getPassword())
                 .email(user.getEmail())
