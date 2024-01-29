@@ -20,9 +20,15 @@ public enum ResponseCode {
     SUCCESS(200, "COM-000", "OK", HttpStatus.OK),
 
     // 유저 : USR
-    // @by 현정 - todo: 건님 바꿔주시죠 Service 구현때문에 넣어뒀습니다.
-    USER_NOT_FOUND(400, "USR-201", "유저를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    USER_NOT_FOUND(400, "USR-001", "유저를 찾을 수 없습니다.",HttpStatus.BAD_REQUEST),
+    USER_UNAUTHORIZED(401, "USR-011", "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED),
+    USER_LOGIN_REQUIRED(401, "USR-012", "다시 로그인해주세요.", HttpStatus.UNAUTHORIZED),
+
     // 유저 목표 : USG
+    USER_GOAL_ALREADY_EXIST(400, "USG-001", "이미 존재하는 목표 입니다.",HttpStatus.BAD_REQUEST),
+    USER_GOAL_INVALID_DATA(400, "USG-002", "입력 값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    USER_GOAL_CATEGORY_NOT_FOUND(400, "USG-003", "해당하는 카테고리를 찾지 못했습니다.",HttpStatus.BAD_REQUEST),
+    USER_GOAL_UPDATE_FAIL(500, "USG-101", "업데이트에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     // 팔로우 : FLW
     // 챌린지 : CHL
     // 카테고리 : CAT
