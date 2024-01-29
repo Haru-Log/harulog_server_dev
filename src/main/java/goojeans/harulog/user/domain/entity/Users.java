@@ -4,6 +4,7 @@ import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.domain.entity.BaseEntity;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.util.SocialType;
+import goojeans.harulog.user.util.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -62,6 +63,10 @@ public class Users extends BaseEntity {
 
     private String imageUrl;
 
+    private UserRole userRole;
+
+    private String refreshToken;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<ChallengeUser> challengeUsers = new HashSet<>();
@@ -84,5 +89,9 @@ public class Users extends BaseEntity {
         if (post.getUser() != this) {
             post.addUser(this);
         }
+    }
+
+    public void updateRefreshToken(String updateToken) {
+        this.refreshToken = updateToken;
     }
 }
