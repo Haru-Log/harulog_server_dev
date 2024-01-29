@@ -59,11 +59,13 @@ public class Users extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private UserRole userRole;
+
     private String contactNumber;
 
     private String imageUrl;
-
-    private UserRole userRole;
 
     private String refreshToken;
 
