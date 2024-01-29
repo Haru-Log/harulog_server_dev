@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
@@ -40,8 +41,6 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         Authentication authenticate = jwtTokenProvider.createAuthentication(user);
 
-        log.info("login success handler");
-
         String accessToken = jwtTokenProvider.generateAccessToken(authenticate);
         String refreshToken = jwtTokenProvider.generateRefreshToken();
 
@@ -57,6 +56,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         cookie.setPath("/");
         cookie.setMaxAge(COOKIE_EXPIRATION);
         response.addCookie(cookie);
+
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
 
         log.info("로그인에 성공하였습니다. 이메일 : {}", email);
         log.info("AccessToken 만료 기간 : {}분", accessTokenExpiration / 1000 / 60);
