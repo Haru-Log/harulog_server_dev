@@ -7,5 +7,5 @@ spring:
         - local
         - jwt
       prod:
-        - local
+        - prod
         - jwt
