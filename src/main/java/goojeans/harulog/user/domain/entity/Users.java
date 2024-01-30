@@ -60,7 +60,6 @@ public class Users extends BaseEntity {
     private SocialType socialType;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
     private UserRole userRole;
 
     private String contactNumber;
