@@ -4,6 +4,7 @@ import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.domain.entity.BaseEntity;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.util.SocialType;
+import goojeans.harulog.user.util.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -58,9 +59,14 @@ public class Users extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
     private String contactNumber;
 
     private String imageUrl;
+
+    private String refreshToken;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -84,5 +90,9 @@ public class Users extends BaseEntity {
         if (post.getUser() != this) {
             post.addUser(this);
         }
+    }
+
+    public void updateRefreshToken(String updateToken) {
+        this.refreshToken = updateToken;
     }
 }

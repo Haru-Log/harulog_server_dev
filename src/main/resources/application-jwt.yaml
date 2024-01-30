@@ -1,0 +1,11 @@
+jwt:
+  secret: ${JWT_SIGN}
+  access:
+    # 30분 : 1800000
+    expiration: ${ACCESS_EXPIRATION}
+  refresh:
+    # 일주일 : 604800000
+    expiration: ${REFRESH_EXPIRATION}
+  # 일주일 + 1분 : 604860
+  cookie:
+    expiration: ${COOKIE_EXPIRATION}

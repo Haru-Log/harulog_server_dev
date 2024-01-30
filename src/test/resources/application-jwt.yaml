@@ -1,0 +1,11 @@
+jwt:
+  secret: fdsahfewloqfbqiwefgjkbq3gkjeeqo1234i325objkgfdgio43t5kjio6jkbgv534lyn3f42qt3b2ji165lb5k26l57b2k45l5v43uilfb
+  access:
+    # 30분
+    # 1800000
+    expiration: 1800000
+  refresh:
+    # 일주일
+    expiration: 604800000
+  cookie:
+    expiration: 604860

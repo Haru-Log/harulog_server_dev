@@ -3,6 +3,7 @@ package goojeans.harulog.user.repository;
 import goojeans.harulog.user.domain.entity.Users;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,4 +28,10 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     @EntityGraph(attributePaths = {"challengeUsers", "posts"})
     Optional<Users> findUsersById(Long id);
+
+    public Optional<Users> findUsersByEmail(String email);
+
+    @Modifying
+    @Query("update Users u set u.refreshToken=:refreshToken where u.nickname=:nickname")
+    public void updateRefreshToken(@Param("refreshToken") String refreshToken, @Param("nickname") String nickname);
 }
