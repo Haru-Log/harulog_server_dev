@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRegisterFoam {
+public class RegistrationFoam {
 
     @NotNull
     private String email;
