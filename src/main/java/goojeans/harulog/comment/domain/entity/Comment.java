@@ -46,6 +46,7 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private int depth;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 

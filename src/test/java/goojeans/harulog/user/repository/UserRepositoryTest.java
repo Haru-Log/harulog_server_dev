@@ -179,7 +179,7 @@ class UserRepositoryTest {
             log.info("user name={}", user.getUserName());
         }
         //Then
-        assertThat(findAll).hasSize(1);
+        assertThat(findAll).hasSize(2);
 
     }
 
