@@ -47,10 +47,9 @@ public class ChatRoom extends BaseEntity {
                 .build();
     }
 
-    public static ChatRoom createDM(String name) {
+    public static ChatRoom createDM() {
         return ChatRoom.builder()
                 .id(java.util.UUID.randomUUID().toString())
-                .name(name)
                 .type(ChatRoomType.DM)
                 .build();
     }
