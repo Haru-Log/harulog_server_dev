@@ -46,20 +46,27 @@ class MessageServiceTest {
     @BeforeEach
     void setUp() {
         user = new Users();
-        chatRoom = ChatRoom.create(test);
+        chatRoom = ChatRoom.createDM();
     }
 
     @Test
     @DisplayName("채팅방 메세지 조회")
     void getMessages() {
         // given
+        String roomId = chatRoom.getId();
+        String userNickname = user.getNickname();
+
         Message message1 = Message.create(chatRoom, user, MessageType.ENTER, test);
         Message message2 = Message.create(chatRoom, user, MessageType.TALK, test);
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(java.util.Optional.of(chatRoom));
-        when(messageRepository.findByChatRoomId(chatRoom.getId())).thenReturn(List.of(message1, message2));
+
+        when(userRepository.findUsersByNickname(userNickname)).thenReturn(java.util.Optional.of(user));
+        when(chatRoomRepository.findById(roomId)).thenReturn(java.util.Optional.of(chatRoom));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, user.getId()))
+                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
+        when(messageRepository.findByChatRoomId(roomId)).thenReturn(List.of(message1, message2));
 
         // when
-         Response<List<MessageDTO>> response = messageService.getMessages(chatRoom.getId());
+         Response<List<MessageDTO>> response = messageService.getMessages(roomId, userNickname);
 
         // then
         Assertions.assertThat(response).isNotNull();
@@ -72,55 +79,35 @@ class MessageServiceTest {
     @DisplayName("채팅방 입장")
     void enter() {
         // given
-        ChatRoom chatRoom = ChatRoom.create(test);
+        ChatRoom chatRoom = ChatRoom.createDM();
         Users user = new Users();
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(java.util.Optional.of(chatRoom));
-        when(userRepository.findById(user.getId())).thenReturn(java.util.Optional.of(user));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(java.util.Optional.of(user));
 
         // when
-        Response<MessageDTO> response = messageService.enter(chatRoom.getId(), user.getId());
+        MessageDTO message = messageService.subscribe(chatRoom.getId(), user.getNickname());
 
         // then
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
-    }
-
-    @Test
-    @DisplayName("채팅방 입장 - 이미 참여 중인 유저")
-    void enter_AlreadyEnter() {
-        // given
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
-                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
-
-        // when
-        Response<MessageDTO> response = messageService.enter(chatRoom.getId(), user.getId());
-
-        // then
-        // 응답에 data값은 없지만 success 해야함.
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
-        Assertions.assertThat(response.getData()).isNull();
-
+        Assertions.assertThat(message).isNotNull();
+        Assertions.assertThat(message.getContent()).isNotNull();
     }
 
     @Test
     @DisplayName("메세지 전송 - 성공")
     void sendSuccess() {
         // given
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        Response<MessageDTO> response = messageService.send(chatRoom.getId(), user.getId(), test);
+        MessageDTO message = messageService.send(chatRoom.getId(), user.getNickname(), test);
 
         // then
         verify(messageRepository).save(any(Message.class));
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(message).isNotNull();
+        Assertions.assertThat(message.getContent()).isNotNull();
 
     }
 
@@ -128,7 +115,7 @@ class MessageServiceTest {
     @DisplayName("메세지 전송 - 실패")
     void sendFail() {
         // given
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.empty());
@@ -136,7 +123,7 @@ class MessageServiceTest {
         // when
         // then
         BusinessException exception = Assertions.catchThrowableOfType(
-                () -> messageService.send(chatRoom.getId(), user.getId(), test),
+                () -> messageService.send(chatRoom.getId(), user.getNickname(), test),
                 BusinessException.class
         );
 
@@ -148,34 +135,17 @@ class MessageServiceTest {
     @DisplayName("채팅방 퇴장")
     void exit() {
         // given
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        Response<MessageDTO> response = messageService.exit(chatRoom.getId(), user.getId());
+        MessageDTO message = messageService.unsubscribe(chatRoom.getId(), user.getNickname());
 
         // then
         verify(chatRoomUserRepository).delete(any(ChatRoomUser.class));
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getData()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("채팅방 퇴장 - 이미 퇴장한 유저")
-    void exit_AlreadyExit() {
-        // given
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
-                .thenReturn(Optional.empty());
-
-        // when
-        Response<MessageDTO> response = messageService.exit(chatRoom.getId(), user.getId());
-
-        // then
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.getData()).isNull();
+        Assertions.assertThat(message).isNotNull();
+        Assertions.assertThat(message.getContent()).isNotNull();
     }
 }

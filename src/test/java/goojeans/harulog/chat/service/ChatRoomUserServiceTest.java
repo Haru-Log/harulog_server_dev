@@ -31,9 +31,12 @@ class ChatRoomUserServiceTest {
     @InjectMocks
     private ChatRoomUserServiceImpl chatRoomUserService;
 
-    @Mock private ChatRoomUserRepository chatRoomUserRepository;
-    @Mock private ChatRoomRepository chatRoomRepository;
-    @Mock private UserRepository userRepository;
+    @Mock
+    private ChatRoomUserRepository chatRoomUserRepository;
+    @Mock
+    private ChatRoomRepository chatRoomRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @Test
     @DisplayName("채팅방에 유저 추가")
@@ -43,10 +46,10 @@ class ChatRoomUserServiceTest {
         ChatRoom chatRoom = new ChatRoom();
         Users user = new Users();
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
 
         // when
-        Response<Void> response = chatRoomUserService.create(chatRoom.getId(), user.getId());
+        Response<Void> response = chatRoomUserService.addUser(chatRoom.getId(), user.getNickname());
 
         // then
         Assertions.assertThat(response).isNotNull();
@@ -63,15 +66,17 @@ class ChatRoomUserServiceTest {
         // given
         String roomId = UUID.randomUUID().toString();
         Long userId = 1L;
+        String userNickname = "user";
         ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
-        Users user = Users.builder().id(userId).build();
+        Users user = Users.builder().id(userId).nickname(userNickname).build();
+        when(userRepository.findUsersByNickname(userNickname)).thenReturn(Optional.of(user));
 
         ChatRoomUser chatRoomUser = ChatRoomUser.create(chatRoom, user);
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
                 .thenReturn(Optional.of(chatRoomUser));
 
         // when
-        chatRoomUserService.delete(roomId, userId);
+        chatRoomUserService.deleteUser(roomId, userNickname);
 
         // then
         /**
@@ -91,14 +96,17 @@ class ChatRoomUserServiceTest {
         // given
         String roomId = UUID.randomUUID().toString();
         Long userId = 1L;
+        String userNickname = "user";
 
+        Users user = Users.builder().id(userId).nickname(userNickname).build();
+        when(userRepository.findUsersByNickname(userNickname)).thenReturn(Optional.of(user));
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
                 .thenReturn(Optional.empty());
 
         // when
         // then
         BusinessException exception = Assertions.catchThrowableOfType(
-                () -> chatRoomUserService.delete(roomId, userId),
+                () -> chatRoomUserService.deleteUser(roomId, userNickname),
                 BusinessException.class
         );
 
@@ -117,7 +125,7 @@ class ChatRoomUserServiceTest {
         when(chatRoomUserRepository.findUserByChatroomId(roomId)).thenReturn(List.of(user1, user2));
 
         // when
-        Response<List<ChatUserDTO>> response = chatRoomUserService.findByChatRoom(roomId);
+        Response<List<ChatUserDTO>> response = chatRoomUserService.getUsers(roomId);
 
         // then
         Assertions.assertThat(response).isNotNull();
@@ -130,16 +138,21 @@ class ChatRoomUserServiceTest {
     void findByUser() {
 
         // given
-        Long userId = 1L;
-        when(chatRoomUserRepository.findChatRoomsByUserId(userId)).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
+        Users user = new Users().builder()
+                .id(1L)
+                .nickname("user")
+                .build();
+
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomUserRepository.findChatRoomsByUserNickName(user.getNickname())).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
 
         // when
-        Response<List<ChatRoomDTO>> response = chatRoomUserService.findByUser(userId);
+        Response<List<ChatRoomDTO>> response = chatRoomUserService.getChatRooms(user.getNickname());
 
         // then
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getData()).hasSize(2);
-        verify(chatRoomUserRepository).findChatRoomsByUserId(userId);
+        verify(chatRoomUserRepository).findChatRoomsByUserNickName(user.getNickname());
 
     }
 }

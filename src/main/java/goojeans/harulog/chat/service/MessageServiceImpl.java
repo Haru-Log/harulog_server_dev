@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,11 +30,11 @@ public class MessageServiceImpl implements MessageService{
     private final MessageRepository messageRepository;
 
     // 채팅방 전체 메세지 조회
-    public Response<List<MessageDTO>> getMessages(String roomId){
+    public Response<List<MessageDTO>> getMessages(String roomId, String userNickname){
         log.trace("MessageServiceImpl.getMessages : " + roomId);
 
-        // 채팅방 있는지 확인
-        findChatRoom(roomId);
+        // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
+        checkPermission(roomId, userNickname);
 
         // 채팅방 메세지 조회
         List<Message> messages = messageRepository.findByChatRoomId(roomId);
@@ -46,74 +45,65 @@ public class MessageServiceImpl implements MessageService{
         return Response.ok(result);
     }
 
-    // 채팅방 입장
+    // 채팅방 구독 여부 확인
     @Override
-    public Response<MessageDTO> enter(String roomId, Long userId) {
-        log.trace("MessageServiceImpl.enter : " + roomId + ", " + userId);
+    public boolean existSubscribe(String roomId, String userNickname) {
+        Users user = findUser(userNickname);
+        return chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, user.getId()).isPresent();
+    }
 
-        // 유저 정보 찾기
-        Users user = findUser(userId);
-        // 채팅방 찾기
-        ChatRoom chatRoom = findChatRoom(roomId);
+    // 채팅방 구독 & 입장 메세지 반환
+    @Override
+    public MessageDTO subscribe(String roomId, String userNickname) {
 
-        Optional<ChatRoomUser> optional = chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId);
+        ChatRoom room = findChatRoom(roomId);
+        Users user = findUser(userNickname);
 
-        if(optional.isPresent()){ // 유저가 이미 채팅방에 참여해 있음.
-            return Response.ok();
+        // 채팅방 구독
+        chatRoomUserRepository.save(ChatRoomUser.create(room, user));
 
-        } else { // 유저가 채팅방에 참여하지 않았으므로, 채팅방에 추가
-            chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user));
+        // 입장 메세지 생성 및 저장
+        String content = user.getNickname() + "님이 입장하셨습니다.";
+        Message message = Message.create(room, user, MessageType.ENTER, content);
+        messageRepository.save(message);
 
-            // 입장 메세지 생성 및 저장
-            String content = user.getNickname() + "님이 입장하셨습니다.";
-            Message message = Message.create(chatRoom, user, MessageType.ENTER, content);
-            messageRepository.save(message);
-
-            return Response.ok(MessageDTO.of(message));
-        }
+        return MessageDTO.of(message);
     }
 
     // 메세지 전송
     @Override
-    public Response<MessageDTO> send(String roomId, Long userId, String content) {
-        log.trace("MessageServiceImpl.send : " + roomId + ", " + userId + ", " + content);
+    public MessageDTO send(String roomId, String userNickname, String content) {
+        log.trace("MessageServiceImpl.send : " + roomId + ", " + userNickname + ", " + content);
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
-        ChatRoomUser find = checkPermission(roomId, userId);
+        ChatRoomUser find = checkPermission(roomId, userNickname);
 
         Message message = Message.create(find.getChatRoom(), find.getUser(), MessageType.TALK, content);
         messageRepository.save(message);
 
-        return Response.ok(MessageDTO.of(message));
+        return MessageDTO.of(message);
     }
 
     // 채팅방 퇴장
     @Override
-    public Response<MessageDTO> exit(String roomId, Long userId) {
-        log.trace("MessageServiceImpl.exit : " + roomId + ", " + userId);
+    public MessageDTO unsubscribe(String roomId, String userNickname) {
+        log.trace("MessageServiceImpl.exit : " + roomId + ", " + userNickname);
 
-        // 유저 정보 찾기
-        Users user = findUser(userId);
-        // 채팅방 찾기
-        ChatRoom chatRoom = findChatRoom(roomId);
-        Optional<ChatRoomUser> find = chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId);
+        // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
+        ChatRoomUser find = checkPermission(roomId, userNickname);
 
-        if(find.isEmpty()){ // 이미 퇴장한 유저
-            return Response.ok();
+        // 채팅방 구독 취소
+        chatRoomUserRepository.delete(find);
 
-        } else {
-            chatRoomUserRepository.delete(find.get());
+        String content = find.getUser().getNickname() + "님이 나가셨습니다.";
+        Message message = Message.create(find.getChatRoom(), find.getUser(), MessageType.EXIT, content);
+        messageRepository.save(message);
 
-            String content = user.getNickname() + "님이 퇴장하셨습니다.";
-            Message message = Message.create(chatRoom, user, MessageType.EXIT, content);
-            messageRepository.save(message);
-
-            return Response.ok(MessageDTO.of(message));
-        }
+        return MessageDTO.of(message);
     }
 
-    private Users findUser(Long userId){
-        return userRepository.findById(userId)
+    private Users findUser(String userNickname){
+        return userRepository.findUsersByNickname(userNickname)
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
     }
 
@@ -122,10 +112,10 @@ public class MessageServiceImpl implements MessageService{
                 .orElseThrow(() -> new BusinessException(ResponseCode.CHATROOM_NOT_FOUND));
     }
 
-    private ChatRoomUser checkPermission(String roomId, Long userId){
-        findUser(userId);
+    private ChatRoomUser checkPermission(String roomId, String userNickname){
+        Users user = findUser(userNickname);
         findChatRoom(roomId);
-        return chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId)
+        return chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, user.getId())
                 .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NO_PERMISSION));
     }
 }
