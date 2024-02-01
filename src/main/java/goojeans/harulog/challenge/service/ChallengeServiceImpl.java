@@ -45,7 +45,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         //Challenge 생성에 필요한 ChatRoom 생성
-        ChatRoom chatRoom = ChatRoom.create(request.getChallengeTitle());
+        ChatRoom chatRoom = ChatRoom.createChallenge(request.getChallengeTitle(), request.getImageUrl());
 
         //Challenge 생성
         Challenge challenge = Challenge.builder()
