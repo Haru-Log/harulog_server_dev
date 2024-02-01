@@ -26,7 +26,7 @@ class ChatRoomRepositoryTest {
     @DisplayName("채팅방 생성")
     void create() {
         // given
-        ChatRoom chatRoom = ChatRoom.create(test);
+        ChatRoom chatRoom = ChatRoom.createDM();
 
         // when
         ChatRoom saved = chatRoomRepository.save(chatRoom);
@@ -40,7 +40,7 @@ class ChatRoomRepositoryTest {
     void delete(){
 
         // given
-        ChatRoom chatRoom = ChatRoom.create(test);
+        ChatRoom chatRoom = ChatRoom.createDM();
         ChatRoom saved = chatRoomRepository.save(chatRoom);
 
         // when

@@ -40,7 +40,7 @@ class ChatRoomServiceTest {
 //        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
         // when
-        Response<ChatRoomDTO> created = chatRoomService.create();
+        Response<ChatRoomDTO> created = chatRoomService.createDM();
 
         // then
         Assertions.assertThat(created).isNotNull(); // response가 null이 아닌지 확인

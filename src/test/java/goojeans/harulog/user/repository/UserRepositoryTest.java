@@ -55,7 +55,7 @@ class UserRepositoryTest {
         em.persist(testUser);
 
         //chatroom 생성
-        ChatRoom testChatroom = ChatRoom.create(testString);
+        ChatRoom testChatroom = ChatRoom.createDM();
         em.persist(testChatroom);
 
         //category 찾아오기
