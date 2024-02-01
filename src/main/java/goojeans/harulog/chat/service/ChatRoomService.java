@@ -6,9 +6,9 @@ import goojeans.harulog.domain.dto.Response;
 public interface ChatRoomService {
 
     // 채팅방 생성
-    public Response<ChatRoomDTO> create();
+    public Response<ChatRoomDTO> createDM();
 
-    public Response<ChatRoomDTO> create(String name);
+    public Response<ChatRoomDTO> createChallenge(String name, String imageUrl);
 
     // 채팅방 조회
     public Response<ChatRoomDTO> findByRoomId(String roomId);
