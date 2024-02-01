@@ -27,12 +27,10 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService{
     private final UserRepository userRepository;
 
     @Override
-    public Response<Void> create(String roomId, Long userId) {
+    public Response<Void> addUser(String roomId, String userNickname) {
 
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NOT_FOUND));
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        ChatRoom chatRoom = findChatRoom(roomId);
+        Users user = findUser(userNickname);
 
         chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user));
 
@@ -40,9 +38,24 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService{
     }
 
     @Override
-    public Response<Void> delete(String roomId, Long userId) {
+    public Response<Void> addUser(String roomId, List<String> usersNickname) {
 
-        ChatRoomUser chatRoomUser = chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId)
+            ChatRoom chatRoom = findChatRoom(roomId);
+            List<Users> users = usersNickname.stream()
+                    .map(userNickname -> findUser(userNickname))
+                    .toList();
+
+            users.stream()
+                    .forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user)));
+
+            return Response.ok();
+    }
+
+    @Override
+    public Response<Void> deleteUser(String roomId, String userNickname) {
+
+        Users user = findUser(userNickname);
+        ChatRoomUser chatRoomUser = chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, user.getId())
                 .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NO_PERMISSION));
         chatRoomUserRepository.delete(chatRoomUser);
 
@@ -50,7 +63,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService{
     }
 
     @Override
-    public Response<List<ChatUserDTO>> findByChatRoom(String roomId) {
+    public Response<List<ChatUserDTO>> getUsers(String roomId) {
 
         List<Users> userList = chatRoomUserRepository.findUserByChatroomId(roomId);
         List<ChatUserDTO> userDTOList = userList.stream()
@@ -61,13 +74,24 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService{
     }
 
     @Override
-    public Response<List<ChatRoomDTO>> findByUser(Long userId) {
+    public Response<List<ChatRoomDTO>> getChatRooms(String userNickname) {
 
-        List<ChatRoom> chatRoomList = chatRoomUserRepository.findChatRoomsByUserId(userId);
+        Users user = findUser(userNickname);
+        List<ChatRoom> chatRoomList = chatRoomUserRepository.findChatRoomsByUserNickName(userNickname);
         List<ChatRoomDTO> chatRoomDTOList = chatRoomList.stream()
                 .map(chatRoom -> ChatRoomDTO.of(chatRoom))
                 .toList();
 
         return Response.ok(chatRoomDTOList);
+    }
+
+    private Users findUser(String userNickname){
+        return userRepository.findUsersByNickname(userNickname)
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+    }
+
+    private ChatRoom findChatRoom(String roomId){
+        return chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.CHATROOM_NOT_FOUND));
     }
 }
