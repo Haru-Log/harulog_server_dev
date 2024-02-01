@@ -1,7 +1,9 @@
 package goojeans.harulog.chat.domain.entity;
 
+import goojeans.harulog.chat.util.ChatRoomType;
 import goojeans.harulog.domain.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,11 +28,30 @@ public class ChatRoom extends BaseEntity {
     @Column(name = "chatroom_name")
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chatroom_type")
+    @NotNull
+    private ChatRoomType type;
+
+    // todo: 챌린지 이미지 update
+    @Column(name = "chatroom_image_url")
+    private String imageUrl;
+
     // 채팅방 생성 - 정적 팩토리 메서드
-    public static ChatRoom create(String name) {
+    public static ChatRoom createChallenge(String name, String imageUrl) {
         return ChatRoom.builder()
                 .id(java.util.UUID.randomUUID().toString())
                 .name(name)
+                .type(ChatRoomType.CHALLENGE)
+                .imageUrl(imageUrl)
+                .build();
+    }
+
+    public static ChatRoom createDM(String name) {
+        return ChatRoom.builder()
+                .id(java.util.UUID.randomUUID().toString())
+                .name(name)
+                .type(ChatRoomType.DM)
                 .build();
     }
 }
