@@ -6,32 +6,29 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+가import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class ChatRoomDTO {
     private String roomId;
-    private String roomName;
     private ChatRoomType roomType;
-    private String imageUrl;
+    private String challengeName;
+    private String challengeImageUrl;
+    private List<ChatUserDTO> users;
     private LocalDateTime updatedAt;
 
-    public static ChatRoomDTO of(ChatRoom chatRoom){
-        return new ChatRoomDTO(
-                chatRoom.getId(),
-                chatRoom.getName(),
-                chatRoom.getType(),
-                chatRoom.getImageUrl(),
-                chatRoom.getUpdatedAt()
-        );
-    }
+    public static ChatRoomDTO of(ChatRoom chatRoom) {
+        List<ChatUserDTO> userDTOs = chatRoom.getUsers().stream()
+                .map(ChatUserDTO::of)
+                .toList();
 
-    public static ChatRoomDTO of(ChatRoom chatRoom, String imageUrl){
         return new ChatRoomDTO(
                 chatRoom.getId(),
-                chatRoom.getName(),
                 chatRoom.getType(),
-                imageUrl,
+                chatRoom.getName(),
+                chatRoom.getImageUrl(),
+                userDTOs,
                 chatRoom.getUpdatedAt()
         );
     }
