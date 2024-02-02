@@ -38,8 +38,8 @@ class ChatRoomUserRepositoryTest {
      */
     @BeforeEach
     void setUp(){
-        chatRoom1 = ChatRoom.create(test);
-        chatRoom2 = ChatRoom.create(test);
+        chatRoom1 = ChatRoom.createDM();
+        chatRoom2 = ChatRoom.createDM();
         user1 = Users.builder()
                 .userName(test)
                 .email("test1")
@@ -74,7 +74,7 @@ class ChatRoomUserRepositoryTest {
 
 
         // when
-        List<ChatRoom> findRooms = chatRoomUserRepository.findChatRoomsByUserId(user1.getId());
+        List<ChatRoom> findRooms = chatRoomUserRepository.findChatRoomsByUserNickName(user1.getNickname());
 
         // then
         Assertions.assertThat(findRooms.size()).isEqualTo(2);

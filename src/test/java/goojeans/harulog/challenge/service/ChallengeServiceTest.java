@@ -78,7 +78,7 @@ class ChallengeServiceTest {
                 .imageUrl("test image")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(1))
-                .chatroom(ChatRoom.create("test challenge"))
+                .chatroom(ChatRoom.createChallenge("test challenge",null))
                 .category(category)
                 .build();
     }

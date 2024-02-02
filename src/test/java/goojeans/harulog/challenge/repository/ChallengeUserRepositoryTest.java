@@ -52,7 +52,7 @@ class ChallengeUserRepositoryTest {
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(1))
                 .category(category)
-                .chatroom(ChatRoom.create("test"))
+                .chatroom(ChatRoom.createChallenge("test",null))
                 .build();
 
         em.persist(challenge);

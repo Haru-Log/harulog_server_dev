@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Slf4j
 @Service
 @Transactional
@@ -23,23 +21,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     // 채팅방 생성
     @Override
-    public Response<ChatRoomDTO> create() {
-        log.trace("create() execute");
+    public Response<ChatRoomDTO> createDM() {
+        log.trace("create DM execute");
 
-        String uuid = UUID.randomUUID().toString();
-        ChatRoom chatRoom = ChatRoom.builder()
-                .id(uuid)
-                .name(uuid)
-                .build();
+        ChatRoom chatRoom = ChatRoom.createDM();
         chatRoomRepository.save(chatRoom);
         return Response.ok(ChatRoomDTO.of(chatRoom));
     }
 
     @Override
-    public Response<ChatRoomDTO> create(String name) {
-        log.trace("create(name) execute");
+    public Response<ChatRoomDTO> createChallenge(String name, String imageUrl) {
+        log.trace("create ChallengeChatRoom execute");
 
-        ChatRoom chatRoom = ChatRoom.create(name);
+        ChatRoom chatRoom = ChatRoom.createChallenge(name, imageUrl);
         chatRoomRepository.save(chatRoom);
         return Response.ok(ChatRoomDTO.of(chatRoom));
     }

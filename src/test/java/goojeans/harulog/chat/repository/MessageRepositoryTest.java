@@ -37,16 +37,15 @@ class MessageRepositoryTest {
         user1 = Users.builder()
                 .userName(test)
                 .email("test1")
-                .nickname(test)
+                .nickname("test1")
                 .password(test)
                 .socialType(SocialType.HARU)
                 .build();
 
-        chatRoom1 = ChatRoom.create(test);
+        chatRoom1 = ChatRoom.createDM();
 
         em.persist(user1);
         em.persist(chatRoom1);
-        em.flush();
     }
 
     @Test
