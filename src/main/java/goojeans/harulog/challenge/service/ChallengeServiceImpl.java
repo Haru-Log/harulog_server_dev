@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,7 +48,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         Category category = categoryRepository.findByCategoryName(request.getCategoryName()).orElseThrow(() -> new BusinessException(ResponseCode.CATEGORY_NOT_FOUND));
 
         if (!canJoinChallenge(user, request.getCategoryName())) {
-            throw new BusinessException(ResponseCode.CHALLENGE_ALREADY_JOIN);
+            throw new BusinessException(ResponseCode.CHALLENGE_CAT_ALREADY_PARTICIPATE);
         }
 
         //Challenge 생성에 필요한 ChatRoom 생성
@@ -87,8 +88,12 @@ public class ChallengeServiceImpl implements ChallengeService {
         Users user = userRepository.findUsersById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
         Challenge challenge = challengeRepository.findByChallengeId(request.getChallengeId()).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
 
-        if (!canJoinChallenge(user, challenge.getCategory().getCategoryName())) {
+        if (isAlreadyJoin(userId, challenge.getChallengeId())) {
             throw new BusinessException(ResponseCode.CHALLENGE_ALREADY_JOIN);
+        }
+
+        if (!canJoinChallenge(user, challenge.getCategory().getCategoryName())) {
+            throw new BusinessException(ResponseCode.CHALLENGE_CAT_ALREADY_PARTICIPATE);
         }
 
         ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
@@ -173,6 +178,12 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .collect(Collectors.toList());
 
         return Response.ok(challengeResponses);
+    }
+
+    public boolean isAlreadyJoin(Long userId, Long ChallengeId) {
+        Optional<ChallengeUser> challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, ChallengeId);
+
+        return challengeUser.isPresent();
     }
 
     //한 사용자는 한 카테고리에 한 챌린지만 참여 가능하다.
