@@ -70,6 +70,7 @@ class ChatRoomUserServiceTest {
         ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
         Users user = Users.builder().id(userId).nickname(userNickname).build();
         when(userRepository.findUsersByNickname(userNickname)).thenReturn(Optional.of(user));
+        when(chatRoomRepository.findById(roomId)).thenReturn(Optional.of(chatRoom));
 
         ChatRoomUser chatRoomUser = ChatRoomUser.create(chatRoom, user);
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
@@ -99,7 +100,9 @@ class ChatRoomUserServiceTest {
         String userNickname = "user";
 
         Users user = Users.builder().id(userId).nickname(userNickname).build();
+        ChatRoom chatRoom = ChatRoom.builder().id(roomId).build();
         when(userRepository.findUsersByNickname(userNickname)).thenReturn(Optional.of(user));
+        when(chatRoomRepository.findById(roomId)).thenReturn(Optional.of(chatRoom));
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId))
                 .thenReturn(Optional.empty());
 
@@ -138,12 +141,11 @@ class ChatRoomUserServiceTest {
     void findByUser() {
 
         // given
-        Users user = new Users().builder()
+        Users user = Users.builder()
                 .id(1L)
                 .nickname("user")
                 .build();
 
-        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
         when(chatRoomUserRepository.findChatRoomsByUserNickName(user.getNickname())).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
 
         // when
