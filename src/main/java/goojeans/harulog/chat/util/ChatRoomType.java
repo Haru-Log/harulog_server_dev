@@ -1,5 +1,5 @@
 package goojeans.harulog.chat.util;
 
 public enum ChatRoomType {
-    CHALLENGE, DM
+    DM, GROUP, CHALLENGE
 }
