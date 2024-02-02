@@ -2,7 +2,10 @@ package goojeans.harulog.challenge.service;
 
 import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.category.repository.CategoryRepository;
+import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
+import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeRegisterRequest;
+import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
@@ -33,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -51,12 +55,15 @@ class ChallengeServiceTest {
     private Users user;
     private Category category;
     private Challenge challenge;
+    private final Long challengeId = 1L;
+    private final Long userId = 1L;
+    private final Long categoryId = 1L;
 
     @BeforeEach
     void beforeEach() {
 
         user = Users.builder()
-                .id(1L)
+                .id(userId)
                 .email("test@test.com")
                 .password("test")
                 .userName("test")
@@ -65,12 +72,12 @@ class ChallengeServiceTest {
                 .build();
 
         category = Category.builder()
-                .categoryId(1L)
+                .categoryId(categoryId)
                 .categoryName("운동")
                 .build();
 
         challenge = Challenge.builder()
-                .challengeId(1L)
+                .challengeId(challengeId)
                 .challengeTitle("test challenge")
                 .challengeContent("test")
                 .challengeGoal(3)
@@ -78,7 +85,7 @@ class ChallengeServiceTest {
                 .imageUrl("test image")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(1))
-                .chatroom(ChatRoom.createChallenge("test challenge",null))
+                .chatroom(ChatRoom.createChallenge("test challenge", null))
                 .category(category)
                 .build();
     }
@@ -87,9 +94,9 @@ class ChallengeServiceTest {
     @DisplayName("새 챌린지 생성 후 첫 참여하기")
     void createChallenge() {
 
-        ChallengeRegisterRequest request = new ChallengeRegisterRequest("tester", "test challenge", 3, "test", "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
+        ChallengeRegisterRequest request = new ChallengeRegisterRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
 
-        when(userRepository.findUsersById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.save(any(Challenge.class))).thenReturn(challenge);
 
@@ -104,12 +111,12 @@ class ChallengeServiceTest {
     @DisplayName("이미 참여하고 있는 카테고리의 챌린지를 생성하면 에러 발생")
     void createChallengeWithError() {
 
-        ChallengeRegisterRequest request = new ChallengeRegisterRequest("tester", "test challenge", 3, "test", "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
+        ChallengeRegisterRequest request = new ChallengeRegisterRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList(challenge));
 
-        when(userRepository.findUsersById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
-        when(challengeRepository.findAllByUserId(1L)).thenReturn(userChallenges);
+        when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
 
         Assertions.assertThatThrownBy(() -> challengeService.registerChallenge(user.getId(), request)).isInstanceOf(BusinessException.class);
     }
@@ -118,41 +125,45 @@ class ChallengeServiceTest {
     @DisplayName("존재하는 챌린지에 참여하기")
     void joinChallenge() {
 
+        ChallengeJoinRequest request = new ChallengeJoinRequest(challengeId);
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList());
 
-        when(userRepository.findUsersById(1L)).thenReturn(Optional.of(user));
-        when(challengeRepository.findByChallengeId(1L)).thenReturn(Optional.of(challenge));
-        when(challengeRepository.findAllByUserId(1L)).thenReturn(userChallenges);
+        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+        when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
 
-        Response<ChallengeResponse> response = challengeService.joinChallenge(user.getId(), challenge.getChallengeId());
-        Assertions.assertThat(response.getData().getChallengeUserList().get(0).getUser().getNickname()).isEqualTo("tester");
+        Response<ChallengeResponse> response = challengeService.joinChallenge(user.getId(), request);
+        Assertions.assertThat(response.getData().getChallengeUserList().get(0).getNickname()).isEqualTo("tester");
     }
 
     @Test
     @DisplayName("이미 참여하고 있는 카테고리의 챌린지에 참여하면 에러 발생")
     void joinChallengeWithError() {
+
+        ChallengeJoinRequest request = new ChallengeJoinRequest(challengeId);
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList(challenge));
 
-        when(userRepository.findUsersById(1L)).thenReturn(Optional.of(user));
-        when(challengeRepository.findByChallengeId(1L)).thenReturn(Optional.of(challenge));
-        when(challengeRepository.findAllByUserId(1L)).thenReturn(userChallenges);
+        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+        when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
 
-        Assertions.assertThatThrownBy(() -> challengeService.joinChallenge(user.getId(), challenge.getChallengeId())).isInstanceOf(IllegalStateException.class);
+        Assertions.assertThatThrownBy(() -> challengeService.joinChallenge(user.getId(), request)).isInstanceOf(BusinessException.class);
     }
 
     @Test
     @DisplayName("참여하고 있는 챌린지 나가기")
     void leaveChallenge() {
 
+        ChallengeLeaveRequest request = new ChallengeLeaveRequest(challengeId);
         ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
 
-        when(userRepository.findUsersById(1L)).thenReturn(Optional.of(user));
-        when(challengeRepository.findByChallengeId(1L)).thenReturn(Optional.of(challenge));
-        when(challengeUserRepository.findChallengeUserByUserAndChallenge(1L, 1L)).thenReturn(Optional.of(challengeUser));
+        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+        when(challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId)).thenReturn(Optional.of(challengeUser));
 
         challenge.addChallengeUser(challengeUser);
 
-        Response<Void> response = challengeService.leaveChallenge(user.getId(), challenge.getChallengeId());
+        Response<Void> response = challengeService.leaveChallenge(user.getId(), request);
         challenge.removeChallengeUser(challengeUser);
 
         Assertions.assertThat(response).isNotNull();
@@ -162,7 +173,7 @@ class ChallengeServiceTest {
     @DisplayName("챌린지 단건 조회")
     void getChallenge() {
 
-        when(challengeRepository.findByChallengeId(1L)).thenReturn(Optional.of(challenge));
+        when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
 
         Response<ChallengeResponse> response = challengeService.getChallenge(challenge.getChallengeId());
         Assertions.assertThat(response.getData().getChallengeTitle()).isEqualTo("test challenge");
@@ -176,7 +187,7 @@ class ChallengeServiceTest {
 
         when(challengeRepository.findAll()).thenReturn(challenges);
 
-        Response<List<ChallengeResponse>> response = challengeService.getAllChallenge();
+        Response<List<ChallengeAllResponse>> response = challengeService.getAllChallenge();
         Assertions.assertThat(response.getData()).hasSize(1);
     }
 
@@ -186,9 +197,34 @@ class ChallengeServiceTest {
 
         List<Challenge> challenges = new ArrayList<>(Arrays.asList(challenge));
 
-        when(challengeRepository.findAllByUserId(1L)).thenReturn(challenges);
+        when(challengeRepository.findAllByUserId(userId)).thenReturn(challenges);
 
         Response<List<ChallengeResponse>> response = challengeService.getUserChallenge(user.getId());
         Assertions.assertThat(response.getData()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("챌린지 삭제하기")
+    void deleteChallenge() {
+        ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
+        challengeUser.updateRole();
+        challenge.getChallengeUserList().add(challengeUser);
+
+        when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+
+        Response<Void> response = challengeService.deleteChallenge(userId, challengeId);
+        Assertions.assertThat(response.getStatus()).isEqualTo(200);
+        verify(challengeRepository).delete(challenge);
+    }
+
+    @Test
+    @DisplayName("리더가 아니라면 챌린지 삭제할 때 에러 발생")
+    void deleteChallengeWithError() {
+        ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
+        challenge.getChallengeUserList().add(challengeUser);
+
+        when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+
+        Assertions.assertThatThrownBy(() -> challengeService.deleteChallenge(userId, challengeId)).isInstanceOf(BusinessException.class);
     }
 }

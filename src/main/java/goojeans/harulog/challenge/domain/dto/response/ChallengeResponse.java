@@ -1,7 +1,6 @@
 package goojeans.harulog.challenge.domain.dto.response;
 
 import goojeans.harulog.challenge.domain.entity.Challenge;
-import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,9 +36,9 @@ public class ChallengeResponse {
         @NotNull
         private String chatRoomId;
         @NotNull
-        private List<ChallengeUser> challengeUserList;
+        private List<ChallengeUsersResponse> challengeUserList;
 
-        public static ChallengeResponse of(Challenge challenge) {
+        public static ChallengeResponse of(Challenge challenge, List<ChallengeUsersResponse> challengeUsers) {
             return new ChallengeResponse(
                     challenge.getChallengeId(),
                     challenge.getChallengeTitle(),
@@ -51,6 +50,6 @@ public class ChallengeResponse {
                     challenge.getEndDate(),
                     challenge.getCategory().getCategoryName(),
                     challenge.getChatroom().getId(),
-                    challenge.getChallengeUserList());
+                    challengeUsers);
         }
 }
