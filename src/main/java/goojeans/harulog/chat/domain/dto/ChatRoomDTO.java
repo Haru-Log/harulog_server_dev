@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-가import java.util.List;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
