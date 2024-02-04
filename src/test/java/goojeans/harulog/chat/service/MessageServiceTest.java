@@ -76,8 +76,8 @@ class MessageServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방 입장")
-    void enter() {
+    @DisplayName("채팅방 구독")
+    void subscribe() {
         // given
         ChatRoom chatRoom = ChatRoom.createDM();
         Users user = new Users();
@@ -85,7 +85,25 @@ class MessageServiceTest {
         when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(java.util.Optional.of(user));
 
         // when
-        MessageDTO message = messageService.subscribe(chatRoom.getId(), user.getNickname());
+        messageService.subscribe(chatRoom.getId(), user.getNickname());
+
+        // then
+        verify(chatRoomUserRepository).save(any(ChatRoomUser.class));
+    }
+
+    @Test
+    @DisplayName("채팅방 입장")
+    void enter() {
+        // given
+        ChatRoom chatRoom = ChatRoom.createDM();
+        Users user = new Users();
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
+                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
+
+        // when
+        MessageDTO message = messageService.enter(chatRoom.getId(), user.getNickname());
 
         // then
         Assertions.assertThat(message).isNotNull();
@@ -141,7 +159,7 @@ class MessageServiceTest {
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        MessageDTO message = messageService.unsubscribe(chatRoom.getId(), user.getNickname());
+        MessageDTO message = messageService.exit(chatRoom.getId(), user.getNickname());
 
         // then
         verify(chatRoomUserRepository).delete(any(ChatRoomUser.class));
