@@ -20,7 +20,7 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE chatroom SET active_status= 'DELETED' WHERE chatroom_id = ?")
 @SQLRestriction("active_status <> 'DELETED'")
 @Table(name = "chatroom")
-public class ChatRoom extends BaseEntity {
+public class ChatRoom extends BaseEntity implements Comparable<ChatRoom>{
 
     @Id
     @Column(name = "chatroom_id")
@@ -67,4 +67,16 @@ public class ChatRoom extends BaseEntity {
                 .map(ChatRoomUser::getUser)
                 .toList();
     }
+
+    // 채팅방 정렬 기준 : 최신순
+    @Override
+    public int compareTo(ChatRoom c) {
+
+        // updatedAt이 null일 경우 0을 반환
+        if(getUpdatedAt()==null || c.getUpdatedAt()==null) return 0;
+
+        // updatedAt이 null이 아닐 경우, 최신순으로 정렬
+        return c.getUpdatedAt().compareTo(getUpdatedAt());
+    }
+
 }

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static goojeans.harulog.chat.util.MessageType.*;
@@ -98,6 +99,10 @@ public class MessageServiceImpl implements MessageService{
 
         Message message = Message.create(find.getChatRoom(), find.getUser(), TALK, content);
         messageRepository.save(message);
+
+        // 채팅방 업데이트 시간 변경 : 오로지 "채팅 메세지"에 한정. enter, exit 메세지는 제외
+        find.getChatRoom().setUpdatedAt(LocalDateTime.now());
+        chatRoomRepository.save(find.getChatRoom());
 
         return MessageDTO.of(message);
     }

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static goojeans.harulog.chat.util.ChatRoomType.DM;
@@ -29,6 +30,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
 
+    // todo: 유저 추가되었을 때, 채팅방 타입 변경 로직 추가
     @Override
     public Response<Void> addUser(String roomId, String userNickname) {
 
@@ -60,6 +62,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         return Response.ok();
     }
 
+    // todo: 유저 삭제되었을 때, 채팅방 타입 변경 로직 추가
     @Override
     public Response<Void> deleteUser(String roomId, String userNickname) {
 
@@ -83,6 +86,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
         List<ChatRoom> chatRoomList = chatRoomUserRepository.findChatRoomsByUserNickName(userNickname);
         List<ChatRoomDTO> chatRoomDTOList = chatRoomList.stream()
+                .sorted(Comparator.naturalOrder()) // Comparable에 의한 정렬
                 .map(ChatRoomDTO::of)
                 .toList();
 
