@@ -28,17 +28,25 @@ public class MessageController {
     private final MessageService messageService;
     private final SecurityUtils securityUtils;
 
-    // 채팅방 구독
+    // 채팅방 구독 및 입장 메세지 전송
     @SubscribeMapping("/chat/{roomId}/subscribe") // "/app/chat/{roomId}/subscribe"
-    @SendTo("/topic/chat/{roomId}")
-    public MessageDTO subscribe(
+    public void subscribe(
             @DestinationVariable("roomId") String roomId,
             Authentication authentication
     ) {
         String nickname = authentication.getName();
         log.trace("MessageController.subscribe : " + roomId + ", " + nickname);
 
-        return messageService.subscribe(roomId, nickname);
+        // 구독되어 있지 않다면 구독
+        if(messageService.existSubscribe(roomId, nickname)){
+            messageService.subscribe(roomId, nickname);
+        }
+
+        // 입장한 적이 없으면, 입장 메세지 전송
+        if(!messageService.isEntered(roomId, nickname)){
+            MessageDTO enterMessage = messageService.enter(roomId, nickname);
+            template.convertAndSend("/topic/chat/" + roomId, enterMessage);
+        }
     }
 
     // 채팅방 메세지 조회
@@ -63,19 +71,20 @@ public class MessageController {
         return messageService.send(roomId, messageRequest.getSender(), messageRequest.getContent());
     }
 
-    // 채팅방 구독 취소
+    // 채팅방 퇴장
     @MessageMapping("/chat/{roomId}/exit")
-    public void unsubscribe(
-            @DestinationVariable("roomId") String roomId
+    public void exit(
+            @DestinationVariable("roomId") String roomId,
+            Authentication authentication
     ) {
-        String nickname = securityUtils.getCurrentUserInfo().getNickname();
+        String nickname = authentication.getName();
 
         // 사용자가 채팅방에 구독되어있는지 확인
         boolean isSubscribed = messageService.existSubscribe(roomId, nickname);
 
-        // 구독되어있다면 구독 취소
+        // 구독되어있다면 구독 취소 후, 퇴장 메세지 전송
         if (isSubscribed) {
-            MessageDTO exitMessage = messageService.unsubscribe(roomId, nickname);
+            MessageDTO exitMessage = messageService.exit(roomId, nickname);
             template.convertAndSend("/topic/chat/" + roomId, exitMessage);
         }
     }

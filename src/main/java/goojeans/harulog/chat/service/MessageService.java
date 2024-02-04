@@ -13,12 +13,18 @@ public interface MessageService {
     // 채팅방 구독 여부 확인
     public boolean existSubscribe(String roomId, String userNickname);
 
-    // 클라이언트 채팅방 입장
-    public MessageDTO subscribe(String roomId, String userNickname);
+    // 채팅방 입장 여부 확인
+    public boolean isEntered(String roomId, String userNickname);
+
+    // 채팅방 구독
+    public void subscribe(String roomId, String userNickname);
+
+    // 채팅방 입장
+    public MessageDTO enter(String roomId, String userNickname);
 
     // 메세지 전송
     public MessageDTO send(String roomId, String userNickname, String content);
 
     // 클라이언트 채팅방 구독 취소
-    public MessageDTO unsubscribe(String roomId, String userNickname);
+    public MessageDTO exit(String roomId, String userNickname);
 }
