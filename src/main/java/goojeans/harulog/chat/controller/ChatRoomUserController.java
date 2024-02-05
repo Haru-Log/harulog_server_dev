@@ -9,6 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 채팅방-유저 관련 API
+ * 1. 채팅방에 유저 추가
+ * 2. 채팅방에 참여하고 있는 유저 조회
+ * 3. 유저가 참여하고 있는 채팅방 조회
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor

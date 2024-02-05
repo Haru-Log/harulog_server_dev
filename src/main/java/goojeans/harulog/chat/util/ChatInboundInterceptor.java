@@ -24,7 +24,9 @@ public class ChatInboundInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
-        // STOMP의 CONNECT 요청을 처리하고, 해당 요청의 유효성을 검증
+        /**
+         * STOMP의 CONNECT 요청을 처리하고, 해당 요청의 유효성을 검증
+         */
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");

@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 웹소켓 채팅 메세지 관련 API
+ * (websocket) 입장, 메세지 전송, 퇴장
+ * (http) 메세지 조회
+ */
 @Slf4j
 @Transactional
 @RestController

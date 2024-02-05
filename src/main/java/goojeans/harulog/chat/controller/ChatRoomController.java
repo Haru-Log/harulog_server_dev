@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 채팅방 생성, 삭제
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor

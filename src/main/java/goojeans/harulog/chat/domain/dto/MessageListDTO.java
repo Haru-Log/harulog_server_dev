@@ -5,6 +5,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * 채팅방 메세지 목록을 담는 DTO
+ */
 @Getter
 @AllArgsConstructor
 public class MessageListDTO {
