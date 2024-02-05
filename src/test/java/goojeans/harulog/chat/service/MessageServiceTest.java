@@ -1,6 +1,7 @@
 package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
+import goojeans.harulog.chat.domain.dto.MessageListDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.domain.entity.Message;
@@ -66,13 +67,31 @@ class MessageServiceTest {
         when(messageRepository.findByChatRoomId(roomId)).thenReturn(List.of(message1, message2));
 
         // when
-         Response<List<MessageDTO>> response = messageService.getMessages(roomId, userNickname);
+         Response<MessageListDTO> response = messageService.getMessages(roomId, userNickname);
 
         // then
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
-        Assertions.assertThat(response.getData().size()).isEqualTo(2);
+        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(response.getData().getRoomId()).isEqualTo(roomId);
+        Assertions.assertThat(response.getData().getMessages().size()).isEqualTo(2);
 
+    }
+
+    @Test
+    @DisplayName("채팅방 구독")
+    void subscribe() {
+        // given
+        ChatRoom chatRoom = ChatRoom.createDM();
+        Users user = new Users();
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(java.util.Optional.of(chatRoom));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(java.util.Optional.of(user));
+
+        // when
+        messageService.subscribe(chatRoom.getId(), user.getNickname());
+
+        // then
+        verify(chatRoomUserRepository).save(any(ChatRoomUser.class));
     }
 
     @Test
@@ -81,11 +100,13 @@ class MessageServiceTest {
         // given
         ChatRoom chatRoom = ChatRoom.createDM();
         Users user = new Users();
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(java.util.Optional.of(chatRoom));
-        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(java.util.Optional.of(user));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
+                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        MessageDTO message = messageService.subscribe(chatRoom.getId(), user.getNickname());
+        MessageDTO message = messageService.enter(chatRoom.getId(), user.getNickname());
 
         // then
         Assertions.assertThat(message).isNotNull();
@@ -141,7 +162,7 @@ class MessageServiceTest {
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        MessageDTO message = messageService.unsubscribe(chatRoom.getId(), user.getNickname());
+        MessageDTO message = messageService.exit(chatRoom.getId(), user.getNickname());
 
         // then
         verify(chatRoomUserRepository).delete(any(ChatRoomUser.class));

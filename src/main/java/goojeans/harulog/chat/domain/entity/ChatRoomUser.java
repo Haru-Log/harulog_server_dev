@@ -5,10 +5,7 @@ import goojeans.harulog.domain.entity.BaseEntity;
 import goojeans.harulog.user.domain.entity.Users;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -38,6 +35,11 @@ public class ChatRoomUser extends BaseEntity {
     @JsonBackReference // 순환 참조 방지
     @NotNull
     private Users user;
+
+    @Builder.Default
+    @Setter
+    @NotNull
+    private boolean isEntered = false; // 채팅방 입장 여부
 
     // 정적 팩토리 메서드
     public static ChatRoomUser create(ChatRoom chatRoom, Users user) {
