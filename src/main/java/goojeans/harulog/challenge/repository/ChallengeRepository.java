@@ -20,4 +20,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
 
     @Query("select c from Challenge c join fetch c.challengeUserList cu where cu.challengeUserPK.userId = :userId")
     List<Challenge> findAllByUserId(@Param("userId") Long userId);
+
+    @Query(value = "select * from challenge order by rand() limit 4", nativeQuery = true)
+    List<Challenge> findRandomLimitFour();
 }
