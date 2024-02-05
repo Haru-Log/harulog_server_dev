@@ -2,7 +2,7 @@ package goojeans.harulog.challenge.service;
 
 import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
-import goojeans.harulog.challenge.domain.dto.request.ChallengeRegisterRequest;
+import goojeans.harulog.challenge.domain.dto.request.ChallengeRequest;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
 import goojeans.harulog.domain.dto.Response;
@@ -12,7 +12,7 @@ import java.util.List;
 public interface ChallengeService {
 
     //새 챌린지 생성 후 첫 참여
-    Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRegisterRequest request);
+    Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRequest request);
 
     //기존 챌린지에 참여
     Response<ChallengeResponse> joinChallenge(Long userId, ChallengeJoinRequest request);
@@ -31,4 +31,10 @@ public interface ChallengeService {
 
     //한 사용자가 참여하는 모든 챌린지 조회
     Response<List<ChallengeResponse>> getUserChallenge(Long userId);
+
+    //챌린지 수정
+    Response<ChallengeResponse> updateChallenge(Long userId, Long challengeId, ChallengeRequest request);
+
+    //랜덤으로 4개의 챌린지 조회
+    Response<List<ChallengeAllResponse>> getRandomChallenge();
 }

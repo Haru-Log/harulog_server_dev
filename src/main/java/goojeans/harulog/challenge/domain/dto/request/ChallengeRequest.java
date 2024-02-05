@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChallengeRegisterRequest {
+public class ChallengeRequest {
 
     @NotNull
     private String challengeTitle;

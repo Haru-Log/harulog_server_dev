@@ -4,7 +4,7 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
-import goojeans.harulog.challenge.domain.dto.request.ChallengeRegisterRequest;
+import goojeans.harulog.challenge.domain.dto.request.ChallengeRequest;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeUsersResponse;
@@ -24,8 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,7 +42,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
 
     @Override
-    public Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRegisterRequest request) {
+    public Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRequest request) {
 
         Users user = userRepository.findUsersById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
         Category category = categoryRepository.findByCategoryName(request.getCategoryName()).orElseThrow(() -> new BusinessException(ResponseCode.CATEGORY_NOT_FOUND));
@@ -178,6 +178,53 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .collect(Collectors.toList());
 
         return Response.ok(challengeResponses);
+    }
+
+    @Override
+    public Response<ChallengeResponse> updateChallenge(Long userId, Long challengeId, ChallengeRequest request) {
+
+        Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
+        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
+
+        if (!challengeUser.getRole().equals(ChallengeRole.LEADER)) {
+            throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
+        }
+
+        challenge.updateChallengeTitle(request.getChallengeTitle());
+        challenge.updateChallengeContent(request.getChallengeContent());
+        challenge.updateChallengeGoal(request.getChallengeGoal());
+        challenge.updateSubmission(request.getSubmission());
+        challenge.updateStartDate(request.getStartDate());
+        challenge.updateEndDate(request.getEndDate());
+
+        Challenge updatedChallenge = challengeRepository.save(challenge);
+
+        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(updatedChallenge.getChallengeUserList());
+        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
+
+        return Response.ok(challengeResponse);
+    }
+
+    @Override
+    public Response<List<ChallengeAllResponse>> getRandomChallenge() {
+
+        List<Challenge> challenges;
+
+        //존재하는 챌린지가 4개 미만이라면 findAll 해준다.
+        if (challengeRepository.count() < 4) {
+            challenges = challengeRepository.findAll();
+
+        } else {
+            challenges = challengeRepository.findRandomLimitFour();
+        }
+
+        List<ChallengeAllResponse> challengeResponse = challenges.stream().map(challenge -> new ChallengeAllResponse(challenge.getChallengeId(),
+                challenge.getChallengeTitle(),
+                challenge.getCategory().getCategoryName(),
+                challenge.getChallengeUserList().size(),
+                challenge.getImageUrl())).collect(Collectors.toList());
+
+        return Response.ok(challengeResponse);
     }
 
     public boolean isAlreadyJoin(Long userId, Long ChallengeId) {
