@@ -2,7 +2,7 @@ package goojeans.harulog.challenge.controller;
 
 import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
-import goojeans.harulog.challenge.domain.dto.request.ChallengeRegisterRequest;
+import goojeans.harulog.challenge.domain.dto.request.ChallengeRequest;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
 import goojeans.harulog.challenge.service.ChallengeService;
@@ -24,11 +24,11 @@ public class ChallengeController {
     private final SecurityUtils securityUtils;
 
     @PostMapping("/challenge/register")
-    public ResponseEntity<Response<ChallengeResponse>> registerChallenge(@RequestBody ChallengeRegisterRequest request) {
+    public ResponseEntity<Response<ChallengeResponse>> registerChallenge(@RequestBody ChallengeRequest request) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<ChallengeResponse> response = challengeService.registerChallenge(userId, request);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/challenge/join")
@@ -36,7 +36,7 @@ public class ChallengeController {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<ChallengeResponse> response = challengeService.joinChallenge(userId, request);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/challenge/leave")
@@ -44,7 +44,7 @@ public class ChallengeController {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<Void> response = challengeService.leaveChallenge(userId, request);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/challenge/{challengeId}")
@@ -59,13 +59,29 @@ public class ChallengeController {
     public ResponseEntity<Response<ChallengeResponse>> getChallenge(@PathVariable("challengeId") Long challengeId) {
         Response<ChallengeResponse> response = challengeService.getChallenge(challengeId);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/challenge")
     public ResponseEntity<Response<List<ChallengeAllResponse>>> getAllChallenge() {
         Response<List<ChallengeAllResponse>> response = challengeService.getAllChallenge();
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/challenge/{challengeId}")
+    public ResponseEntity<Response<ChallengeResponse>> updateChallenge(@PathVariable("challengeId") Long challengeId, @RequestBody ChallengeRequest request) {
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+
+        Response<ChallengeResponse> response = challengeService.updateChallenge(userId, challengeId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/main/challenge")
+    public ResponseEntity<Response<List<ChallengeAllResponse>>> getRandomChallenge() {
+        Response<List<ChallengeAllResponse>> response = challengeService.getRandomChallenge();
+
+        return ResponseEntity.ok(response);
     }
 }
