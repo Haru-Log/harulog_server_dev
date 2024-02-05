@@ -1,6 +1,7 @@
 package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
+import goojeans.harulog.chat.domain.dto.MessageListDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.domain.entity.Message;
@@ -66,12 +67,14 @@ class MessageServiceTest {
         when(messageRepository.findByChatRoomId(roomId)).thenReturn(List.of(message1, message2));
 
         // when
-         Response<List<MessageDTO>> response = messageService.getMessages(roomId, userNickname);
+         Response<MessageListDTO> response = messageService.getMessages(roomId, userNickname);
 
         // then
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
-        Assertions.assertThat(response.getData().size()).isEqualTo(2);
+        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(response.getData().getRoomId()).isEqualTo(roomId);
+        Assertions.assertThat(response.getData().getMessages().size()).isEqualTo(2);
 
     }
 

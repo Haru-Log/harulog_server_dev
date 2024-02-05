@@ -1,6 +1,7 @@
 package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
+import goojeans.harulog.chat.domain.dto.MessageListDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.domain.entity.Message;
@@ -32,7 +33,7 @@ public class MessageServiceImpl implements MessageService{
     private final MessageRepository messageRepository;
 
     // 채팅방 전체 메세지 조회
-    public Response<List<MessageDTO>> getMessages(String roomId, String userNickname){
+    public Response<MessageListDTO> getMessages(String roomId, String userNickname){
         log.trace("MessageServiceImpl.getMessages : " + roomId);
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
@@ -41,10 +42,12 @@ public class MessageServiceImpl implements MessageService{
         // 채팅방 메세지 조회
         List<Message> messages = messageRepository.findByChatRoomId(roomId);
         List<MessageDTO> result = messages.stream()
-                .map(message -> MessageDTO.of(message))
+                .map(MessageDTO::of)
                 .toList();
 
-        return Response.ok(result);
+        int userCount = chatRoomRepository.findById(roomId).get().getUsers().size();
+
+        return Response.ok(MessageListDTO.of(roomId, userCount, result));
     }
 
     // 채팅방 구독 여부 확인

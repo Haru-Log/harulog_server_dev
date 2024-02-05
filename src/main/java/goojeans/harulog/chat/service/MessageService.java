@@ -1,14 +1,13 @@
 package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
+import goojeans.harulog.chat.domain.dto.MessageListDTO;
 import goojeans.harulog.domain.dto.Response;
-
-import java.util.List;
 
 public interface MessageService {
 
     // 채팅방 메세지 조회
-    public Response<List<MessageDTO>> getMessages(String roomId, String userNickname);
+    public Response<MessageListDTO> getMessages(String roomId, String userNickname);
 
     // 채팅방 구독 여부 확인
     public boolean existSubscribe(String roomId, String userNickname);
