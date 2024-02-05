@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 임시 UserDTO
- * todo: UserDTO 만들어지면 교체 예정
+ * 채팅방에 참여한 유저 정보를 담는 DTO
  */
 @Getter
 @AllArgsConstructor
