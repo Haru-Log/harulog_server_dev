@@ -35,7 +35,7 @@ public class ChatRoomUserController {
     }
 
     // 유저가 참여하고 있는 채팅방 조회
-    // todo: 채팅방의 마지막 메세지를 기준으로 최신순으로 정렬해서 반환.
+    // 채팅방의 마지막 메세지를 기준으로 최신순으로 정렬해서 반환.
     @GetMapping("/user/chats")
     public ResponseEntity<?> getChatRooms(){
         String userNickname = securityUtils.getCurrentUserInfo().getNickname();
