@@ -4,7 +4,7 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
-import goojeans.harulog.challenge.domain.dto.request.ChallengeRegisterRequest;
+import goojeans.harulog.challenge.domain.dto.request.ChallengeRequest;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
 import goojeans.harulog.challenge.domain.entity.Challenge;
@@ -36,8 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -94,7 +93,7 @@ class ChallengeServiceTest {
     @DisplayName("새 챌린지 생성 후 첫 참여하기")
     void createChallenge() {
 
-        ChallengeRegisterRequest request = new ChallengeRegisterRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
+        ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
 
         when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
@@ -111,7 +110,7 @@ class ChallengeServiceTest {
     @DisplayName("이미 참여하고 있는 카테고리의 챌린지를 생성하면 에러 발생")
     void createChallengeWithError() {
 
-        ChallengeRegisterRequest request = new ChallengeRegisterRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
+        ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList(challenge));
 
         when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
@@ -226,5 +225,70 @@ class ChallengeServiceTest {
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
 
         Assertions.assertThatThrownBy(() -> challengeService.deleteChallenge(userId, challengeId)).isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    @DisplayName("챌린지 4개 이상일 때 랜덤 조회")
+    void findRandomChallengeLimitFour() {
+
+        List<Challenge> challenges = new ArrayList<>();
+        challenges.add(challenge);
+
+        for (long i = 2L; i <= 4L; i++) {
+            Challenge newChallenge = Challenge.builder()
+                    .challengeId(i)
+                    .challengeTitle("test challenge" + "i")
+                    .challengeContent("test")
+                    .challengeGoal(3)
+                    .submission("test")
+                    .imageUrl("test image")
+                    .startDate(LocalDateTime.now())
+                    .endDate(LocalDateTime.now().plusDays(1))
+                    .chatroom(ChatRoom.createChallenge("test challenge", null))
+                    .category(category)
+                    .build();
+
+            challenges.add(newChallenge);
+        }
+
+        when(challengeRepository.count()).thenReturn(4L);
+        when(challengeRepository.findRandomLimitFour()).thenReturn(challenges);
+
+        Response<List<ChallengeAllResponse>> response = challengeService.getRandomChallenge();
+
+        Assertions.assertThat(response.getData()).hasSize(4);
+        verify(challengeRepository, times(1)).findRandomLimitFour();
+        verify(challengeRepository, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("챌린지 4개 미만일 때 랜덤 조회")
+    void findRandomChallengeLessThanFour() {
+
+        Challenge Challenge2 = Challenge.builder()
+                .challengeId(2L)
+                .challengeTitle("test challenge" + "i")
+                .challengeContent("test")
+                .challengeGoal(3)
+                .submission("test")
+                .imageUrl("test image")
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(1))
+                .chatroom(ChatRoom.createChallenge("test challenge", null))
+                .category(category)
+                .build();
+
+        List<Challenge> challenges = new ArrayList<>();
+        challenges.add(challenge);
+        challenges.add(Challenge2);
+
+        when(challengeRepository.count()).thenReturn(2L);
+        when(challengeRepository.findAll()).thenReturn(challenges);
+
+        Response<List<ChallengeAllResponse>> response = challengeService.getRandomChallenge();
+
+        Assertions.assertThat(response.getData()).hasSize(2);
+        verify(challengeRepository, times(1)).findAll();
+        verify(challengeRepository, never()).findRandomLimitFour();
     }
 }
