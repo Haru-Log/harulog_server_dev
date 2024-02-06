@@ -28,6 +28,7 @@ public enum ResponseCode {
     USER_GOAL_ALREADY_EXIST(400, "USG-001", "이미 존재하는 목표 입니다.",HttpStatus.BAD_REQUEST),
     USER_GOAL_INVALID_DATA(400, "USG-002", "입력 값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     USER_GOAL_CATEGORY_NOT_FOUND(400, "USG-003", "해당하는 카테고리를 찾지 못했습니다.",HttpStatus.BAD_REQUEST),
+    USER_GOAL_NOT_FOUND(400, "USG-004", "목표들을 찾지 못했습니다.", HttpStatus.BAD_REQUEST),
     USER_GOAL_UPDATE_FAIL(500, "USG-101", "업데이트에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     // 팔로우 : FLW
     // 챌린지 : CHL

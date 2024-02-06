@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO: 리팩터링 필요 (로직 점검 및 중복 코드 제거)
 @RequiredArgsConstructor
@@ -33,13 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String LOGIN_URI = "/api/login";
     private final String HOME_URI = "/api";
 
+    protected List<String> filterPassList = List.of(LOGIN_URI, HOME_URI, "/", "/login", "/oauth2/authorization/kakao", "/login/oauth2/code/kakao", "/favicon.ico");
+
     @Value("${jwt.cookie.expiration}")
     private Integer COOKIE_EXPIRATION;
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(LOGIN_URI) || request.getRequestURI().equals(HOME_URI) || request.getRequestURI().equals("/")) {
+        if (filterPassList.contains(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -92,6 +96,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         }
 
+        if (!accessToken.startsWith("Bearer")){
+            accessToken = "Bearer " + accessToken;
+        }
         response.addHeader("Authorization", accessToken);
 
         Cookie cookie = new Cookie("refreshToken", refreshToken);
