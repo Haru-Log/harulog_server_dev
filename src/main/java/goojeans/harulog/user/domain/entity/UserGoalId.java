@@ -16,4 +16,8 @@ public class UserGoalId implements Serializable {
     private Long userId;
     private Long categoryId;
 
+    public static UserGoalId of(Long userId, Long categoryId) {
+        return new UserGoalId(userId, categoryId);
+    }
+
 }

@@ -22,25 +22,29 @@ public class UserGoal extends BaseEntity {
     private UserGoalId userGoalId;
 
     @MapsId("userId")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Users user;
 
     @MapsId("categoryId")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    private String goal;
+    private Integer goal;
 
     @Builder
-    public static UserGoal of(Users user, Category category, String goal) {
+    public static UserGoal of(Users user, Category category, Integer goal) {
         UserGoal userGoal = new UserGoal();
         userGoal.userGoalId = new UserGoalId(user.getId(), category.getCategoryId());
         userGoal.user = user;
         userGoal.category = category;
         userGoal.goal = goal;
         return userGoal;
+    }
+
+    public void updateGoal(Integer updateGoal) {
+        this.goal = updateGoal;
     }
 
 }

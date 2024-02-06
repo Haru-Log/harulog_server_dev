@@ -45,27 +45,19 @@ public class Users extends BaseEntity {
 
     @NotNull
     private String email;
-
-    @NotNull
-    private String password;
-
-    @NotNull
-    private String userName;
-
     @NotNull
     private String nickname;
-
     @NotNull
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    private String password;
+    private String userName;
+    private Long socialId;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-
     private String contactNumber;
-
     private String imageUrl;
-
     private String refreshToken;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -94,5 +86,17 @@ public class Users extends BaseEntity {
 
     public void updateRefreshToken(String updateToken) {
         this.refreshToken = updateToken;
+    }
+
+    public void updateUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public void updateUserName(String newName) {
+        this.userName = newName;
     }
 }

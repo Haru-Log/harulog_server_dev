@@ -10,13 +10,13 @@ import lombok.*;
 @NoArgsConstructor
 public class UpdateUserGoalRequest {
 
-    private String nickname;
+    private Long userId;
     @NotNull
     private String categoryName;
     @NotNull
     private Integer goal;
 
-    public static UpdateUserGoalRequest of(String nickname, String categoryName, Integer goal) {
-        return new UpdateUserGoalRequest(nickname, categoryName, goal);
+    public static UpdateUserGoalRequest of(Long userId, String categoryName, Integer goal) {
+        return new UpdateUserGoalRequest(userId, categoryName, goal);
     }
 }
