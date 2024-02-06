@@ -55,8 +55,8 @@ public class UserGoalRepositoryTest {
         category1 = findCategory("운동");
         category2 = findCategory("독서");
 
-        userGoal1 = UserGoal.of(user1, category1, "60");
-        userGoal2 = UserGoal.of(user1, category2, "30");
+        userGoal1 = UserGoal.of(user1, category1, 60);
+        userGoal2 = UserGoal.of(user1, category2, 30);
 
         em.persist(userGoal1);
         em.persist(userGoal2);
@@ -67,7 +67,7 @@ public class UserGoalRepositoryTest {
     @DisplayName("유저 목표 생성")
     void createUserGoal() {
         //Given
-        UserGoal userGoal3 = UserGoal.of(user2, category1, "80");
+        UserGoal userGoal3 = UserGoal.of(user2, category1, 80);
 
         //When
         UserGoal save = repository.save(userGoal3);
