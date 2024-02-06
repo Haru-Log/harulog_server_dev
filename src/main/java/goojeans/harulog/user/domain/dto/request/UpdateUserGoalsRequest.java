@@ -3,20 +3,20 @@ package goojeans.harulog.user.domain.dto.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserGoalRequest {
+public class UpdateUserGoalsRequest {
 
     private Long userId;
     @NotNull
-    private String categoryName;
-    @NotNull
-    private Integer goal;
+    private List<UpdateGoalsDto> updateGoalsList;
 
-    public static UpdateUserGoalRequest of(Long userId, String categoryName, Integer goal) {
-        return new UpdateUserGoalRequest(userId, categoryName, goal);
+    public static UpdateUserGoalsRequest of(Long userId, List<UpdateGoalsDto> updateGoalsList) {
+        return new UpdateUserGoalsRequest(userId, updateGoalsList);
     }
 }
