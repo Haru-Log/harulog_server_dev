@@ -1,5 +1,6 @@
 package goojeans.harulog.user.domain.dto;
 
+import goojeans.harulog.user.util.SocialType;
 import goojeans.harulog.user.util.UserRole;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,10 +19,12 @@ public class JwtUserDetail extends User {
     private final UserRole roles;
     private final String introduction;
     private final LocalDateTime createdAt;
+    private final SocialType socialType;
 
     @Builder(builderMethodName = "userDetailBuilder")
     public JwtUserDetail(Long id, String username, String password, String email, String imageUrl, UserRole role,
-                         Collection<? extends GrantedAuthority> authorities, String nickname, String introduction, LocalDateTime createdAt) {
+                         Collection<? extends GrantedAuthority> authorities, String nickname, String introduction,
+                         LocalDateTime createdAt, SocialType socialType) {
         super(username, password, authorities);
         this.id = id;
         this.nickname = nickname;
@@ -30,6 +33,7 @@ public class JwtUserDetail extends User {
         this.roles = role;
         this.introduction = introduction;
         this.createdAt = createdAt;
+        this.socialType = socialType;
     }
 
 }
