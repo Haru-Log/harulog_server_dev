@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import goojeans.harulog.filter.JsonAuthenticationFilter;
 import goojeans.harulog.filter.JwtAuthenticationFilter;
 import goojeans.harulog.user.repository.UserRepository;
+import goojeans.harulog.user.service.CustomOAuth2UserService;
 import goojeans.harulog.user.service.LoginService;
-import goojeans.harulog.user.util.JwtTokenProvider;
-import goojeans.harulog.user.util.LoginFailureHandler;
-import goojeans.harulog.user.util.LoginSuccessHandler;
-import goojeans.harulog.user.util.UserRole;
+import goojeans.harulog.user.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,9 +35,9 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
-//    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-//    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-//    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
+    private final OAuthLoginFailureHandler oAuthLoginFailureHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -59,14 +57,20 @@ public class SecurityConfig {
                         authorizeHttpRequests.requestMatchers("/api/admin")
                                 .hasRole(UserRole.ADMIN.getRole())
                                 .requestMatchers("/","/css/**","/images/**", "/js/**",
+                                        "/index.html",
+                                        "/**",
                                         "/favicon.ico", "/swagger-ui/**", "/api", "/api/login")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
+                )
+                .oauth2Login((oauth2Login) ->
+                        oauth2Login.successHandler(oAuthLoginSuccessHandler)
+                                .failureHandler(oAuthLoginFailureHandler)
+                                .userInfoEndpoint((userInfoEndPoint) ->
+                                        userInfoEndPoint.userService(customOAuth2UserService)
+                                )
                 );
-//                .oauth2Login((oauth2Login) ->
-//
-//                )
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
         http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonAuthenticationFilter.class);
 
