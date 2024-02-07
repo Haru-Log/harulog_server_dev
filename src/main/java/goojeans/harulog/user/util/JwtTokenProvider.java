@@ -103,6 +103,7 @@ public class JwtTokenProvider {
                 .role(user.getUserRole())
                 .imageUrl(user.getImageUrl())
                 .introduction(user.getIntroduction())
+                .createdAt(user.getCreatedAt())
                 .authorities(auth)
                 .build();
 
@@ -122,6 +123,7 @@ public class JwtTokenProvider {
                 .role(user.getUserRole())
                 .imageUrl(user.getImageUrl())
                 .introduction(user.getIntroduction())
+                .createdAt(user.getCreatedAt())
                 .authorities(auth)
                 .build();
 
