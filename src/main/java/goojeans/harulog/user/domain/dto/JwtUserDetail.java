@@ -15,15 +15,17 @@ public class JwtUserDetail extends User {
     private final String nickname;
     private final String imageUrl;
     private final UserRole roles;
+    private final String introduction;
 
     @Builder(builderMethodName = "userDetailBuilder")
-    public JwtUserDetail(Long id, String username, String password, String email, String imageUrl, UserRole role, Collection<? extends GrantedAuthority> authorities, String nickname) {
+    public JwtUserDetail(Long id, String username, String password, String email, String imageUrl, UserRole role, Collection<? extends GrantedAuthority> authorities, String nickname, String introduction) {
         super(username, password, authorities);
         this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.imageUrl = imageUrl;
         this.roles = role;
+        this.introduction = introduction;
     }
 
 }

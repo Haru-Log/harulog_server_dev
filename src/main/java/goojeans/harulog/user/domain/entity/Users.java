@@ -59,6 +59,7 @@ public class Users extends BaseEntity {
     private String contactNumber;
     private String imageUrl;
     private String refreshToken;
+    private String introduction;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
