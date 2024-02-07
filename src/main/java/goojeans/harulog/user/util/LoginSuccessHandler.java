@@ -1,7 +1,10 @@
 package goojeans.harulog.user.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.service.LoginService;
@@ -16,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
+import java.io.IOException;
+
 @Slf4j
 @RequiredArgsConstructor
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -29,6 +34,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Value("${jwt.cookie.expiration}")
     private Integer COOKIE_EXPIRATION;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -48,8 +55,16 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         user.updateRefreshToken(refreshToken);
         loginService.updateRefreshToken(user);
 
-        response.setStatus(HttpServletResponse.SC_OK);
         response.setHeader("Authorization", accessToken);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+
+        try {
+            String responseBody = objectMapper.writeValueAsString(Response.ok());
+            response.getWriter().write(responseBody);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
