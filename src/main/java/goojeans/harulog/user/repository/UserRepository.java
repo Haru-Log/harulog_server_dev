@@ -34,4 +34,6 @@ public interface UserRepository extends JpaRepository<Users, Long> {
     @Modifying
     @Query("update Users u set u.refreshToken=:refreshToken where u.nickname=:nickname")
     public void updateRefreshToken(@Param("refreshToken") String refreshToken, @Param("nickname") String nickname);
+
+    public Optional<Users> findUsersBySocialId(Long socialId);
 }
