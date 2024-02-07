@@ -6,6 +6,8 @@ spring:
       local:
         - local
         - jwt
+        - oauth
       prod:
         - prod
         - jwt
+        - oauth
