@@ -18,7 +18,7 @@ public enum ResponseCode {
      * Guide: User 엔티티의 경우 USER_BAD_REQUEST, Chat 엔티티의 경우 CHAT_BAD_REQUEST 형식으로 엔티티 이름을 앞에다 붙여줄 것.
      */
     SUCCESS(200, "COM-000", "OK", HttpStatus.OK),
-
+    VALIDATION_FAIL(400, "COM-001", "형식이 맞지 않습니다.", HttpStatus.BAD_REQUEST),
     // 유저 : USR
     USER_NOT_FOUND(400, "USR-001", "유저를 찾을 수 없습니다.",HttpStatus.BAD_REQUEST),
     USER_LOGIN_FAIL(400, "USR-002", "로그인에 실패했습니다.", HttpStatus.BAD_REQUEST),
