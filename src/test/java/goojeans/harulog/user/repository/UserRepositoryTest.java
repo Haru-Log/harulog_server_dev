@@ -9,6 +9,7 @@ import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
+import goojeans.harulog.user.util.UserRole;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -259,6 +260,33 @@ class UserRepositoryTest {
         Users findUser = em.find(Users.class, testId1);
 
         assertThat(findUser.getRefreshToken()).isEqualTo(updateToken);
+    }
+
+    @Test
+    @DisplayName("소셜 아이디로 유저 찾기")
+    void findUserBySocialId() {
+        //Given
+        String socialTest = "testSocial";
+        Long socialId = 1L;
+        Users socialUser = Users.builder()
+                .userName(testString)
+                .userRole(UserRole.GUEST)
+                .nickname(socialTest)
+                .socialType(SocialType.KAKAO)
+                .email(socialTest)
+                .password(socialTest)
+                .socialId(socialId)
+                .build();
+        em.persist(socialUser);
+
+        //When
+        Users users = repository.findUsersBySocialId(socialId).stream()
+                .findAny()
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        //Then
+        assertThat(users).isEqualTo(socialUser);
+
     }
 
     /**
