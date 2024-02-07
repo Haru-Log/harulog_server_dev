@@ -34,10 +34,7 @@ jobs:
         # Java 개발 키트(JDK)를 설정합니다. 여기서는 버전 17을 사용합니다.
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew \
-              -Dspring.security.oauth2.client.registration.kakao.client-id=${{ secrets.CLIENT_ID }} \
-              -Dspring.security.oauth2.client.registration.kakao.client-secret=${{ secrets.CLIENT_SECRET }} \
-              -Dspring.security.oauth2.client.registration.kakao.redirect-uri=${{ secrets.REDIRECT_URI }}
+        run: chmod +x gradlew
         # Gradle 래퍼 스크립트에 실행 권한을 부여합니다.
 
       - name: Build with Gradle
