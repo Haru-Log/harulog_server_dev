@@ -106,6 +106,7 @@ public class JwtTokenProvider {
                 .createdAt(user.getCreatedAt())
                 .socialType(user.getSocialType())
                 .authorities(auth)
+                .contactNumber(user.getContactNumber())
                 .build();
 
         return new UsernamePasswordAuthenticationToken(jwtUserDetail, "", auth);
@@ -127,6 +128,7 @@ public class JwtTokenProvider {
                 .createdAt(user.getCreatedAt())
                 .authorities(auth)
                 .socialType(user.getSocialType())
+                .contactNumber(user.getContactNumber())
                 .build();
 
         return new UsernamePasswordAuthenticationToken(jwtUserDetail, "", auth);

@@ -20,11 +20,12 @@ public class JwtUserDetail extends User {
     private final String introduction;
     private final LocalDateTime createdAt;
     private final SocialType socialType;
+    private final String contactNumber;
 
     @Builder(builderMethodName = "userDetailBuilder")
     public JwtUserDetail(Long id, String username, String password, String email, String imageUrl, UserRole role,
                          Collection<? extends GrantedAuthority> authorities, String nickname, String introduction,
-                         LocalDateTime createdAt, SocialType socialType) {
+                         LocalDateTime createdAt, SocialType socialType, String contactNumber) {
         super(username, password, authorities);
         this.id = id;
         this.nickname = nickname;
@@ -34,6 +35,7 @@ public class JwtUserDetail extends User {
         this.introduction = introduction;
         this.createdAt = createdAt;
         this.socialType = socialType;
+        this.contactNumber = contactNumber;
     }
 
 }
