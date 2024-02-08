@@ -19,17 +19,20 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 해당 prefix를 붙인 요청을 메시지 브로커로 전달한다.
         // todo: rabbitmq로 바꾸기
         registry.enableSimpleBroker("/topic", "/queue"); // subscriber
+//        registry.setPathMatcher(new AntPathMatcher("."));
+//        registry.setApplicationDestinationPrefixes("/app") // publisher
+//                .enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/queue");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // todo: Postman 테스트용 - 배포 시 반드시 주석처리.
-        registry.addEndpoint("/ws")
-                .setAllowedOrigins("*"); // 클라이언트에서 웹소켓서버에 요청 시 모든 요청 허용.(CORS)
+//        registry.addEndpoint("/ws")
+//                .setAllowedOrigins("*"); // 클라이언트에서 웹소켓서버에 요청 시 모든 요청 허용.(CORS)
 
         // sockJS 사용
-//        registry.addEndpoint("/ws")
-//                .setAllowedOrigins("*")
-//                .withSockJS();// SockJS를 사용하기 위한 설정
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*")
+                .withSockJS();// SockJS를 사용하기 위한 설정
     }
 }
