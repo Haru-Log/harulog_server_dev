@@ -1,10 +1,13 @@
 package goojeans.harulog.chat.util;
 
+import goojeans.harulog.chat.service.ChatRoomUserService;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.user.util.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -14,36 +17,51 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ChatInboundInterceptor implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
-
+    private final ChatRoomUserService chatRoomUserService;
+    private final RabbitMQConfig rabbitMQConfig;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         /**
-         * STOMP의 CONNECT 요청을 처리하고, 해당 요청의 유효성을 검증
+         * CONNECT
+         * 1. jwt 토큰 검증
          */
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");
-            if (token == null) {
-                throw new BusinessException(ResponseCode.USER_NOT_FOUND);
-            }
+            log.info("token : {}", token);
 
-            // 토큰에서 Authentication 객체를 추출하여 accessor에 저장
+            // jwt 토큰 검증
+            Authentication authentication = getAuthentication(token);
+            accessor.setUser(authentication);
+        }
+
+        /**
+         * SEND
+         * todo 1. 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
+         */
+
+        return message;
+    }
+
+    private Authentication getAuthentication(String token){
+        try{
+            token = token.substring("Bearer ".length()); // "Bearer " 제거
+
             Claims claims = jwtTokenProvider.getClaim(token).stream()
                     .findAny()
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_UNAUTHORIZED));
 
-            Authentication authentication = jwtTokenProvider.getAuthentication(claims);
-            accessor.setUser(authentication);
+            return jwtTokenProvider.getAuthentication(claims);
+        }catch (Exception e){
+            throw new BusinessException(ResponseCode.USER_UNAUTHORIZED);
         }
-        return message;
     }
-
-
 }
