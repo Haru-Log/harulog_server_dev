@@ -28,7 +28,7 @@ public class ChatRoomController {
     public ResponseEntity<?> create(){
         log.trace("ChatRoomController.create");
 
-        Response<ChatRoomDTO> response = chatRoomService.createDM(); // DM 채팅방 생성
+        Response<ChatRoomDTO> response = chatRoomService.createChatRoom(); // DM 채팅방 생성
         String userNickname = securityUtils.getCurrentUserInfo().getNickname();
 
         chatRoomUserService.addUser(response.getData().getRoomId(), userNickname); // 채팅방에 "나" 추가
@@ -39,6 +39,6 @@ public class ChatRoomController {
     @DeleteMapping("/chats/{roomId}")
     public ResponseEntity<?> delete(@PathVariable("roomId") String roomId){
         log.trace("ChatRoomController.delete : " + roomId);
-        return ResponseEntity.ok(chatRoomService.delete(roomId));
+        return ResponseEntity.ok(chatRoomService.deleteChatRoom(roomId));
     }
 }
