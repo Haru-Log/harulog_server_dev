@@ -11,6 +11,7 @@ import goojeans.harulog.user.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class ChallengeController {
     private final SecurityUtils securityUtils;
 
     @PostMapping("/challenge/register")
-    public ResponseEntity<Response<ChallengeResponse>> registerChallenge(@RequestBody ChallengeRequest request) {
+    public ResponseEntity<Response<ChallengeResponse>> registerChallenge(@Validated @RequestBody ChallengeRequest request) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<ChallengeResponse> response = challengeService.registerChallenge(userId, request);
 
@@ -81,6 +82,14 @@ public class ChallengeController {
     @GetMapping("/main/challenge")
     public ResponseEntity<Response<List<ChallengeAllResponse>>> getRandomChallenge() {
         Response<List<ChallengeAllResponse>> response = challengeService.getRandomChallenge();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/profile/challenge")
+    public ResponseEntity<Response<List<ChallengeAllResponse>>> getUserChallenge() {
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+        Response<List<ChallengeAllResponse>> response = challengeService.getUserChallenge(userId);
 
         return ResponseEntity.ok(response);
     }
