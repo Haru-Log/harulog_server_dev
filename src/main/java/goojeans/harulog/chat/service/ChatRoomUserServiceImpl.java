@@ -39,6 +39,12 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
         chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user));
 
+        // DM 채팅방이면서 유저가 1명 추가되어, 2명 초과가 되면 그룹 채팅방으로 변경
+        if(chatRoom.getType() == DM && chatRoom.getUsers().size()+1 > 2){
+            chatRoom.setType(GROUP);
+            chatRoomRepository.save(chatRoom);
+        }
+
         return Response.ok();
     }
 
@@ -52,9 +58,8 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
         users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user)));
 
-
         // DM 채팅방이면서 유저가 2명 초과이면 그룹 채팅방으로 변경
-        if (chatRoom.getType() == DM && !users.isEmpty()) {
+        if (chatRoom.getType() == DM && chatRoom.getUsers().size() + users.size() > 2) {
             chatRoom.setType(GROUP);
             chatRoomRepository.save(chatRoom);
         }
@@ -62,12 +67,18 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         return Response.ok();
     }
 
-    // todo: 유저 삭제되었을 때, 채팅방 타입 변경 로직 추가
     @Override
     public Response<Void> deleteUser(String roomId, String userNickname) {
 
         ChatRoomUser chatRoomUser = findChatRoomUser(roomId, userNickname);
         chatRoomUserRepository.delete(chatRoomUser);
+
+        // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
+        ChatRoom chatRoom = chatRoomUser.getChatRoom();
+        if(chatRoom.getType() == GROUP && chatRoom.getUsers().size()-1 <= 2){
+            chatRoom.setType(DM);
+            chatRoomRepository.save(chatRoom);
+        }
 
         return Response.ok();
     }
