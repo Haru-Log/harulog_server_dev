@@ -2,23 +2,24 @@ package goojeans.harulog.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 
 @Configuration
 public class WebClientConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+    public WebClient customWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP)
+                        .host("http://krmp-proxy.9rum.cc")
+                        .port(3128));
 
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("http://krmp-proxy.9rum.cc", 3128));
-        requestFactory.setProxy(proxy);
-
-        return new RestTemplate(requestFactory);
+        ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
+        return WebClient.builder().clientConnector(connector).build();
     }
 
 }
