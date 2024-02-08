@@ -102,7 +102,11 @@ public class JwtTokenProvider {
                 .nickname(user.getNickname())
                 .role(user.getUserRole())
                 .imageUrl(user.getImageUrl())
+                .introduction(user.getIntroduction())
+                .createdAt(user.getCreatedAt())
+                .socialType(user.getSocialType())
                 .authorities(auth)
+                .contactNumber(user.getContactNumber())
                 .build();
 
         return new UsernamePasswordAuthenticationToken(jwtUserDetail, "", auth);
@@ -120,7 +124,11 @@ public class JwtTokenProvider {
                 .nickname(user.getNickname())
                 .role(user.getUserRole())
                 .imageUrl(user.getImageUrl())
+                .introduction(user.getIntroduction())
+                .createdAt(user.getCreatedAt())
                 .authorities(auth)
+                .socialType(user.getSocialType())
+                .contactNumber(user.getContactNumber())
                 .build();
 
         return new UsernamePasswordAuthenticationToken(jwtUserDetail, "", auth);

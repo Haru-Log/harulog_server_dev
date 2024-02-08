@@ -8,6 +8,7 @@ import goojeans.harulog.user.service.UserGoalService;
 import goojeans.harulog.user.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class UserGoalController {
     }
 
     @PutMapping("/user-goal/update")
-    public ResponseEntity<Response<Void>> updateUserGoal(@RequestBody UpdateUserGoalsRequest request) {
+    public ResponseEntity<Response<Void>> updateUserGoal(@Validated @RequestBody UpdateUserGoalsRequest request) {
 
         JwtUserDetail currentUserInfo = contextUtils.getCurrentUserInfo();
         request.setUserId(currentUserInfo.getId());
