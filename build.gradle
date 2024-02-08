@@ -35,7 +35,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.springframework.kafka:spring-kafka'
 
 	compileOnly 'org.projectlombok:lombok'
 
@@ -50,7 +49,6 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'org.testcontainers:kafka'
 	testImplementation 'org.testcontainers:mysql'
 	testImplementation 'org.testcontainers:rabbitmq'
 
@@ -59,7 +57,15 @@ dependencies {
 
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	// rabbitmq 설치
+	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	implementation 'io.projectreactor.netty:reactor-netty'
+	implementation 'io.netty:netty-all'
 }
+
+System.getProperty("os.name") == "Mac OS X" && System.getProperty("os.arch") == "aarch64"
+
 
 tasks.named('test') {
 	useJUnitPlatform()
