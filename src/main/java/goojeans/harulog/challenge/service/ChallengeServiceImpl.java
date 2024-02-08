@@ -156,28 +156,33 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         List<Challenge> challenges = challengeRepository.findAll();
 
-        List<ChallengeAllResponse> challengeResponse = challenges.stream().map(challenge -> new ChallengeAllResponse(challenge.getChallengeId(),
-                challenge.getChallengeTitle(),
-                challenge.getCategory().getCategoryName(),
-                challenge.getChallengeUserList().size(),
-                challenge.getImageUrl())).collect(Collectors.toList());
+        List<ChallengeAllResponse> challengeResponse = challenges.stream()
+                .map(challenge -> new ChallengeAllResponse(
+                        challenge.getChallengeId(),
+                        challenge.getChallengeTitle(),
+                        challenge.getCategory().getCategoryName(),
+                        challenge.getChallengeUserList().size(),
+                        challenge.getImageUrl()
+                )).collect(Collectors.toList());
 
         return Response.ok(challengeResponse);
     }
 
     @Override
-    public Response<List<ChallengeResponse>> getUserChallenge(Long userId) {
+    public Response<List<ChallengeAllResponse>> getUserChallenge(Long userId) {
 
         List<Challenge> challenges = challengeRepository.findAllByUserId(userId);
 
-        List<ChallengeResponse> challengeResponses = challenges.stream()
-                .map(challenge -> {
-                    List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge.getChallengeUserList());
-                    return ChallengeResponse.of(challenge, challengeUserList);
-                })
-                .collect(Collectors.toList());
+        List<ChallengeAllResponse> challengeResponse = challenges.stream()
+                .map(challenge -> new ChallengeAllResponse(
+                        challenge.getChallengeId(),
+                        challenge.getChallengeTitle(),
+                        challenge.getCategory().getCategoryName(),
+                        challenge.getChallengeUserList().size(),
+                        challenge.getImageUrl()
+                )).collect(Collectors.toList());
 
-        return Response.ok(challengeResponses);
+        return Response.ok(challengeResponse);
     }
 
     @Override

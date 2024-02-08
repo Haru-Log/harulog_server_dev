@@ -30,7 +30,7 @@ public interface ChallengeService {
     Response<List<ChallengeAllResponse>> getAllChallenge();
 
     //한 사용자가 참여하는 모든 챌린지 조회
-    Response<List<ChallengeResponse>> getUserChallenge(Long userId);
+    Response<List<ChallengeAllResponse>> getUserChallenge(Long userId);
 
     //챌린지 수정
     Response<ChallengeResponse> updateChallenge(Long userId, Long challengeId, ChallengeRequest request);

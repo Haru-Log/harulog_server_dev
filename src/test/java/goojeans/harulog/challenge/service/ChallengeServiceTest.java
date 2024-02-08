@@ -198,7 +198,7 @@ class ChallengeServiceTest {
 
         when(challengeRepository.findAllByUserId(userId)).thenReturn(challenges);
 
-        Response<List<ChallengeResponse>> response = challengeService.getUserChallenge(user.getId());
+        Response<List<ChallengeAllResponse>> response = challengeService.getUserChallenge(user.getId());
         Assertions.assertThat(response.getData()).hasSize(1);
     }
 

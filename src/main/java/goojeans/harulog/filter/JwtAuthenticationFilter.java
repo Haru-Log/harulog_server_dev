@@ -49,6 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        log.info("request uri = {}", request.getRequestURI());
+
         String accessToken = jwtTokenProvider.extractAccessToken(request).stream()
                 .findAny()
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_LOGIN_REQUIRED));
