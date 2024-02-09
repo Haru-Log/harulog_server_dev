@@ -7,7 +7,9 @@ spring:
         - local
         - jwt
         - oauth
+        - rabbitmq
       dev:
         - dev
         - jwt
         - oauth
+        - rabbitmq
