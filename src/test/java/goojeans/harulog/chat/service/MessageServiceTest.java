@@ -9,6 +9,7 @@ import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.repository.MessageRepository;
 import goojeans.harulog.chat.util.MessageType;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -37,6 +38,8 @@ class MessageServiceTest {
     @Mock private ChatRoomRepository chatRoomRepository;
     @Mock private ChatRoomUserRepository chatRoomUserRepository;
     @Mock private MessageRepository messageRepository;
+    @Mock private RabbitMQConfig rabbitMQConfig;
+
     @InjectMocks private MessageServiceImpl messageService;
 
     String test = "test";
@@ -79,22 +82,6 @@ class MessageServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방 구독")
-    void subscribe() {
-        // given
-        ChatRoom chatRoom = ChatRoom.createDM();
-        Users user = new Users();
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(java.util.Optional.of(chatRoom));
-        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(java.util.Optional.of(user));
-
-        // when
-        messageService.subscribe(chatRoom.getId(), user.getNickname());
-
-        // then
-        verify(chatRoomUserRepository).save(any(ChatRoomUser.class));
-    }
-
-    @Test
     @DisplayName("채팅방 입장")
     void enter() {
         // given
@@ -106,7 +93,7 @@ class MessageServiceTest {
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        MessageDTO message = messageService.enter(chatRoom.getId(), user.getNickname());
+        MessageDTO message = messageService.entry(chatRoom.getId(), user.getNickname());
 
         // then
         Assertions.assertThat(message).isNotNull();

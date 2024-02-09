@@ -3,6 +3,7 @@ package goojeans.harulog.chat.service;
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.dto.Response;
 import org.assertj.core.api.Assertions;
@@ -27,6 +28,9 @@ class ChatRoomServiceTest {
     @Mock
     private ChatRoomRepository chatRoomRepository;
 
+    @Mock
+    private RabbitMQConfig rabbitMQConfig;
+
     @InjectMocks
     private ChatRoomServiceImpl chatRoomService;
 
@@ -40,7 +44,7 @@ class ChatRoomServiceTest {
 //        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
         // when
-        Response<ChatRoomDTO> created = chatRoomService.createDM();
+        Response<ChatRoomDTO> created = chatRoomService.createChatRoom();
 
         // then
         Assertions.assertThat(created).isNotNull(); // response가 null이 아닌지 확인
@@ -87,7 +91,7 @@ class ChatRoomServiceTest {
         String roomId = UUID.randomUUID().toString();
 
         // when
-        Response<Void> response = chatRoomService.delete(roomId);
+        Response<Void> response = chatRoomService.deleteChatRoom(roomId);
 
         // then
         Assertions.assertThat(response).isNotNull();
