@@ -9,11 +9,13 @@ import goojeans.harulog.chat.domain.entity.Message;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.repository.MessageRepository;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,6 +44,9 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     // 입장, 퇴장 메세지 전송
     private final RabbitTemplate rabbitTemplate;
 
+    // 채팅방 - 유저 binding, unbinding
+    private final RabbitMQConfig rabbitMQConfig;
+
     /**
      * 채팅방에 유저 1명 추가
      * + DM방 일때 유저가 1명 추가되어, 2명 초과가 되면 Group 채팅방으로 변경
@@ -59,6 +64,9 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             chatRoom.setType(GROUP);
             chatRoomRepository.save(chatRoom);
         }
+
+        // 채팅방 Exchange에 유저 Queue BINDING
+        rabbitMQConfig.binding(roomId, userNickname);
 
         // 입장 메세지 전송
         sendEnterMessage(chatRoom, user);
@@ -79,6 +87,9 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
                 .toList();
 
         users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user)));
+
+        // 채팅방 Exchange에 유저 Queue BINDING
+        users.forEach(user -> rabbitMQConfig.binding(roomId, user.getNickname()));
 
         // 입장 메세지 전송
         users.forEach(user -> sendEnterMessage(chatRoom, user));
@@ -111,6 +122,9 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
         // 퇴장 메세지 전송
         sendExitMessage(chatRoom, chatRoomUser.getUser());
+
+        // 채팅방 Exchange에 유저 Queue UNBINDING
+        rabbitMQConfig.unBinding(roomId, userNickname);
 
         return Response.ok();
     }

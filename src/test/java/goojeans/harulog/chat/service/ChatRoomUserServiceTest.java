@@ -10,6 +10,7 @@ import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.repository.MessageRepository;
 import goojeans.harulog.chat.util.MessageType;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -43,6 +44,7 @@ class ChatRoomUserServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private MessageRepository messageRepository;
     @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private RabbitMQConfig rabbitMQConfig;
 
     @Captor
     private ArgumentCaptor<Message> messageCaptor; // 저장되는 Message 캡처를 위한 ArgumentCaptor
