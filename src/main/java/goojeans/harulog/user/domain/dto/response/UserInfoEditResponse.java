@@ -1,5 +1,7 @@
 package goojeans.harulog.user.domain.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import goojeans.harulog.user.util.SocialType;
 import lombok.*;
 
 
@@ -8,6 +10,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserInfoEditResponse {
 
     private String imageUrl;
@@ -17,5 +20,6 @@ public class UserInfoEditResponse {
     private String contactNumber;
     private String createdAt;
     private String introduction;
+    private SocialType socialType;
 
 }
