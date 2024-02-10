@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.ConnectException;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,5 +28,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Response<?>> handleValidateException(MethodArgumentNotValidException e) {
         log.error("validate fail = {}", e.getMessage());
         return new ResponseEntity<>(Response.fail(ResponseCode.VALIDATION_FAIL), ResponseCode.VALIDATION_FAIL.getHttpStatus());
+    }
+
+    // WebSocket 연결 실패
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity<Response<?>> handleConnectException(ConnectException e) {
+        log.error("connect fail = {} : {}", e.getMessage(), "WebSocket 연결을 사용하려면 WebSocketConfig와 application.yaml 설정을 확인헤주세요.");
+
+        return new ResponseEntity<>(Response.fail(ResponseCode.CONNECT_FAIL), ResponseCode.CONNECT_FAIL.getHttpStatus());
     }
 }

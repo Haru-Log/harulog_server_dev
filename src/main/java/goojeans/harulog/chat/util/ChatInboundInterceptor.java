@@ -1,7 +1,5 @@
 package goojeans.harulog.chat.util;
 
-import goojeans.harulog.chat.service.ChatRoomUserService;
-import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.user.util.JwtTokenProvider;
@@ -23,8 +21,6 @@ import org.springframework.stereotype.Component;
 public class ChatInboundInterceptor implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final ChatRoomUserService chatRoomUserService;
-    private final RabbitMQConfig rabbitMQConfig;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -45,6 +41,7 @@ public class ChatInboundInterceptor implements ChannelInterceptor {
 
         /**
          * SEND
+         * 채팅방에 메세지 보내기 전,
          * todo 1. 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
          */
 
