@@ -4,20 +4,26 @@ import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.dto.JwtUserDetail;
+import goojeans.harulog.user.domain.dto.request.DeleteUserRequest;
 import goojeans.harulog.user.domain.dto.request.SignUpRequest;
 import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
+import goojeans.harulog.user.util.JwtTokenProvider;
 import goojeans.harulog.user.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -25,6 +31,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final SecurityUtils securityUtils;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Response<Void> signUp(SignUpRequest request) {
@@ -41,6 +49,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Users entity = request.toEntity();
+        entity.updatePassword(passwordEncoder.encode(entity.getPassword()));
 
         userRepository.save(entity);
 
@@ -64,16 +73,17 @@ public class UserServiceImpl implements UserService {
                 .nickname(currentUserInfo.getNickname())
                 .contactNumber(currentUserInfo.getContactNumber())
                 .imageUrl(currentUserInfo.getImageUrl())
+                .socialType(currentUserInfo.getSocialType())
                 .build();
 
         return Response.ok(response);
     }
 
     @Override
-    public Response<Void> updateUserInfo(UpdateUserInfoRequest request) {
+    public String updateUserInfo(UpdateUserInfoRequest request) {
         JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
 
-        Users users = userRepository.findUsersById(currentUserInfo.getId()).stream()
+        Users users = userRepository.findById(currentUserInfo.getId()).stream()
                 .findAny()
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
@@ -81,36 +91,38 @@ public class UserServiceImpl implements UserService {
         users.updateIntroduction(request.getIntroduction());
         users.updateContactNumber(request.getIntroduction());
 
-        return Response.ok();
+        Authentication auth = jwtTokenProvider.createAuthentication(users);
+
+        return jwtTokenProvider.generateAccessToken(auth);
     }
 
     @Override
     public Response<Void> updatePassword(UpdatePasswordRequest request) {
         JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
 
-        if (!request.getBeforePassword().equals(currentUserInfo.getPassword())) {
+        if (!passwordEncoder.matches(request.getBeforePassword(), currentUserInfo.getPassword())) {
             throw new BusinessException(ResponseCode.USER_PASSWORD_NOT_MATCH);
         }
 
-        Users user = userRepository.findUsersById(currentUserInfo.getId()).stream()
+        Users user = userRepository.findById(currentUserInfo.getId()).stream()
                 .findAny()
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
-        user.updatePassword(request.getAfterPassword());
+        user.updatePassword(passwordEncoder.encode(request.getAfterPassword()));
 
         return Response.ok();
     }
 
     // confirm string is email
     @Override
-    public Response<Void> delete(String confirmString) {
+    public Response<Void> delete(DeleteUserRequest request) {
         JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
 
-        if (!confirmString.equals(currentUserInfo.getEmail())) {
+        if (!request.getConfirmString().equals(currentUserInfo.getEmail())) {
             throw new BusinessException(ResponseCode.USER_DELETE_STRING_NOT_MATCH);
         }
 
-        Users user = userRepository.findUsersById(currentUserInfo.getId()).stream()
+        Users user = userRepository.findById(currentUserInfo.getId()).stream()
                 .findAny()
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
