@@ -100,4 +100,16 @@ public class Users extends BaseEntity {
     public void updateUserName(String newName) {
         this.userName = newName;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public void updateIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
 }
