@@ -1,5 +1,6 @@
 package goojeans.harulog.user.domain.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -8,8 +9,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdatePasswordRequest {
-
+    @NotNull
     private String beforePassword;
+    @NotNull
     private String afterPassword;
 
 }

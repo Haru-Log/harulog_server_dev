@@ -1,5 +1,6 @@
 package goojeans.harulog.user.domain.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -9,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 public class UpdateUserInfoRequest {
 
+    @NotNull
     private String nickname;
     private String contactNumber;
     private String introduction;
