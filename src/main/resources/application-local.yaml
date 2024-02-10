@@ -1,0 +1,7 @@
+---
+# docker-compose 자동 실행 해제
+spring:
+  docker:
+    compose:
+      enabled: false
+---
