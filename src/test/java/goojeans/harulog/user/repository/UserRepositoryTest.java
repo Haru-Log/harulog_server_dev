@@ -7,6 +7,7 @@ import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.post.domain.entity.Post;
+import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
 import goojeans.harulog.user.util.UserRole;
@@ -140,35 +141,53 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("아이디로 유저 & 게시물 & 챌린지 개수 정보 가져오기")
+    @DisplayName("아이디로 유저 & 팔로워 팔로잉 수 가져오기")
     void findUserById() {
         //Given
-        String jpql = "select c from Category c where c.categoryName='운동'";
-        Category testCategory = em.createQuery(jpql, Category.class).getSingleResult();
+        String followerString = "follower";
+        String followingString = "following";
 
-        Post testPost = Post.builder()
-                .category(testCategory)
-                .content("test")
-                .activityTime(1)
-                .imgUrl("test")
+        Users from = Users.builder()
+                .email(followerString)
+                .userName(followerString)
+                .socialType(SocialType.HARU)
+                .password(followerString)
+                .imageUrl(followerString)
+                .userRole(UserRole.USER)
+                .nickname(followerString)
                 .build();
-        testPost.addUser(testUser);
 
-        em.persist(testPost);
+        Users to = Users.builder()
+                .email(followingString)
+                .userName(followingString)
+                .socialType(SocialType.HARU)
+                .password(followingString)
+                .imageUrl(followingString)
+                .userRole(UserRole.USER)
+                .nickname(followingString)
+                .build();
+
+        em.persist(from);
+        em.persist(to);
+
+        Follow follow = Follow.builder()
+                .follower(from)
+                .following(to)
+                .build();
+
+        from.addFollowing(follow);
+        to.addFollower(follow);
 
         //When
-        Users findUser = repository.findUsersById(testId1).stream()
+        Users findUser = repository.findUsersById(to.getId()).stream()
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("no such entity"));
 
         //Then
-        assertThat(findUser).isEqualTo(testUser);
-        assertThat(findUser.getPosts()).hasSize(1);
+        assertThat(findUser).isEqualTo(to);
+        assertThat(findUser.getFollowers()).hasSize(1);
+        assertThat(findUser.getFollowings()).hasSize(0);
 
-        String nativeQuery = "delete from post where post_id = :pid";
-        em.createNativeQuery(nativeQuery)
-                .setParameter("pid", testPost.getId())
-                .executeUpdate();
     }
 
     @Test
