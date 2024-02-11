@@ -6,7 +6,6 @@ import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
-import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
@@ -141,7 +140,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("아이디로 유저 & 팔로워 팔로잉 수 가져오기")
+    @DisplayName("이메일로 유저 & 팔로워 팔로잉 수 가져오기")
     void findUserById() {
         //Given
         String followerString = "follower";
@@ -179,7 +178,7 @@ class UserRepositoryTest {
         to.addFollower(follow);
 
         //When
-        Users findUser = repository.findUsersById(to.getId()).stream()
+        Users findUser = repository.findByNickname(to.getNickname()).stream()
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("no such entity"));
 

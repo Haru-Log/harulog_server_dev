@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
 
     @EntityGraph(attributePaths = {"followers", "followings"})
-    Optional<Users> findUsersById(Long id);
+    Optional<Users> findByNickname(String email);
 
     public Optional<Users> findUsersByEmail(String email);
 
