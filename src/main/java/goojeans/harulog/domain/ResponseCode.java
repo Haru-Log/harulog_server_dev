@@ -28,6 +28,8 @@ public enum ResponseCode {
     USER_NICKNAME_DUPLICATION(400, "USR-004", "닉네임이 중복되었습니다.", HttpStatus.BAD_REQUEST),
     USER_EMAIL_DUPLICATION(400, "USR-005", "이메일이 중복되었습니다.", HttpStatus.BAD_REQUEST),
     USER_NICKNAME_EMAIL_DUPLICATION(400, "USR-006", "닉네임과 이메일이 중복되었습니다.", HttpStatus.BAD_REQUEST),
+    USER_PASSWORD_NOT_MATCH(400, "USR-007", "비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
+    USER_DELETE_STRING_NOT_MATCH(400, "USR-008", "이메일이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     USER_UNAUTHORIZED(401, "USR-011", "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED),
     USER_LOGIN_REQUIRED(401, "USR-012", "다시 로그인해주세요.", HttpStatus.UNAUTHORIZED),
 
