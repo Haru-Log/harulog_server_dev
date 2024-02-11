@@ -23,7 +23,7 @@ public class MessageDTO {
                 message.getSender().getImageUrl(),
                 message.getType(),
                 message.getContent(),
-                message.getCreatedAt()
+                LocalDateTime.now()
         );
     }
 }
