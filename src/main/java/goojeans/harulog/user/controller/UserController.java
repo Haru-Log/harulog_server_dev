@@ -5,8 +5,10 @@ import goojeans.harulog.user.domain.dto.request.DeleteUserRequest;
 import goojeans.harulog.user.domain.dto.request.SignUpRequest;
 import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
+import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
 import goojeans.harulog.user.service.UserService;
+import goojeans.harulog.user.util.SecurityUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final SecurityUtils securityUtils;
 
     @PostMapping("/sign-up")
     ResponseEntity<Response<Void>> signUp(@Validated @RequestBody SignUpRequest request) {
@@ -52,6 +55,19 @@ public class UserController {
     @PostMapping("/edit/delete")
     ResponseEntity<Response<Void>> deleteUser(@Validated @RequestBody DeleteUserRequest request) {
         return ResponseEntity.ok(userService.delete(request));
+    }
+
+    @GetMapping("/profile")
+    ResponseEntity<Response<MyPageInfoResponse>> getMyPage() {
+
+        String nickname = securityUtils.getCurrentUserInfo().getNickname();
+
+        return ResponseEntity.ok(userService.getMyPageUserInfo(nickname));
+    }
+
+    @GetMapping("/profile/{nickname}")
+    ResponseEntity<Response<MyPageInfoResponse>> getUserMyPageInfo(@PathVariable String nickname) {
+        return ResponseEntity.ok(userService.getMyPageUserInfo(nickname));
     }
 
 }

@@ -7,7 +7,9 @@ import goojeans.harulog.user.domain.dto.request.DeleteUserRequest;
 import goojeans.harulog.user.domain.dto.request.SignUpRequest;
 import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
+import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
+import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.util.JwtTokenProvider;
@@ -212,6 +214,20 @@ public class UserServiceTest {
 
     }
 
+    @Test
+    @DisplayName("마이페이지 유저 정보 가져오기")
+    void getMyPageUserInfo() {
+        //Given
+        testUser.getFollowers().add(new Follow());
 
+        doReturn(Optional.of(testUser)).when(userRepository).findByNickname(testUser.getNickname());
 
+        //When
+        Response<MyPageInfoResponse> response = userService.getMyPageUserInfo(testUser.getNickname());
+
+        //Then
+        assertThat(response.getData()).isEqualTo(MyPageInfoResponse.entityToResponse(testUser));
+        verify(userRepository, times(1)).findByNickname(testUser.getNickname());
+
+    }
 }

@@ -69,6 +69,14 @@ public class Users extends BaseEntity {
     @Builder.Default
     private Set<Post> posts = new HashSet<>();
 
+    @OneToMany(mappedBy = "following", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Follow> followers = new HashSet<>();
+
+    @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Follow> followings = new HashSet<>();
+
     // 연관 관계 편의 메서드
     public void addChallengeUser(ChallengeUser challengeUser) {
         this.challengeUsers.add(challengeUser);
@@ -82,6 +90,20 @@ public class Users extends BaseEntity {
         this.posts.add(post);
         if (post.getUser() != this) {
             post.addUser(this);
+        }
+    }
+
+    public void addFollower(Follow follower) {
+        this.followers.add(follower);
+        if (follower.getFollowing() != this){
+            follower.addFollowing(this);
+        }
+    }
+
+    public void addFollowing(Follow following) {
+        this.followings.add(following);
+        if (following.getFollower() != this) {
+            following.addFollower(this);
         }
     }
 
