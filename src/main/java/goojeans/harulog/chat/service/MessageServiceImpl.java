@@ -24,6 +24,11 @@ import java.util.List;
 
 import static goojeans.harulog.chat.util.MessageType.*;
 
+/**
+ * 채팅방에 들어가기(in), 나가기(out), 메세지 전송
+ * (입장, 퇴장 메세지는 채팅방에 유저가 추가되고 삭제 될 때 -> ChatRoomUserService에서 구현)
+ */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,12 +40,13 @@ public class MessageServiceImpl implements MessageService{
     private final MessageRepository messageRepository;
     private final RabbitMQConfig rabbitMQConfig;
 
-
     /**
-     * 채팅방 입장 및 메세지 조회
+     * 채팅방 들어가기
+     * @return 채팅방 메세지 전체 조회. (todo: 커서 기반 페이징)
      */
-    public Response<MessageListDTO> getMessages(String roomId, String userNickname){
-        log.trace("MessageServiceImpl.getMessages : " + roomId);
+    @Override
+    public Response<MessageListDTO> roomIn(String roomId, String userNickname) {
+        log.trace("MessageServiceImpl.roomIn : " + roomId + ", " + userNickname);
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
         checkPermission(roomId, userNickname);
@@ -60,30 +66,30 @@ public class MessageServiceImpl implements MessageService{
     }
 
     /**
-     * 채팅방 입장 메세지 생성 및 저장
+     * 채팅방 나가기
+     * todo: 현재까지 읽은 메세지 저장 -> 이후 채팅방 입장 시, 읽은 메세지 기준으로 페이징 (커서 기반) : 구현 검토.
      */
     @Override
-    public MessageDTO entry(String roomId, String userNickname) {
+    public Response<Void> roomOut(String roomId, String userNickname) {
+        log.trace("MessageServiceImpl.roomOut : " + roomId + ", " + userNickname);
 
-        ChatRoomUser find = checkPermission(roomId, userNickname);
+        // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
+        checkPermission(roomId, userNickname);
 
-        // 입장 메세지 생성 및 저장
-        String content = userNickname + "님이 입장하셨습니다.";
-        Message message = Message.create(find.getChatRoom(), find.getUser(), ENTER, content);
-        messageRepository.save(message);
+        // 채팅방-유저 UNBINDING
+        rabbitMQConfig.unBinding(roomId, userNickname);
 
-        // 채팅방 입장 상태 변경
-        find.setEntered(true);
-        chatRoomUserRepository.save(find);
-
-        return MessageDTO.of(message);
+        return Response.ok();
     }
 
-    // 메세지 전송
+    /**
+     * 메세지 전송
+     * @return 전송한 메세지를 DTO로 반환
+     */
     @Transactional // 메세지 전송 시, 채팅방 업데이트 시간 변경
     @Override
-    public MessageDTO send(String roomId, String userNickname, String content) {
-        log.trace("MessageServiceImpl.send : " + roomId + ", " + userNickname + ", " + content);
+    public MessageDTO sendMessage(String roomId, String userNickname, String content) {
+        log.trace("MessageServiceImpl.sendMessage : " + content + ", [" + roomId + " : " + userNickname + "]");
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
         ChatRoomUser find = checkPermission(roomId, userNickname);
@@ -94,24 +100,6 @@ public class MessageServiceImpl implements MessageService{
         // 채팅방 업데이트 시간 변경 : 오로지 "채팅 메세지"에 한정. enter, exit 메세지는 제외
         find.getChatRoom().setUpdatedAt(LocalDateTime.now());
         chatRoomRepository.save(find.getChatRoom());
-
-        return MessageDTO.of(message);
-    }
-
-    // 채팅방 퇴장
-    @Override
-    public MessageDTO exit(String roomId, String userNickname) {
-        log.trace("MessageServiceImpl.exit : " + roomId + ", " + userNickname);
-
-        // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
-        ChatRoomUser find = checkPermission(roomId, userNickname);
-
-        // 채팅방 구독 취소
-        chatRoomUserRepository.delete(find);
-
-        String content = find.getUser().getNickname() + "님이 나가셨습니다.";
-        Message message = Message.create(find.getChatRoom(), find.getUser(), EXIT, content);
-        messageRepository.save(message);
 
         return MessageDTO.of(message);
     }
