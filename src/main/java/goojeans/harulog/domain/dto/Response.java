@@ -37,6 +37,14 @@ public class Response<T> {
         return response;
     }
 
+    public static <T> Response<T> ok(String message){
+        Response<T> response = new Response<T>();
+        response.status = ResponseCode.SUCCESS.getStatus();
+        response.code = ResponseCode.SUCCESS.getCode();
+        response.message = message;
+        return response;
+    }
+
     /**
      * 실패 응답에 대한 정적 팩토리 메서드
      */
