@@ -95,7 +95,7 @@ class ChallengeServiceTest {
 
         ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
 
-        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.save(any(Challenge.class))).thenReturn(challenge);
 
@@ -113,7 +113,7 @@ class ChallengeServiceTest {
         ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList(challenge));
 
-        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
 
@@ -127,7 +127,7 @@ class ChallengeServiceTest {
         ChallengeJoinRequest request = new ChallengeJoinRequest(challengeId);
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList());
 
-        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
         when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
 
@@ -142,7 +142,7 @@ class ChallengeServiceTest {
         ChallengeJoinRequest request = new ChallengeJoinRequest(challengeId);
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList(challenge));
 
-        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
         when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
 
@@ -156,7 +156,7 @@ class ChallengeServiceTest {
         ChallengeLeaveRequest request = new ChallengeLeaveRequest(challengeId);
         ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
 
-        when(userRepository.findUsersById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
         when(challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId)).thenReturn(Optional.of(challengeUser));
 

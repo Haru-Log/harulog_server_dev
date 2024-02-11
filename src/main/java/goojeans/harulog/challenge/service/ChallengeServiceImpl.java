@@ -44,7 +44,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRequest request) {
 
-        Users user = userRepository.findUsersById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        Users user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
         Category category = categoryRepository.findByCategoryName(request.getCategoryName()).orElseThrow(() -> new BusinessException(ResponseCode.CATEGORY_NOT_FOUND));
 
         if (!canJoinChallenge(user, request.getCategoryName())) {
@@ -85,7 +85,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public Response<ChallengeResponse> joinChallenge(Long userId, ChallengeJoinRequest request) {
 
-        Users user = userRepository.findUsersById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        Users user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
         Challenge challenge = challengeRepository.findByChallengeId(request.getChallengeId()).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
 
         if (isAlreadyJoin(userId, challenge.getChallengeId())) {
@@ -107,7 +107,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     public Response<Void> leaveChallenge(Long userId, ChallengeLeaveRequest request) {
 
-        Users user = userRepository.findUsersById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        Users user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
         Challenge challenge = challengeRepository.findByChallengeId(request.getChallengeId()).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
         ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(user.getId(), challenge.getChallengeId()).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
 
