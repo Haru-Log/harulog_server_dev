@@ -8,6 +8,7 @@ import goojeans.harulog.user.domain.dto.request.DeleteUserRequest;
 import goojeans.harulog.user.domain.dto.request.SignUpRequest;
 import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
+import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
@@ -129,6 +130,16 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
 
         return Response.ok();
+    }
+
+    @Override
+    public Response<MyPageInfoResponse> getMyPageUserInfo(String nickname) {
+
+        Users findUser = userRepository.findByNickname(nickname).stream()
+                .findAny()
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        return Response.ok(MyPageInfoResponse.entityToResponse(findUser));
     }
 
     private boolean checkNicknameDuplication(String nickname) {

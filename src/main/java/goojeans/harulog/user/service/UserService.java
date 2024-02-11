@@ -6,18 +6,21 @@ import goojeans.harulog.user.domain.dto.request.DeleteUserRequest;
 import goojeans.harulog.user.domain.dto.request.SignUpRequest;
 import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
+import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
 
 public interface UserService {
 
-    public Response<Void> signUp(SignUpRequest request);
+    Response<Void> signUp(SignUpRequest request);
 
-    public Response<UserInfoEditResponse> getUserInfoForEdit();
+    Response<UserInfoEditResponse> getUserInfoForEdit();
 
-    public String updateUserInfo(UpdateUserInfoRequest request);
+    String updateUserInfo(UpdateUserInfoRequest request);
 
-    public Response<Void> updatePassword(UpdatePasswordRequest request);
+    Response<Void> updatePassword(UpdatePasswordRequest request);
 
-    public Response<Void> delete(DeleteUserRequest request);
+    Response<Void> delete(DeleteUserRequest request);
+
+    Response<MyPageInfoResponse> getMyPageUserInfo(String nickname);
 
 }
