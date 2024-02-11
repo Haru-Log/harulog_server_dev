@@ -19,6 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ChatInboundInterceptor chatInboundInterceptor;
 
+    @Value("${spring.rabbitmq.host}") String host;
     @Value("${spring.rabbitmq.username}") String username;
     @Value("${spring.rabbitmq.password}") String password;
 
@@ -28,7 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // rabbitmq
         registry.setApplicationDestinationPrefixes("/app") // publisher
                 .enableStompBrokerRelay("/queue", "/topic", "/exchange", "/amq/topic","/amq/queue")
-                .setRelayHost("localhost")
+                .setRelayHost(host)
                 .setRelayPort(61613)
                 .setClientLogin(username)
                 .setClientPasscode(password)
