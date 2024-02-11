@@ -3,7 +3,9 @@ package goojeans.harulog.chat.service;
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
+import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,9 @@ class ChatRoomServiceTest {
     @Mock
     private ChatRoomRepository chatRoomRepository;
 
+    @Mock
+    private RabbitMQConfig rabbitMQConfig;
+
     @InjectMocks
     private ChatRoomServiceImpl chatRoomService;
 
@@ -37,10 +42,9 @@ class ChatRoomServiceTest {
         // given
         ChatRoom chatRoom = new ChatRoom();
         doReturn(chatRoom).when(chatRoomRepository).save(any(ChatRoom.class));
-//        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
         // when
-        Response<ChatRoomDTO> created = chatRoomService.createDM();
+        Response<ChatRoomDTO> created = chatRoomService.createChatRoom();
 
         // then
         Assertions.assertThat(created).isNotNull(); // response가 null이 아닌지 확인
@@ -75,8 +79,11 @@ class ChatRoomServiceTest {
         // when
 
         // then
+        // 채팅방이 존재하지 않을 때의 에러 메세지 확인
         Assertions.assertThatThrownBy(() -> chatRoomService.findByRoomId(roomId))
-                .isInstanceOf(BusinessException.class);
+                .isInstanceOf(BusinessException.class)                               // BusinessException이 발생하는지 확인
+                .hasMessageContaining(ResponseCode.CHATROOM_NOT_FOUND.getMessage()); // BusinessException의 메세지가 "채팅방을 찾을 수 없습니다."인지 확인
+
         verify(chatRoomRepository).findById(roomId);
     }
 
@@ -87,7 +94,7 @@ class ChatRoomServiceTest {
         String roomId = UUID.randomUUID().toString();
 
         // when
-        Response<Void> response = chatRoomService.delete(roomId);
+        Response<Void> response = chatRoomService.deleteChatRoom(roomId);
 
         // then
         Assertions.assertThat(response).isNotNull();

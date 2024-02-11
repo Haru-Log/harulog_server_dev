@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 // TODO: 리팩터링 필요 (로직 점검 및 중복 코드 제거)
@@ -35,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String LOGIN_URI = "/api/login";
     private final String HOME_URI = "/api";
 
-    protected List<String> filterPassList = List.of(LOGIN_URI, HOME_URI, "/", "/login", "/oauth2/authorization/kakao",
+    protected List<String> filterPassList = List.of(LOGIN_URI, HOME_URI, "/", "/ws", "/login", "/oauth2/authorization/kakao",
             "/login/oauth2/code/kakao", "/favicon.ico", "/api/sign-up");
 
     @Value("${jwt.cookie.expiration}")
