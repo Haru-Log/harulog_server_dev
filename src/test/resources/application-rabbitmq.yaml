@@ -1,0 +1,8 @@
+# RabbitMQ 설정
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASS}
