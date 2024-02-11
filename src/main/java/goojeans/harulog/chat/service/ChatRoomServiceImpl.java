@@ -3,6 +3,7 @@ package goojeans.harulog.chat.service;
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -18,40 +19,48 @@ import org.springframework.stereotype.Service;
 public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final RabbitMQConfig rabbitMQConfig;
 
-    // 채팅방 생성
+    /**
+     * 채팅방 생성
+     * + 채팅방 생성 시 exchange 생성
+     * todo: 채팅방 생성(정적 팩터리 메서드) -> ChatRoom.createRoom(DM) 이런식으로 리팩터링.
+     */
     @Override
-    public Response<ChatRoomDTO> createDM() {
-        log.trace("create DM execute");
+    public Response<ChatRoomDTO> createChatRoom() {
+        log.trace("create ChatRoom");
 
         ChatRoom chatRoom = ChatRoom.createDM();
         chatRoomRepository.save(chatRoom);
+
+        // 채팅방 생성 시 exchange 생성
+        rabbitMQConfig.createFanoutExchange(chatRoom.getId());
+
         return Response.ok(ChatRoomDTO.of(chatRoom));
     }
 
-    @Override
-    public Response<ChatRoomDTO> createChallenge(String name, String imageUrl) {
-        log.trace("create ChallengeChatRoom execute");
-
-        ChatRoom chatRoom = ChatRoom.createChallenge(name, imageUrl);
-        chatRoomRepository.save(chatRoom);
-        return Response.ok(ChatRoomDTO.of(chatRoom));
-    }
-
-    // 채팅방 조회
+    /**
+     * 채팅방 조회
+     */
     @Override
     public Response<ChatRoomDTO> findByRoomId(String roomId) {
         log.trace("findByRoomId() execute");
 
         ChatRoom find = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ResponseCode.CHATROOM_NOT_FOUND));
         return Response.ok(ChatRoomDTO.of(find));
     }
 
-    // 채팅방 삭제 (soft delete)
+    /**
+     * 채팅방 삭제 (soft delete)
+     * + 채팅방 삭제 시 exchange 삭제
+     */
     @Override
-    public Response<Void> delete(String roomId) {
+    public Response<Void> deleteChatRoom(String roomId) {
         log.trace("deleteChatRoom() execute");
+
+        // 채팅방 삭제 시 exchange 삭제
+        rabbitMQConfig.deleteExchange(roomId);
 
         chatRoomRepository.deleteById(roomId);
         return Response.ok();
