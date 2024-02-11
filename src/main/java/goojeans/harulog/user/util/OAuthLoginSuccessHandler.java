@@ -1,6 +1,7 @@
 package goojeans.harulog.user.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -29,6 +30,7 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final RabbitMQConfig rabbitMQConfig;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${jwt.cookie.expiration}")
@@ -63,6 +65,9 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
 
             Users findUser = userRepository.findUsersByEmail(oAuth2User.getUser().getEmail())
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+            // 로그인에 성공했을 때, 유저에게 amqp Queue 할당
+            rabbitMQConfig.createQueue(findUser.getNickname());
 
             // User 의 Role 이 GUEST 일 경우 처음 요청한 회원이므로 회원가입 페이지로 리다이렉트
             if(oAuth2User.getUser().getUserRole() == UserRole.GUEST) {

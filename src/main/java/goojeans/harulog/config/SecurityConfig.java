@@ -38,6 +38,7 @@ public class SecurityConfig {
     private final OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
     private final OAuthLoginFailureHandler oAuthLoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final RabbitMQConfig rabbitMQConfig;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -110,7 +111,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtTokenProvider, userRepository, loginService);
+        return new LoginSuccessHandler(jwtTokenProvider, userRepository, loginService, rabbitMQConfig);
     }
 
     @Bean
