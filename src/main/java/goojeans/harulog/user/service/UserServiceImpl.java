@@ -1,5 +1,6 @@
 package goojeans.harulog.user.service;
 
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private final SecurityUtils securityUtils;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final RabbitMQConfig rabbitMQConfig;
 
     @Override
     public Response<Void> signUp(SignUpRequest request) {
@@ -53,6 +55,9 @@ public class UserServiceImpl implements UserService {
         entity.updatePassword(passwordEncoder.encode(entity.getPassword()));
 
         userRepository.save(entity);
+
+        // 회원가입 성공 시, 유저 Queue 생성
+        rabbitMQConfig.createQueue(entity.getNickname());
 
         return Response.ok();
     }
