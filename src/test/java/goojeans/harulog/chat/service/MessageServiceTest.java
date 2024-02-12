@@ -8,7 +8,6 @@ import goojeans.harulog.chat.domain.entity.Message;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.repository.MessageRepository;
-import goojeans.harulog.chat.util.MessageType;
 import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
@@ -24,7 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -54,74 +52,28 @@ class MessageServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방 메세지 조회")
-    void getMessages() {
+    @DisplayName("채팅방 들어가기")
+    void roomIn() {
         // given
-        String roomId = chatRoom.getId();
-        String userNickname = user.getNickname();
-
-        Message message1 = Message.create(chatRoom, user, MessageType.ENTER, test);
-        Message message2 = Message.create(chatRoom, user, MessageType.TALK, test);
-
-        when(userRepository.findUsersByNickname(userNickname)).thenReturn(java.util.Optional.of(user));
-        when(chatRoomRepository.findById(roomId)).thenReturn(java.util.Optional.of(chatRoom));
-        when(chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, user.getId()))
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
-        when(messageRepository.findByChatRoomId(roomId)).thenReturn(List.of(message1, message2));
 
         // when
-         Response<MessageListDTO> response = messageService.getMessages(roomId, userNickname);
+        Response<MessageListDTO> response = messageService.roomIn(chatRoom.getId(), user.getNickname());
 
         // then
+        verify(rabbitMQConfig).binding(chatRoom.getId(), user.getNickname());
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
         Assertions.assertThat(response.getData()).isNotNull();
-        Assertions.assertThat(response.getData().getRoomId()).isEqualTo(roomId);
-        Assertions.assertThat(response.getData().getMessages().size()).isEqualTo(2);
-
+        Assertions.assertThat(response.getData().getRoomId()).isEqualTo(chatRoom.getId());
     }
 
     @Test
-    @DisplayName("채팅방 입장")
-    void enter() {
-        // given
-        ChatRoom chatRoom = ChatRoom.createDM();
-        Users user = new Users();
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
-        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
-                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
-
-        // when
-        MessageDTO message = messageService.entry(chatRoom.getId(), user.getNickname());
-
-        // then
-        Assertions.assertThat(message).isNotNull();
-        Assertions.assertThat(message.getContent()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("메세지 전송 - 성공")
-    void sendSuccess() {
-        // given
-        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
-        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
-        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
-                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
-
-        // when
-        MessageDTO message = messageService.send(chatRoom.getId(), user.getNickname(), test);
-
-        // then
-        verify(messageRepository).save(any(Message.class));
-        Assertions.assertThat(message).isNotNull();
-        Assertions.assertThat(message.getContent()).isNotNull();
-
-    }
-
-    @Test
-    @DisplayName("메세지 전송 - 실패")
-    void sendFail() {
+    @DisplayName("채팅방 들어가기 - 실패")
+    void roomInFail() {
         // given
         when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
@@ -129,19 +81,19 @@ class MessageServiceTest {
                 .thenReturn(Optional.empty());
 
         // when
-        // then
         BusinessException exception = Assertions.catchThrowableOfType(
-                () -> messageService.send(chatRoom.getId(), user.getNickname(), test),
+                () -> messageService.roomIn(chatRoom.getId(), user.getNickname()),
                 BusinessException.class
         );
 
+        // then
         Assertions.assertThat(exception).isNotNull();
-//        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.CHAT_NO_PERMISSION);
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.CHAT_NO_PERMISSION);
     }
 
     @Test
-    @DisplayName("채팅방 퇴장")
-    void exit() {
+    @DisplayName("채팅방 나가기")
+    void roomOut() {
         // given
         when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
@@ -149,11 +101,69 @@ class MessageServiceTest {
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
         // when
-        MessageDTO message = messageService.exit(chatRoom.getId(), user.getNickname());
+        Response<Void> response = messageService.roomOut(chatRoom.getId(), user.getNickname());
 
         // then
-        verify(chatRoomUserRepository).delete(any(ChatRoomUser.class));
+        verify(rabbitMQConfig).unBinding(chatRoom.getId(), user.getNickname());
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
+    }
+
+    @Test
+    @DisplayName("채팅방 나가기 - 실패")
+    void roomOutFail() {
+        // given
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
+                .thenReturn(Optional.empty());
+
+        // when
+        BusinessException exception = Assertions.catchThrowableOfType(
+                () -> messageService.roomOut(chatRoom.getId(), user.getNickname()),
+                BusinessException.class
+        );
+
+        // then
+        Assertions.assertThat(exception).isNotNull();
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.CHAT_NO_PERMISSION);
+    }
+
+    @Test
+    @DisplayName("메세지 전송")
+    void sendMessage() {
+        // given
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
+                .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
+
+        // when
+        MessageDTO message = messageService.sendMessage(chatRoom.getId(), user.getNickname(), test);
+
+        // then
+        verify(messageRepository).save(any(Message.class));
         Assertions.assertThat(message).isNotNull();
         Assertions.assertThat(message.getContent()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("메세지 전송 - 실패")
+    void sendMessageFail() {
+        // given
+        when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+        when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
+                .thenReturn(Optional.empty());
+
+        // when
+        BusinessException exception = Assertions.catchThrowableOfType(
+                () -> messageService.sendMessage(chatRoom.getId(), user.getNickname(), test),
+                BusinessException.class
+        );
+
+        // then
+        Assertions.assertThat(exception).isNotNull();
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.CHAT_NO_PERMISSION);
     }
 }
