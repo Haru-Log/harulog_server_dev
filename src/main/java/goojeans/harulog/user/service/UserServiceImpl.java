@@ -1,6 +1,5 @@
 package goojeans.harulog.user.service;
 
-import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -35,7 +34,6 @@ public class UserServiceImpl implements UserService {
     private final SecurityUtils securityUtils;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final RabbitMQConfig rabbitMQConfig;
 
     @Override
     public Response<Void> signUp(SignUpRequest request) {
