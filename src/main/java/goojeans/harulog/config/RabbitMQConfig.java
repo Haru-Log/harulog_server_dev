@@ -23,7 +23,6 @@ public class RabbitMQConfig {
 
     /**
      * 채팅방 exchange 생성
-     * @param roomId
      */
     public void createFanoutExchange(String roomId){
         log.info("CREATE FANOUT_EXCHANGE : " + roomId);
@@ -32,7 +31,6 @@ public class RabbitMQConfig {
 
     /**
      * 채팅방 - 유저 queue 생성
-     * @param userNickname
      */
     public void createQueue(String userNickname){
         log.info("CREATE QUEUE : " + userNickname);
@@ -41,8 +39,6 @@ public class RabbitMQConfig {
 
     /**
      * 채팅방 - 유저 binding
-     * @param roomId
-     * @param userNickname
      */
     public void binding(String roomId, String userNickname){
         String queueName = "user."+userNickname;
@@ -68,8 +64,6 @@ public class RabbitMQConfig {
     /**
      * 채팅방 - 유저 unbinding -> 더 이상 메세지를 받지 않음
      * but 메세지 저장은 되고 있음.
-     * @param roomId
-     * @param userNickname
      */
     public void unBinding(String roomId, String userNickname){
         String queueName = "user."+userNickname;

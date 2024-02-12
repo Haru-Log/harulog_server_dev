@@ -1,6 +1,7 @@
 package goojeans.harulog.user.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -27,6 +28,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final LoginService loginService;
+    private final RabbitMQConfig rabbitMQConfig;
 
     @Value("${jwt.access.expiration}")
     private Long accessTokenExpiration;
@@ -72,6 +74,9 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         response.addCookie(cookie);
 
         SecurityContextHolder.getContext().setAuthentication(authenticate);
+
+        // 로그인에 성공했을 때, 유저에게 amqp Queue 할당
+        rabbitMQConfig.createQueue(user.getNickname());
 
         log.info("로그인에 성공하였습니다. 이메일 : {}", email);
         log.info("AccessToken 만료 기간 : {}분", accessTokenExpiration / 1000 / 60);
