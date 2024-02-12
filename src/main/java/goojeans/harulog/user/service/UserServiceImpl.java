@@ -56,9 +56,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(entity);
 
-        // 회원가입 성공 시, 유저 Queue 생성
-        rabbitMQConfig.createQueue(entity.getNickname());
-
         return Response.ok();
     }
 
