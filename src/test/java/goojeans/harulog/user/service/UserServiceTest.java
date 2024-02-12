@@ -1,6 +1,5 @@
 package goojeans.harulog.user.service;
 
-import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.dto.JwtUserDetail;
@@ -35,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @Slf4j
@@ -56,9 +55,6 @@ public class UserServiceTest {
     SecurityUtils securityUtils;
     @Mock
     PasswordEncoder passwordEncoder;
-
-    @Mock
-    RabbitMQConfig rabbitMQConfig;
 
     private String testString = "test";
     private Long testId = 1L;
