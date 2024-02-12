@@ -1,5 +1,6 @@
 package goojeans.harulog.user.service;
 
+import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.dto.JwtUserDetail;
@@ -55,6 +56,9 @@ public class UserServiceTest {
     SecurityUtils securityUtils;
     @Mock
     PasswordEncoder passwordEncoder;
+
+    @Mock
+    RabbitMQConfig rabbitMQConfig;
 
     private String testString = "test";
     private Long testId = 1L;
