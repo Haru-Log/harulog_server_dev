@@ -1,20 +1,11 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: Java CI with Gradle and RabbitMQ
 
-# 이 워크플로우는 main 브랜치에 push 되거나 pull request 이벤트가 발생했을 때 실행됩니다.
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
-# 워크플로우는 여러 잡(job)으로 구성될 수 있습니다. 이 예시에서는 "build"라는 하나의 잡을 정의했습니다.
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -51,3 +42,13 @@ jobs:
       - name: Shutdown RabbitMQ service
         run: docker-compose down
         # RabbitMQ 서비스 종료
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        if: failure() # 테스트 실패 시에만 보고서 업로드
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/test/
+            **/build/test-results/test/
+        # 테스트 보고서 업로드
