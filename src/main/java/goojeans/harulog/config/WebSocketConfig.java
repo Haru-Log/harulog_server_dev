@@ -4,7 +4,6 @@ import goojeans.harulog.chat.util.ChatInboundInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -14,7 +13,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
-@Profile("dev") //웹소켓 사용할 일 없는 환경에서는 빈으로 등록하지 않음.
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ChatInboundInterceptor chatInboundInterceptor;
