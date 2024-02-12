@@ -17,6 +17,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -225,12 +227,118 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("유저 닉네임으로 검색")
-    void searchUser() {
-        String searchKeyword = "t";
-        List<Users> users = repository.searchUsersByNickname(searchKeyword);
+    @DisplayName("전체 유저에서 검색")
+    void findByNicknameContaining() {
+        //Given
+        String tempString = "t";
+        Users user = Users.builder()
+                .socialType(SocialType.HARU)
+                .userName(tempString)
+                .password(tempString)
+                .nickname(tempString)
+                .email(tempString)
+                .contactNumber(tempString)
+                .build();
 
-        assertThat(users).hasSize(1);
+        em.persist(user);
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        //When
+        Page<Users> find = repository.findByNicknameStartingWith(tempString, pageRequest);
+
+        //Then
+        assertThat(find.getContent()).hasSize(2);
+        assertThat(find.getContent().get(0).getNickname()).isEqualTo(tempString);
+
+    }
+
+    @Test
+    @DisplayName("팔로워 중에 검색하기")
+    void findUserOnFollowers() {
+        //Given
+        String tempString = "t";
+        Users user = Users.builder()
+                .socialType(SocialType.HARU)
+                .userName(tempString)
+                .password(tempString)
+                .nickname(tempString)
+                .email(tempString)
+                .contactNumber(tempString)
+                .build();
+
+        em.persist(user);
+
+        Follow follow = Follow.builder()
+                .following(testUser)
+                .follower(user)
+                .build();
+
+        user.addFollowing(follow);
+        testUser.addFollower(follow);
+
+        em.persist(follow);
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        //When
+        Page<Users> response1 = repository.findUserOnFollowers(testUser.getId(), tempString, pageRequest);
+        Page<Users> response2 = repository.findUserOnFollowers(user.getId(), tempString, pageRequest);
+
+        //Then
+        assertThat(response1.getContent()).hasSize(1);
+        assertThat(response1.getContent().get(0).getNickname()).isEqualTo(tempString);
+
+        assertThat(response2.getContent()).hasSize(0);
+
+        String sql = "delete from follow";
+        em.createNativeQuery(sql)
+                .executeUpdate();
+
+    }
+
+    @Test
+    @DisplayName("팔로잉 중에 검색하기")
+    void findUserOnFollowings() {
+        //Given
+        String tempString = "t";
+        Users user = Users.builder()
+                .socialType(SocialType.HARU)
+                .userName(tempString)
+                .password(tempString)
+                .nickname(tempString)
+                .email(tempString)
+                .contactNumber(tempString)
+                .build();
+
+        em.persist(user);
+
+        Follow follow = Follow.builder()
+                .following(testUser)
+                .follower(user)
+                .build();
+
+        user.addFollowing(follow);
+        testUser.addFollower(follow);
+
+        em.persist(follow);
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        //When
+        Page<Users> response1 = repository.findUserOnFollowings(user.getId(), tempString, pageRequest);
+        Page<Users> response2 = repository.findUserOnFollowings(testUser.getId(), tempString, pageRequest);
+
+        //Then
+        assertThat(response1.getContent()).hasSize(1);
+        assertThat(response1.getContent().get(0).getNickname()).isEqualTo(testString);
+
+        assertThat(response2.getContent()).hasSize(0);
+
+        String sql = "delete from follow";
+        em.createNativeQuery(sql)
+                .executeUpdate();
+
     }
 
     @Test
