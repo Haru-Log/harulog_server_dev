@@ -1,39 +1,39 @@
 package goojeans.harulog.user.repository;
 
 import goojeans.harulog.user.domain.entity.Users;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<Users, Long> {
 
-    public Optional<Users> findUsersByEmailAndUserName(String email, String userName);
+    Optional<Users> findUsersByEmailAndUserName(String email, String userName);
 
-    public Optional<Users> findUsersByNickname(String nickname);
+    Optional<Users> findUsersByNickname(String nickname);
 
-    //TODO: paging (cursor or offset)
-    /**
-     * Based on input username, find user by cursor pagination with like.
-     * @param nickname : input username
-     * @return user list which matches with input. Ordered by username.
-     */
-    @Query("select u from Users u where u.nickname like :nickname%")
-    public List<Users> searchUsersByNickname(@Param("nickname")String nickname);
+    Page<Users> findByNicknameStartingWith(String nickname, Pageable pageable);
 
+    @Query("select f.follower from Follow f where f.following.id=:userId and f.follower.nickname like :nickname%")
+    Page<Users> findUserOnFollowers(@Param("userId") Long userId, @Param("nickname") String nickname, Pageable pageable);
+
+    @Query("select f.following from Follow f where f.follower.id=:userId and f.following.nickname like :nickname%")
+    Page<Users> findUserOnFollowings(@Param("userId") Long userId, @Param("nickname") String nickname, Pageable pageable);
 
     @EntityGraph(attributePaths = {"followers", "followings"})
     Optional<Users> findByNickname(String nickname);
 
-    public Optional<Users> findUsersByEmail(String email);
+    Optional<Users> findUsersByEmail(String email);
 
     @Modifying
     @Query("update Users u set u.refreshToken=:refreshToken where u.nickname=:nickname")
-    public void updateRefreshToken(@Param("refreshToken") String refreshToken, @Param("nickname") String nickname);
+    void updateRefreshToken(@Param("refreshToken") String refreshToken, @Param("nickname") String nickname);
 
-    public Optional<Users> findUsersBySocialId(Long socialId);
+    Optional<Users> findUsersBySocialId(Long socialId);
+
 }
