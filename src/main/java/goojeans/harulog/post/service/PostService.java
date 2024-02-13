@@ -27,6 +27,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -36,9 +37,9 @@ public class PostService {
     private final UserGoalRepository userGoalRepository;
     private final CategoryRepository categoryRepository;
 
-    @Transactional
+
     public PostResponseDto createPost(PostRequestDto postRequestDto, Long userId) {
-        Users user = userRepository.findUsersById(userId)
+        Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.CMT_AUTHENTICATION_FAIL));
 
         // categoryName을 이용하여 categoryId 가져오기
@@ -56,23 +57,15 @@ public class PostService {
     }
 
     private int getUserGoalByUserIdAndCategory(Long userId, Category category) {
-        Optional<UserGoal> userGoalOptional = userGoalRepository.findUserGoalByUserIdAndCategory(userId, category);
-
-        if (userGoalOptional.isPresent()) {
-            try {
-                return userGoalOptional.get().getGoal();
-            } catch (NumberFormatException e) {
-                throw new BusinessException(ResponseCode.USER_GOAL_INVALID_DATA);
-            }
-        } else {
-            throw new BusinessException(ResponseCode.USER_GOAL_INVALID_DATA);
-        }
+        return userGoalRepository.findUserGoalByUserIdAndCategory(userId, category)
+                .map(UserGoal::getGoal)
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_GOAL_INVALID_DATA));
     }
 
 
 
     // 하나의 Post 상세
-    @Transactional
+
     public PostResponseDto getPost(Long id){
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
@@ -98,9 +91,9 @@ public class PostService {
     }
 
     //유저의 게시글 전체 조회
-    @Transactional
+
     public List<PostResponseDto> getUserPost(Long id) {
-        Users user = userRepository.findUsersById(id)
+        Users user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL));
 
         List<Post> postList = postRepository.findByUserId(id);
@@ -129,7 +122,7 @@ public class PostService {
     }
 
     //좋아요 높은순서대로 피드 조회
-    @Transactional
+
     public List<PostResponseDto> getPostsOrderByLikes() {
         // 좋아요가 높은 순서대로 게시물 가져오기
         List<Post> postList = postRepository.findPostsOrderByLikes();
@@ -157,7 +150,7 @@ public class PostService {
     }
 
     //카테고리로 좋아요 높은순으로 피드 조회
-    @Transactional
+
     public List<PostResponseDto> getPostCategoryOrderByLikes(String categoryName){
         Category category = categoryRepository.findByCategoryName(categoryName)
                 .orElseThrow(() -> new BusinessException(ResponseCode.POS_CATEGORY_NOT_FOUND));
@@ -190,7 +183,7 @@ public class PostService {
 
 
 
-    @Transactional
+
     public PostResponseDto updatePost(Long postId, PostRequestDto postRequestDto, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
@@ -205,7 +198,7 @@ public class PostService {
     }
 
 
-    @Transactional
+
     public PostResponseDto deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)

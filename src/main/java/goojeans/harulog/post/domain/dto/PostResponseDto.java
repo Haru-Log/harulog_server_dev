@@ -38,7 +38,6 @@ public class PostResponseDto {
         this.imgUrl = post.getImgUrl();
         this.activityTime = post.getActivityTime();;
         this.nickname = post.getUser().getNickname();
-        this.createdAt = post.getCreatedAt();
         this.commentList = commentResponseDtos;
         this.goal =post.getGoal();
     }
@@ -48,6 +47,7 @@ public class PostResponseDto {
         this.activityTime = post.getActivityTime();
         this.createdAt = post.getCreatedAt();
         this.goal = post.getGoal();
+        this.nickname = post.getUser().getNickname();
     }
 
     public PostResponseDto(Post post, List<CommentResponseDto> commentResponseDtos, int commentCount, int likeCount) {
