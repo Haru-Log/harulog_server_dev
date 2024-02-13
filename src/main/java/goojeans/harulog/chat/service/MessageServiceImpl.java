@@ -25,6 +25,7 @@ import java.util.List;
 import static goojeans.harulog.chat.util.MessageType.*;
 
 /**
+ * 메세지 조회
  * 채팅방에 들어가기(in), 나가기(out), 메세지 전송
  * (입장, 퇴장 메세지는 채팅방에 유저가 추가되고 삭제 될 때 -> ChatRoomUserService에서 구현)
  */
@@ -40,27 +41,93 @@ public class MessageServiceImpl implements MessageService{
     private final MessageRepository messageRepository;
     private final RabbitMQConfig rabbitMQConfig;
 
+
+    /**
+     * 보통 메세지 조회할 때 2-30개씩 조회 하는 것이 일반적이어서 -> 30개씩 조회
+     */
+
+    // 이전 메세지 조회 : 내림차순 (최신부터)
+    @Override
+    public List<Message> getMessagesBefore(ChatRoom chatroom, Long lastReadMessageId) {
+        return messageRepository.findBeforeMessagesWithPagination(chatroom.getId(), lastReadMessageId, 30);
+    }
+
+    // 이후 메세지 조회 : 오름차순 (과거부터)
+    @Override
+    public List<Message> getMessagesAfter(ChatRoom chatroom, Long lastReadMessageId) {
+        return messageRepository.findAfterMessagesWithPagination(chatroom.getId(), lastReadMessageId, 30);
+    }
+
+    /**
+     * 채팅방 메세지 조회 : 스크롤 올릴 때
+     * todo: 더이상 조회할 메세지가 없을 때 처리
+     */
+    @Override
+    public Response<MessageListDTO> getMessagesBeforeResponse(String roomId, Long lastReadMessageId) {
+        log.trace("scroll up : " + roomId + ", " + lastReadMessageId + " 이전 메세지 조회");
+
+        ChatRoom chatRoom = findChatRoom(roomId);
+
+        // 마지막으로 읽은 메세지부터 30개씩 조회
+        List<Message> messages = getMessagesBefore(chatRoom, lastReadMessageId);
+        List<MessageDTO> result = messages.stream()
+                .map(MessageDTO::of)
+                .toList();
+
+        // 채팅방에 참여하고 있는 유저 수
+        int userCount = chatRoom.getUsers().size();
+
+        return Response.ok(MessageListDTO.of(roomId, userCount, result));
+    }
+
+    /**
+     * 채팅방 메세지 조회 : 스크롤 내릴 때
+     * todo: 더이상 조회할 메세지가 없을 때 처리
+     */
+    @Override
+    public Response<MessageListDTO> getMessagesAfterResponse(String roomId, Long lastReadMessageId) {
+        log.trace("scroll down : " + roomId + ", " + lastReadMessageId + " 이후 메세지 조회");
+
+        ChatRoom chatRoom = findChatRoom(roomId);
+
+        // 마지막으로 읽은 메세지부터 30개씩 조회
+        List<Message> messages = getMessagesAfter(chatRoom, lastReadMessageId);
+        List<MessageDTO> result = messages.stream()
+                .map(MessageDTO::of)
+                .toList();
+
+        // 채팅방에 참여하고 있는 유저 수
+        int userCount = chatRoom.getUsers().size();
+
+        return Response.ok(MessageListDTO.of(roomId, userCount, result));
+    }
+
     /**
      * 채팅방 들어가기
-     * @return 채팅방 메세지 전체 조회. (todo: 커서 기반 페이징)
+     *
+     * 1. 참여 유저인지 확인
+     * 2. 채팅방 - 유저 binding
+     * 3. 마지막으로 읽은 메세지부터 30개씩 조회
+     * @return 마지막으로 읽었던 메세지부터 30개씩 조회
      */
     @Override
     public Response<MessageListDTO> roomIn(String roomId, String userNickname) {
         log.trace("MessageServiceImpl.roomIn : " + roomId + ", " + userNickname);
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
-        checkPermission(roomId, userNickname);
+        ChatRoomUser cru = checkPermission(roomId, userNickname);
 
         // 채팅방 - 유저 binding
         rabbitMQConfig.binding(roomId, userNickname);
 
         // 채팅방 메세지 조회
-        List<Message> messages = messageRepository.findByChatRoomId(roomId);
+        List<Message> messages = getMessagesAfter(cru.getChatRoom(), cru.getLastReadMessageId());
         List<MessageDTO> result = messages.stream()
                 .map(MessageDTO::of)
                 .toList();
 
-        int userCount = chatRoomRepository.findById(roomId).get().getUsers().size();
+        // 채팅방에 참여하고 있는 유저 수
+        int userCount = cru.getChatRoom().getUsers().size();
 
         return Response.ok(MessageListDTO.of(roomId, userCount, result));
     }
