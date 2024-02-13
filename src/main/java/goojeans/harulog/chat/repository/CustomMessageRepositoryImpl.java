@@ -4,10 +4,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import goojeans.harulog.chat.domain.entity.Message;
 import goojeans.harulog.chat.domain.entity.QMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
+@Repository
 @RequiredArgsConstructor
 public class CustomMessageRepositoryImpl implements CustomMessageRepository{
 

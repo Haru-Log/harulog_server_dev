@@ -33,11 +33,19 @@ public class Message extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private MessageType type;
+    @Builder.Default
+    private MessageType type = MessageType.TALK;
 
     @NotNull
     private String content;
 
+    public static Message create(ChatRoom chatRoom, Users sender, String content){
+        return Message.builder()
+                .chatRoom(chatRoom)
+                .sender(sender)
+                .content(content)
+                .build();
+    }
     public static Message create(ChatRoom chatRoom, Users sender, MessageType type, String content) {
         return Message.builder()
                 .chatRoom(chatRoom)
