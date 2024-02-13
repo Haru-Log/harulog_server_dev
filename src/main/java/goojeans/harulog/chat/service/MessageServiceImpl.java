@@ -138,6 +138,7 @@ public class MessageServiceImpl implements MessageService{
      * 2. 마지막 읽은 메세지 id 저장
      * 3. 채팅방-유저 UNBINDING
      */
+    @Transactional
     @Override
     public Response<Void> roomOut(String roomId, String userNickname) {
         log.trace("MessageServiceImpl.roomOut : " + roomId + ", " + userNickname);
