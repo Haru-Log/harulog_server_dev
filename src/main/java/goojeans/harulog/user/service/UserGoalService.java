@@ -11,6 +11,6 @@ public interface UserGoalService {
 
     public Response<List<UserGoalResponse>> findUserGoalsByUserId(Long id);
 
-    public Response<Void> updateUserGoal(UpdateUserGoalsRequest request);
+    public Response<List<UserGoalResponse>> updateUserGoal(UpdateUserGoalsRequest request);
 
 }

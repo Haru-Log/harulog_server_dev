@@ -32,12 +32,12 @@ public class UserGoalController {
     }
 
     @PutMapping("/user-goal/update")
-    public ResponseEntity<Response<Void>> updateUserGoal(@Validated @RequestBody UpdateUserGoalsRequest request) {
+    public ResponseEntity<Response<List<UserGoalResponse>>> updateUserGoal(@Validated @RequestBody UpdateUserGoalsRequest request) {
 
         JwtUserDetail currentUserInfo = contextUtils.getCurrentUserInfo();
         request.setUserId(currentUserInfo.getId());
 
-        Response<Void> response = userGoalService.updateUserGoal(request);
+        Response<List<UserGoalResponse>> response = userGoalService.updateUserGoal(request);
 
         return ResponseEntity.ok(response);
     }

@@ -31,14 +31,14 @@ public class UserGoalServiceImpl implements UserGoalService {
 
         List<UserGoalResponse> responseList = findUserGoals.stream()
                 .map(userGoal ->
-                        UserGoalResponse.of(userGoal.getCategory().getCategoryName(), userGoal.getGoal()))
+                        UserGoalResponse.of(userGoal.getCategory().getCategoryName(), userGoal.getGoal(), userGoal.getUpdatedAt()))
                 .toList();
 
         return Response.ok(responseList);
     }
 
     @Override
-    public Response<Void> updateUserGoal(UpdateUserGoalsRequest request) {
+    public Response<List<UserGoalResponse>> updateUserGoal(UpdateUserGoalsRequest request) {
 
         List<UserGoal> findUserGoals = userGoalRepository.findUserGoalsByUserId(request.getUserId());
 
@@ -48,8 +48,13 @@ public class UserGoalServiceImpl implements UserGoalService {
                                 updateGoalsDto.getCategoryName().equals(userGoal.getCategory().getCategoryName()))
                         .findAny()
                         .ifPresent(updateGoalsDto -> userGoal.updateGoal(updateGoalsDto.getGoal()))
-                );
+        );
 
-        return Response.ok();
+        List<UserGoalResponse> responseList = findUserGoals.stream()
+                .map(userGoal ->
+                        UserGoalResponse.of(userGoal.getCategory().getCategoryName(), userGoal.getGoal(), userGoal.getUpdatedAt()))
+                .toList();
+
+        return Response.ok(responseList);
     }
 }
