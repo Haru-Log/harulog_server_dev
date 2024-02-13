@@ -60,7 +60,7 @@ class ChatRoomServiceTest {
         // then
         Assertions.assertThat(created).isNotNull(); // response가 null이 아닌지 확인
         Assertions.assertThat(created.getData()).isNotNull(); // response의 data(ChatRoomDTO)가 null이 아닌지 확인
-        verify(chatRoomRepository).save(any(ChatRoom.class));
+        verify(chatRoomRepository,times(2)).save(any(ChatRoom.class));
     }
 
     @Test
