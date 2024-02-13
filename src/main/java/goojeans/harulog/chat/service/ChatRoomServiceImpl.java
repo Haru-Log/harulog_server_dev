@@ -53,13 +53,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if(users.size()>2){
             chatRoom.setType(ChatRoomType.GROUP);
         }
-        chatRoomRepository.save(chatRoom);
 
-        // 변경사항 반영을 위해 다시 조회
-        ChatRoom update = chatRoomRepository.findById(chatRoom.getId()).get();
-        log.info("참여한 사람: {}", update.getUsers());
+        // 채팅방 생성 시 exchange 생성
+        rabbitMQConfig.createFanoutExchange(chatRoom.getId());
 
-        return Response.ok(ChatRoomDTO.of(update));
+        return Response.ok(ChatRoomDTO.of(chatRoom));
     }
 
     /**
