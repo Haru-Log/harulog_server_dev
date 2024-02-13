@@ -92,7 +92,7 @@ public class SecurityConfig {
         // TODO: 운영 환경 배포시 strict 하게 설정
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addExposedHeader("*");
-        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://localhost:5672",
