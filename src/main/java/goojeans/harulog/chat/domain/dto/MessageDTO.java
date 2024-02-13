@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MessageDTO {
 
+    private Long messageId;
     private String senderName;
     private String imageUrl;
     private MessageType type;
@@ -19,6 +20,7 @@ public class MessageDTO {
 
     public static MessageDTO of(Message message) {
         return new MessageDTO(
+                message.getId(),
                 message.getSender().getNickname(),
                 message.getSender().getImageUrl(),
                 message.getType(),

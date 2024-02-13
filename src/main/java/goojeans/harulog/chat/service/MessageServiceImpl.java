@@ -147,6 +147,7 @@ public class MessageServiceImpl implements MessageService{
 
         // 마지막 메세지 id 저장
         cru.setLastReadMessageId(messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId).getId());
+        chatRoomUserRepository.save(cru);
 
         // 채팅방-유저 UNBINDING
         rabbitMQConfig.unBinding(roomId, userNickname);
