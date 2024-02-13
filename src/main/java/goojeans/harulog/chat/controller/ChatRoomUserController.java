@@ -7,6 +7,7 @@ import goojeans.harulog.user.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,10 +29,20 @@ public class ChatRoomUserController {
     @PostMapping("/chats/{roomId}/users")
     public ResponseEntity<?> addUser(
             @PathVariable("roomId") String roomId,
-            @RequestBody AddUserRequest addUserRequest
+            @Validated @RequestBody AddUserRequest addUserRequest
     ){
         chatRoomUserService.addUser(roomId, addUserRequest.getUserNicknames());
-        return ResponseEntity.ok(Response.ok());
+        return ResponseEntity.ok(Response.ok("채팅방에 유저가 추가되었습니다."));
+    }
+
+    // 채팅방에서 "나" 퇴장
+    @DeleteMapping("/chats/{roomId}/me")
+    public ResponseEntity<?> deleteMe(
+            @PathVariable("roomId") String roomId
+    ){
+        String userNickname = securityUtils.getCurrentUserInfo().getNickname();
+        chatRoomUserService.deleteUser(roomId, userNickname);
+        return ResponseEntity.ok(Response.ok("채팅방에서 퇴장합니다."));
     }
 
     // 채팅방 참여 유저 조회

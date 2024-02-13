@@ -15,7 +15,6 @@ import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -65,9 +64,6 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             chatRoomRepository.save(chatRoom);
         }
 
-        // 채팅방 Exchange에 유저 Queue BINDING
-        rabbitMQConfig.binding(roomId, userNickname);
-
         // 입장 메세지 전송
         sendEnterMessage(chatRoom, user);
 
@@ -88,9 +84,6 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
         users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user)));
 
-        // 채팅방 Exchange에 유저 Queue BINDING
-        users.forEach(user -> rabbitMQConfig.binding(roomId, user.getNickname()));
-
         // 입장 메세지 전송
         users.forEach(user -> sendEnterMessage(chatRoom, user));
 
@@ -106,6 +99,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     /**
      * 채팅방에 유저 삭제
      * + 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
+     * todo: 채팅방에 유저가 없으면 채팅방 삭제
      */
     @Override
     public Response<Void> deleteUser(String roomId, String userNickname) {
@@ -122,9 +116,6 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
         // 퇴장 메세지 전송
         sendExitMessage(chatRoom, chatRoomUser.getUser());
-
-        // 채팅방 Exchange에 유저 Queue UNBINDING
-        rabbitMQConfig.unBinding(roomId, userNickname);
 
         return Response.ok();
     }
