@@ -7,7 +7,7 @@ import goojeans.harulog.comment.repository.CommentRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.post.domain.entity.Post;
-import goojeans.harulog.post.domain.repository.PostRepository;
+import goojeans.harulog.post.repository.PostRepository;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import jakarta.transaction.Transactional;

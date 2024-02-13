@@ -21,5 +21,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Comment findByDepth(int depth);
     List<Comment> findByParentId(Long parentId);
 
+    @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.id = :postId")
+    int countCommentsByPostId(@Param("postId") Long postId);
 
 }
