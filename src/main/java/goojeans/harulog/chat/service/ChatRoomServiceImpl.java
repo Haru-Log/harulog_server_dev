@@ -41,6 +41,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = ChatRoom.createDM();
         chatRoomRepository.save(chatRoom);
 
+        // 닉네임이 2개 미만이면 채팅방 생성 불가 (자기 자신만 있는 채팅방 생성 불가)
+        if(nicknames.size() < 2){
+            throw new BusinessException(ResponseCode.CHATROOM_USER_NOT_ENOUGH);
+        }
+
         // 닉네임으로 유저 찾아오기
         List<Users> users = nicknames.stream()
                 .map(this::findUser)
