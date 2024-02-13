@@ -110,11 +110,13 @@ public class UserGoalServiceTest {
                 .build();
 
         // When
-        Response<Void> response = service.updateUserGoal(updateDto);
+        Response<List<UserGoalResponse>> response = service.updateUserGoal(updateDto);
 
         // Then
         assertThat(testUserGoal1.getGoal()).isEqualTo(newUserGoal.getGoal());
         assertThat(testUserGoal2.getGoal()).isEqualTo(testGoal);
+
+        assertThat(response.getData()).hasSize(2);
         assertThat(response.getCode()).isEqualTo(ResponseCode.SUCCESS.getCode());
 
         verify(userGoalRepository, times(1)).findUserGoalsByUserId(testId1);
