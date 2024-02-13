@@ -43,6 +43,10 @@ public enum ResponseCode {
     // 챌린지 : CHL
     // 카테고리 : CAT
     // 게시글 : POS
+    POS_NOT_FOUND(400,"POS_001","피드를 찾을 수 없습니다. ",HttpStatus.BAD_REQUEST),
+    POS_CATEGORY_NOT_FOUND(400, "POS-002", "해당하는 카테고리를 찾지 못했습니다.", HttpStatus.BAD_REQUEST),
+    POS_AUTHENTICATION_FAIL(400,"POS-003", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
+
     // 댓글 : CMT
     CMT_AUTHENTICATION_FAIL(400, " CMT-101", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
     CMT_NOT_FOUND(400,"CMT_201", "댓글을 찾을 수 없습니다.",HttpStatus.BAD_REQUEST),

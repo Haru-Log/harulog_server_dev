@@ -36,4 +36,7 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     Optional<Users> findUsersBySocialId(Long socialId);
 
+    Optional<Users> findUsersById(Long id);
+
+
 }

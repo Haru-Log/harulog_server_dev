@@ -5,10 +5,13 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.domain.entity.*;
 import goojeans.harulog.likes.domain.entity.Likes;
+import goojeans.harulog.post.domain.dto.PostRequestDto;
 import goojeans.harulog.user.domain.entity.Users;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 
@@ -16,6 +19,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE post SET active_status = 'DELETED' WHERE post_id = ? AND active_status <> 'DELETED'")
+@SQLRestriction("active_status <> 'DELETED'")
 @Entity(name = "post")
 public class Post extends BaseEntity {
     @Id
@@ -29,6 +34,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @NotNull
     private Category category;
 
 
@@ -42,7 +48,8 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @NotNull
+    private int goal;
+
     private int activityTime;
 
     private String imgUrl;
@@ -55,4 +62,22 @@ public class Post extends BaseEntity {
             user.addPost(this);
         }
     }
+
+    public Post(PostRequestDto postRequestDto, Users user, Category category, int userGoal) {
+        this.user = user;
+        this.content = postRequestDto.getContent();
+        this.activityTime = postRequestDto.getActivityTime();
+        this.imgUrl = postRequestDto.getImgUrl();
+        this.goal = userGoal;
+        this.category = category;
+    }
+
+
+
+    public void update(PostRequestDto postRequestDto){
+        this.imgUrl = postRequestDto.getImgUrl();
+        this.activityTime = postRequestDto.getActivityTime();
+        this.content = postRequestDto.getContent();
+    }
+
 }
