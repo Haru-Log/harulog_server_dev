@@ -153,6 +153,23 @@ public class UserServiceImpl implements UserService {
         return Response.ok(MyPageInfoResponse.entityToResponse(findUser));
     }
 
+    @Override
+    public Response<Void> logout() {
+
+        String logoutToken = "logout";
+
+        JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
+
+        Users user = userRepository.findById(currentUserInfo.getId()).stream()
+                .findAny()
+                .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+        user.updateRefreshToken(logoutToken);
+
+        return Response.ok();
+
+    }
+
     private boolean checkNicknameDuplication(String nickname) {
         return userRepository.findUsersByNickname(nickname).isPresent();
     }
