@@ -23,4 +23,6 @@ public interface UserService {
 
     Response<MyPageInfoResponse> getMyPageUserInfo(String nickname);
 
+    Response<Void> logout();
+
 }

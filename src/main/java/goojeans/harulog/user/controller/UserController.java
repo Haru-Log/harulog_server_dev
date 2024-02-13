@@ -70,4 +70,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getMyPageUserInfo(nickname));
     }
 
+    @PutMapping("/logout")
+    ResponseEntity<Response<Void>> logout() {
+        return ResponseEntity.ok(userService.logout());
+    }
+
 }

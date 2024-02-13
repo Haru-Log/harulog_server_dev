@@ -245,4 +245,23 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findByNickname(testUser.getNickname());
 
     }
+
+    @Test
+    @DisplayName("로그아웃")
+    void logout() {
+        //Given
+        doReturn(jwtUserDetail).when(securityUtils).getCurrentUserInfo();
+        doReturn(Optional.of(testUser)).when(userRepository).findById(testId);
+
+        //When
+        Response<Void> response = userService.logout();
+
+        //Then
+        assertThat(response.getCode()).isEqualTo(ResponseCode.SUCCESS.getCode());
+
+        verify(securityUtils, times(1)).getCurrentUserInfo();
+        verify(userRepository, times(1)).findById(testId);
+
+    }
+
 }
