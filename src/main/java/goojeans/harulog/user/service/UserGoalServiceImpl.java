@@ -30,8 +30,7 @@ public class UserGoalServiceImpl implements UserGoalService {
         if (findUserGoals.isEmpty()) throw new BusinessException(ResponseCode.USER_GOAL_NOT_FOUND);
 
         List<UserGoalResponse> responseList = findUserGoals.stream()
-                .map(userGoal ->
-                        UserGoalResponse.of(userGoal.getCategory().getCategoryName(), userGoal.getGoal(), userGoal.getUpdatedAt()))
+                .map(UserGoalResponse::from)
                 .toList();
 
         return Response.ok(responseList);
@@ -51,8 +50,7 @@ public class UserGoalServiceImpl implements UserGoalService {
         );
 
         List<UserGoalResponse> responseList = findUserGoals.stream()
-                .map(userGoal ->
-                        UserGoalResponse.of(userGoal.getCategory().getCategoryName(), userGoal.getGoal(), userGoal.getUpdatedAt()))
+                .map(UserGoalResponse::from)
                 .toList();
 
         return Response.ok(responseList);
