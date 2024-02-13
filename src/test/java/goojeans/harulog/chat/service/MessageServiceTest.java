@@ -23,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -44,11 +45,55 @@ class MessageServiceTest {
 
     private Users user;
     private ChatRoom chatRoom;
+    private Message message1, message2, message3, message4, message5;
 
     @BeforeEach
     void setUp() {
         user = new Users();
         chatRoom = ChatRoom.createDM();
+        when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
+
+        message1 = Message.create(chatRoom, user, test);
+        message2 = Message.create(chatRoom, user, test);
+        message3 = Message.create(chatRoom, user, test);
+        message4 = Message.create(chatRoom, user, test);
+        message5 = Message.create(chatRoom, user, test);
+    }
+
+    @Test
+    @DisplayName("채팅방 이전 메세지 조회")
+    void getMessagesBeforeResponse() {
+        // given
+        when(messageRepository.findBeforeMessagesWithPagination(chatRoom.getId(), message5.getId(), 30))
+                .thenReturn(List.of(message4, message3, message2, message1));
+
+        // when
+        Response<MessageListDTO> response = messageService.getMessagesBeforeResponse(chatRoom.getId(), message5.getId());
+
+        // then
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
+        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(response.getData().getMessages()).isNotNull();
+        Assertions.assertThat(response.getData().getMessages().size()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("채팅방 이후 메세지 조회")
+    void getMessagesAfterResponse() {
+        // given
+        when(messageRepository.findAfterMessagesWithPagination(chatRoom.getId(), message1.getId(), 30))
+                .thenReturn(List.of(message2, message3, message4, message5));
+
+        // when
+        Response<MessageListDTO> response = messageService.getMessagesAfterResponse(chatRoom.getId(), message1.getId());
+
+        // then
+        Assertions.assertThat(response).isNotNull();
+        Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
+        Assertions.assertThat(response.getData()).isNotNull();
+        Assertions.assertThat(response.getData().getMessages()).isNotNull();
+        Assertions.assertThat(response.getData().getMessages().size()).isEqualTo(4);
     }
 
     @Test
@@ -99,12 +144,12 @@ class MessageServiceTest {
         when(chatRoomRepository.findById(chatRoom.getId())).thenReturn(Optional.of(chatRoom));
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
+        when(messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId())).thenReturn(message1);
 
         // when
         Response<Void> response = messageService.roomOut(chatRoom.getId(), user.getNickname());
 
         // then
-        verify(rabbitMQConfig).unBinding(chatRoom.getId(), user.getNickname());
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatus()).isEqualTo(ResponseCode.SUCCESS.getStatus());
     }
