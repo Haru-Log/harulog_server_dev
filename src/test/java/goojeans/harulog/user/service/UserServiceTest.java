@@ -1,5 +1,7 @@
 package goojeans.harulog.user.service;
 
+import goojeans.harulog.category.domain.entity.Category;
+import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.dto.JwtUserDetail;
@@ -10,7 +12,9 @@ import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
 import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
 import goojeans.harulog.user.domain.entity.Follow;
+import goojeans.harulog.user.domain.entity.UserGoal;
 import goojeans.harulog.user.domain.entity.Users;
+import goojeans.harulog.user.repository.UserGoalRepository;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.util.JwtTokenProvider;
 import goojeans.harulog.user.util.SecurityUtils;
@@ -55,6 +59,10 @@ public class UserServiceTest {
     SecurityUtils securityUtils;
     @Mock
     PasswordEncoder passwordEncoder;
+    @Mock
+    UserGoalRepository userGoalRepository;
+    @Mock
+    CategoryRepository categoryRepository;
 
     private String testString = "test";
     private Long testId = 1L;
@@ -102,9 +110,14 @@ public class UserServiceTest {
                 .userName(testString)
                 .build();
 
+        Category category = new Category(testId, testString);
+
         doReturn(Optional.empty()).when(userRepository).findUsersByEmail(testString);
         doReturn(Optional.empty()).when(userRepository).findUsersByNickname(testString);
+        doReturn(List.of(category)).when(categoryRepository).findAll();
         doReturn(testUser).when(userRepository).save(any(Users.class));
+        doReturn(UserGoal.of(testUser, category, 0)).when(userGoalRepository).save(any(UserGoal.class));
+
 
         //When
         Response<Void> response = userService.signUp(signUpRequest);
@@ -114,6 +127,8 @@ public class UserServiceTest {
         verify(userRepository, times(1)).findUsersByEmail(testString);
         verify(userRepository, times(1)).findUsersByNickname(testString);
         verify(userRepository, times(1)).save(any(Users.class));
+        verify(categoryRepository, times(1)).findAll();
+        verify(userGoalRepository, times(1)).save(any(UserGoal.class));
 
     }
 

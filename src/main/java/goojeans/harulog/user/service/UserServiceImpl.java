@@ -1,5 +1,7 @@
 package goojeans.harulog.user.service;
 
+import goojeans.harulog.category.domain.entity.Category;
+import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -10,7 +12,9 @@ import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
 import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
+import goojeans.harulog.user.domain.entity.UserGoal;
 import goojeans.harulog.user.domain.entity.Users;
+import goojeans.harulog.user.repository.UserGoalRepository;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.util.JwtTokenProvider;
 import goojeans.harulog.user.util.SecurityUtils;
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -34,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private final SecurityUtils securityUtils;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final CategoryRepository categoryRepository;
+    private final UserGoalRepository userGoalRepository;
 
     @Override
     public Response<Void> signUp(SignUpRequest request) {
@@ -53,6 +60,10 @@ public class UserServiceImpl implements UserService {
         entity.updatePassword(passwordEncoder.encode(entity.getPassword()));
 
         userRepository.save(entity);
+
+        List<Category> allCategory = categoryRepository.findAll();
+        allCategory.forEach(category ->
+                        userGoalRepository.save(UserGoal.of(entity, category, 0)));
 
         return Response.ok();
     }
