@@ -58,6 +58,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if(users.size()>2){
             chatRoom.setType(ChatRoomType.GROUP);
         }
+        chatRoomRepository.save(chatRoom);
 
         // 채팅방 생성 시 exchange 생성
         rabbitMQConfig.createFanoutExchange(chatRoom.getId());
