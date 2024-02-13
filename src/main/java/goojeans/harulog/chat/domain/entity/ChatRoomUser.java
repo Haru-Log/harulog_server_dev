@@ -38,8 +38,7 @@ public class ChatRoomUser extends BaseEntity {
 
     @Builder.Default
     @Setter
-    @NotNull
-    private boolean isEntered = false; // 채팅방 입장 여부
+    private Long lastReadMessageId = 0L; // 마지막으로 읽은 메세지 ID
 
     // 정적 팩토리 메서드
     public static ChatRoomUser create(ChatRoom chatRoom, Users user) {

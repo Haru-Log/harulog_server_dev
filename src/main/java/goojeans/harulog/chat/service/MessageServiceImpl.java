@@ -67,14 +67,19 @@ public class MessageServiceImpl implements MessageService{
 
     /**
      * 채팅방 나가기
-     * todo: 현재까지 읽은 메세지 저장 -> 이후 채팅방 입장 시, 읽은 메세지 기준으로 페이징 (커서 기반) : 구현 검토.
+     * 1. 참여 유저인지 확인
+     * 2. 마지막 읽은 메세지 id 저장
+     * 3. 채팅방-유저 UNBINDING
      */
     @Override
     public Response<Void> roomOut(String roomId, String userNickname) {
         log.trace("MessageServiceImpl.roomOut : " + roomId + ", " + userNickname);
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
-        checkPermission(roomId, userNickname);
+        ChatRoomUser cru = checkPermission(roomId, userNickname);
+
+        // 마지막 메세지 id 저장
+        cru.setLastReadMessageId(messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId).getId());
 
         // 채팅방-유저 UNBINDING
         rabbitMQConfig.unBinding(roomId, userNickname);
