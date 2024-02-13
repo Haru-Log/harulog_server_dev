@@ -1,14 +1,16 @@
 package goojeans.harulog.chat.controller;
 
-import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
+import goojeans.harulog.chat.domain.dto.request.AddUserRequest;
 import goojeans.harulog.chat.service.ChatRoomService;
 import goojeans.harulog.chat.service.ChatRoomUserService;
-import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 채팅방 생성, 삭제
@@ -23,21 +25,23 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final ChatRoomUserService chatRoomUserService;
 
-    // 채팅방 생성 및 채팅방 생성한 유저 추가
+    // 채팅방 생성
     @PostMapping("/chats")
-    public ResponseEntity<?> create(){
+    public ResponseEntity<?> createChatroom(
+            @Validated @RequestBody AddUserRequest addUserRequest
+    ) {
         log.trace("ChatRoomController.create");
 
-        Response<ChatRoomDTO> response = chatRoomService.createChatRoom(); // DM 채팅방 생성
-        String userNickname = securityUtils.getCurrentUserInfo().getNickname();
+        String me = securityUtils.getCurrentUserInfo().getNickname();
+        List<String> users = addUserRequest.getUserNicknames();
+        users.add(me);
 
-        chatRoomUserService.addUser(response.getData().getRoomId(), userNickname); // 채팅방에 "나" 추가
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(chatRoomService.createChatRoom(users));
     }
 
     // 채팅방 삭제
     @DeleteMapping("/chats/{roomId}")
-    public ResponseEntity<?> delete(@PathVariable("roomId") String roomId){
+    public ResponseEntity<?> deleteChatRoom(@PathVariable("roomId") String roomId) {
         log.trace("ChatRoomController.delete : " + roomId);
         return ResponseEntity.ok(chatRoomService.deleteChatRoom(roomId));
     }
