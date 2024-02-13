@@ -98,8 +98,8 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
     /**
      * 채팅방에 유저 삭제
-     * + 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
-     * todo: 채팅방에 유저가 없으면 채팅방 삭제
+     *  - 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
+     *  - 채팅방에 유저가 없으면 채팅방 삭제
      */
     @Override
     public Response<Void> deleteUser(String roomId, String userNickname) {
@@ -107,15 +107,27 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         ChatRoomUser chatRoomUser = findChatRoomUser(roomId, userNickname);
         chatRoomUserRepository.delete(chatRoomUser);
 
-        // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
         ChatRoom chatRoom = chatRoomUser.getChatRoom();
-        if(chatRoom.getType() == GROUP && chatRoom.getUsers().size()-1 <= 2){
-            chatRoom.setType(DM);
-            chatRoomRepository.save(chatRoom);
+
+        // 채팅방에 유저가 없으면 채팅방 삭제
+        if(chatRoom.getUsers().isEmpty()){
+            log.info("채팅방에 사람이 없습니다.");
+            // 채팅방 exchange 삭제
+            rabbitMQConfig.deleteExchange(chatRoom.getId());
+            // 채팅방 삭제
+            chatRoomRepository.deleteById(chatRoom.getId());
         }
 
-        // 퇴장 메세지 전송
-        sendExitMessage(chatRoom, chatRoomUser.getUser());
+        // 채팅방 Type 변경 및 퇴장 메세지 전송
+        else {
+            // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
+            if(chatRoom.getType() == GROUP && chatRoom.getUsers().size()-1 <= 2) {
+                chatRoom.setType(DM);
+                chatRoomRepository.save(chatRoom);
+            }
+            // 퇴장 메세지 전송
+            sendExitMessage(chatRoom, chatRoomUser.getUser());
+        }
 
         return Response.ok();
     }
