@@ -35,6 +35,11 @@ public class CommentController {
         return ResponseEntity.ok(commentService.deleteComment(id, userId));
     }
 
+    //comment 상세
+    @GetMapping("comments/{id}")
+    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long id) {
+        return ResponseEntity.ok(commentService.getComment(id));
 
 
+    }
 }

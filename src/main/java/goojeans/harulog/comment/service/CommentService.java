@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,22 @@ public class CommentService {
     }
 
 
+    public CommentResponseDto getComment(Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                () -> new BusinessException(ResponseCode.CMT_POST_NOT_FOUND)
+        );
+
+        List<Comment> childrenComments = commentRepository.findChildrenComments(id);
+        List<CommentResponseDto> childrenDtoList = new ArrayList<>();
+
+        for (Comment childComment : childrenComments) {
+            CommentResponseDto childDto = new CommentResponseDto(childComment, id);
+            childrenDtoList.add(childDto);
+        }
+
+        return  new CommentResponseDto(comment, childrenDtoList);
+    }
+
 
 
     public CommentResponseDto updateComment(Long id, CommentRequestDto requestDto, Long userId) {
@@ -77,6 +96,8 @@ public class CommentService {
 
         return new CommentResponseDto(comment);
     }
+
+
 }
 
 
