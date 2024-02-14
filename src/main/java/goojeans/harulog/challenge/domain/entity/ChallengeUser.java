@@ -36,7 +36,7 @@ public class ChallengeUser extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private ChallengeRole role = ChallengeRole.PARTICIPANT;
+    private ChallengeRole role;
 
     //정적 팩토리 메서드
     public static ChallengeUser create(Users user, Challenge challenge) {

@@ -37,4 +37,7 @@ public interface ChallengeService {
 
     //랜덤으로 4개의 챌린지 조회
     Response<List<ChallengeAllResponse>> getRandomChallenge();
+
+    //챌린지 강퇴하기
+    Response<Void> kickout(Long userId, Long challengeId, String nickname);
 }

@@ -17,6 +17,8 @@ import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
+import goojeans.harulog.post.domain.entity.Post;
+import goojeans.harulog.post.repository.PostRepository;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +41,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeUserRepository challengeUserRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final PostRepository postRepository;
 
 
     @Override
@@ -77,7 +80,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             challengeUser.updateRole();
         }
 
-        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge.getChallengeUserList());
+        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
         ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
         return Response.ok(challengeResponse);
     }
@@ -99,7 +102,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
         challenge.addChallengeUser(challengeUser);
 
-        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge.getChallengeUserList());
+        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
         ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
         return Response.ok(challengeResponse);
     }
@@ -145,7 +148,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         Challenge challenge = challengeRepository.findByChallengeId(ChallengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
 
-        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge.getChallengeUserList());
+        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
         ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
 
         return Response.ok(challengeResponse);
@@ -189,25 +192,28 @@ public class ChallengeServiceImpl implements ChallengeService {
     public Response<ChallengeResponse> updateChallenge(Long userId, Long challengeId, ChallengeRequest request) {
 
         Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
-        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
 
-        if (!challengeUser.getRole().equals(ChallengeRole.LEADER)) {
+        //챌린지 리더인지 확인
+        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
+        boolean isChallengeLeader = challengeUser.getRole().equals(ChallengeRole.LEADER);
+
+        if (isChallengeLeader) {
+            challenge.updateChallengeTitle(request.getChallengeTitle());
+            challenge.updateChallengeContent(request.getChallengeContent());
+            challenge.updateChallengeGoal(request.getChallengeGoal());
+            challenge.updateSubmission(request.getSubmission());
+            challenge.updateStartDate(request.getStartDate());
+            challenge.updateEndDate(request.getEndDate());
+
+            Challenge updatedChallenge = challengeRepository.save(challenge);
+
+            List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(updatedChallenge);
+            ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
+
+            return Response.ok(challengeResponse);
+        } else {
             throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
         }
-
-        challenge.updateChallengeTitle(request.getChallengeTitle());
-        challenge.updateChallengeContent(request.getChallengeContent());
-        challenge.updateChallengeGoal(request.getChallengeGoal());
-        challenge.updateSubmission(request.getSubmission());
-        challenge.updateStartDate(request.getStartDate());
-        challenge.updateEndDate(request.getEndDate());
-
-        Challenge updatedChallenge = challengeRepository.save(challenge);
-
-        List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(updatedChallenge.getChallengeUserList());
-        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
-
-        return Response.ok(challengeResponse);
     }
 
     @Override
@@ -232,6 +238,34 @@ public class ChallengeServiceImpl implements ChallengeService {
         return Response.ok(challengeResponse);
     }
 
+    @Override
+    public Response<Void> kickout(Long userId, Long challengeId, String nickname) {
+        Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
+
+        //챌린지 리더인지 확인
+        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
+        boolean isChallengeLeader = challengeUser.getRole().equals(ChallengeRole.LEADER);
+
+        if (isChallengeLeader) {
+
+            Users kickoutUser = userRepository.findByNickname(nickname).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+
+            //자신을 강퇴할 시 에러 발생
+            if (kickoutUser.getId().equals(userId)) {
+                throw new BusinessException(ResponseCode.CHALLENGE_CANNOT_KICKOUT_SELF);
+            }
+
+            ChallengeUser kickoutChallengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(kickoutUser.getId(), challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
+
+            challenge.removeChallengeUser(kickoutChallengeUser);
+            challengeUserRepository.delete(kickoutChallengeUser);
+
+            return Response.ok();
+        } else {
+            throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
+        }
+    }
+
     public boolean isAlreadyJoin(Long userId, Long ChallengeId) {
         Optional<ChallengeUser> challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, ChallengeId);
 
@@ -251,16 +285,39 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     //ChallengeUser 정보를 담은 ChallengeUsersResponse 리스트 생성
-    public List<ChallengeUsersResponse> createChallengeUserList(List<ChallengeUser> challengeUsers) {
-        return challengeUsers.stream().map(challengeUser -> {
+    public List<ChallengeUsersResponse> createChallengeUserList(Challenge challenge) {
+        return challenge.getChallengeUserList().stream().map(challengeUser -> {
             Users user = challengeUser.getUser();
-            return new ChallengeUsersResponse(
+                    return new ChallengeUsersResponse(
                     user.getId(),
                     user.getNickname(),
                     user.getImageUrl(),
-                    challengeUser.getRole()
+                    challengeUser.getRole(),
+                    isSuccess(challengeUser, challenge)
+
             );
         })
         .collect(Collectors.toList());
+    }
+
+    public boolean isSuccess(ChallengeUser challengeUser, Challenge challenge) {
+        LocalDate today = LocalDate.now();
+        List<Post> posts = postRepository.findByUserIdAndToday(challengeUser.getUser().getId(), today.atStartOfDay());
+
+        boolean isSuccess = false;
+
+        if (challenge.getCategory().getCategoryName().equals("기상")) {
+            isSuccess = posts.stream()
+                    .filter(post -> post.getCategory().getCategoryName().equals("기상"))
+                    .anyMatch(post -> post.getActivityTime() <= challenge.getChallengeGoal());
+        } else {
+            int totalActivityTime = posts.stream()
+                    .filter(post -> post.getCategory().getCategoryName().equals(challenge.getCategory().getCategoryName()))
+                    .mapToInt(Post::getActivityTime).sum();
+
+            isSuccess = totalActivityTime >= challenge.getChallengeGoal();
+        }
+
+        return isSuccess;
     }
 }

@@ -1,6 +1,7 @@
 package goojeans.harulog.challenge.domain.dto.response;
 
 import goojeans.harulog.challenge.util.ChallengeRole;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,5 @@ public class ChallengeUsersResponse {
 
     private ChallengeRole role;
 
-    //TODO: 성공한 날짜 수 내려주기
-//    private int days;
+    private boolean success;
 }
