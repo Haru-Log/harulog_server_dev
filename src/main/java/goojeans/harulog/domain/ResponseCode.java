@@ -60,6 +60,7 @@ public enum ResponseCode {
     CHAT_NO_PERMISSION(400, "CHT-102", "채팅방에 참여하지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
     CHATROOM_NOT_FOUND(400, "CHT-201", "채팅방을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CHATROOM_USER_NOT_ENOUGH(400, "CHT-202", "채팅방에 참여할 유저가 부족합니다.", HttpStatus.BAD_REQUEST),
+    CHALLENGE_CHATROOM_USER_CANNOT_LEAVE(400, "CHT-203", "챌린지에서 먼저 나가야 합니다.", HttpStatus.BAD_REQUEST),
     NO_MORE_MESSAGE(200, "CHT-301", "더 이상 메세지가 없습니다.", HttpStatus.OK),
 
     //챌린지 : CHL

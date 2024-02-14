@@ -18,6 +18,9 @@ public interface ChatRoomUserService {
     Response<Void> addUser(ChatRoom room, Users user);
     Response<Void> addUser(ChatRoom room, List<Users> users);
 
+    // Controller에서 deleteUser 호출
+    Response<Void> deleteUserRequest(String roomId, String userNickname);
+
     // 채팅방에 유저 삭제
     Response<Void> deleteUser(String roomId, String userNickname);
 

@@ -41,7 +41,7 @@ public class ChatRoomUserController {
             @PathVariable("roomId") String roomId
     ){
         String userNickname = securityUtils.getCurrentUserInfo().getNickname();
-        chatRoomUserService.deleteUser(roomId, userNickname);
+        chatRoomUserService.deleteUserRequest(roomId, userNickname);
         return ResponseEntity.ok(Response.ok("채팅방에서 퇴장합니다."));
     }
 

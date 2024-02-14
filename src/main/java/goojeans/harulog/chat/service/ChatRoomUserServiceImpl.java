@@ -24,8 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 
-import static goojeans.harulog.chat.util.ChatRoomType.DM;
-import static goojeans.harulog.chat.util.ChatRoomType.GROUP;
+import static goojeans.harulog.chat.util.ChatRoomType.*;
 import static goojeans.harulog.chat.util.MessageType.ENTER;
 import static goojeans.harulog.chat.util.MessageType.EXIT;
 
@@ -120,6 +119,18 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         return Response.ok();
     }
 
+    @Override
+    public Response<Void> deleteUserRequest(String roomId, String userNickname) {
+        ChatRoom chatRoom = findChatRoom(roomId);
+
+        // 채팅방이 Challenge이면, Challenge 채팅방에서는 유저가 나가지 못하도록 함
+        if (chatRoom.getType() == CHALLENGE) {
+            throw new BusinessException(ResponseCode.CHALLENGE_CHATROOM_USER_CANNOT_LEAVE);
+        }
+
+        return deleteUser(roomId, userNickname);
+    }
+
     /**
      * 채팅방에 유저 삭제
      * - 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
@@ -143,7 +154,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         chatRoomUserRepository.delete(cru);
 
         // 채팅방에 유저가 없으면 채팅방 삭제
-        if (remain-1<=0) {
+        if (remain - 1 <= 0) {
             log.info("채팅방에 사람이 없습니다.");
             // 채팅방 exchange 삭제
             rabbitMQConfig.deleteExchange(room.getId());
