@@ -1,2 +1,2 @@
 firebase:
-  key: "test"
+  key: ${FIREBASE_ADMIN_KEY}
