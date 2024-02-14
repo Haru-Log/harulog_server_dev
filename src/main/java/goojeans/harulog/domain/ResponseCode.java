@@ -58,9 +58,9 @@ public enum ResponseCode {
     CHAT_TRANSMISSION_FAIL(400, "CHT-001", "채팅 전송에 실패했습니다.", HttpStatus.BAD_REQUEST),
     CHAT_AUTHENTICATION_FAIL(400, "CHT-101", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
     CHAT_NO_PERMISSION(400, "CHT-102", "채팅방에 참여하지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
-    CHAT_NOT_FOUND(400, "CHT-201", "채팅을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    CHATROOM_NOT_FOUND(400, "CHT-202", "채팅방을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    CHATROOM_USER_NOT_ENOUGH(400, "CHT-301", "채팅방에 참여할 유저가 부족합니다.", HttpStatus.BAD_REQUEST),
+    CHATROOM_NOT_FOUND(400, "CHT-201", "채팅방을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    CHATROOM_USER_NOT_ENOUGH(400, "CHT-202", "채팅방에 참여할 유저가 부족합니다.", HttpStatus.BAD_REQUEST),
+    NO_MORE_MESSAGE(200, "CHT-301", "더 이상 메세지가 없습니다.", HttpStatus.OK),
 
     //챌린지 : CHL
     CHALLENGE_NOT_FOUND(400, "CHL-001", "챌린지를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
