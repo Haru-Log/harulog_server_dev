@@ -12,7 +12,7 @@ public interface ChatRoomService {
     Response<ChatRoomDTO> createChatRoom(List<String> nicknames);
 
     // 챌린지 채팅방 생성
-    ChatRoom createChallengeChatRoom(String leaderNickname, String challengeName, String imageUrl);
+    ChatRoom createChallengeChatRoom(String challengeName, String imageUrl);
 
     // 채팅방 조회
     Response<ChatRoomDTO> findByRoomId(String roomId);

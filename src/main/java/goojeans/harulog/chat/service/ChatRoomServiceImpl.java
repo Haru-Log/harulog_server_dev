@@ -40,6 +40,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = ChatRoom.createDM();
         chatRoomRepository.save(chatRoom);
 
+        // 채팅방 생성 시 exchange 생성
+        rabbitMQConfig.createFanoutExchange(chatRoom.getId());
+
         // 닉네임이 2개 미만이면 채팅방 생성 불가 (자기 자신만 있는 채팅방 생성 불가)
         if(nicknames.size() < 2){
             throw new BusinessException(ResponseCode.CHATROOM_USER_NOT_ENOUGH);
@@ -59,28 +62,21 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
         chatRoomRepository.save(chatRoom);
 
-        // 채팅방 생성 시 exchange 생성
-        rabbitMQConfig.createFanoutExchange(chatRoom.getId());
-
         return Response.ok(ChatRoomDTO.of(chatRoom));
     }
 
     @Override
-    public ChatRoom createChallengeChatRoom(String leaderNickname, String challengeName, String imageUrl) {
+    public ChatRoom createChallengeChatRoom(String challengeName, String imageUrl) {
         log.trace("createChallengeChatRoom() execute");
 
         // 채팅방 생성
         ChatRoom room = ChatRoom.createChallenge(challengeName, imageUrl);
-        chatRoomRepository.save(room);
 
-        // 유저 조회
-        Users leader = findUser(leaderNickname);
-
-        // 채팅방에 리더 추가
-        chatRoomUserService.addUser(room, leader);
+        // 채팅방 생성 시 exchange 생성
+        rabbitMQConfig.createFanoutExchange(room.getId());
 
         // 채팅방 저장
-        return room;
+        return chatRoomRepository.save(room);
     }
 
     /**
@@ -106,7 +102,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         // 채팅방 삭제 시 exchange 삭제
         rabbitMQConfig.deleteExchange(roomId);
 
+        // 채팅방 삭제
         chatRoomRepository.deleteById(roomId);
+
         return Response.ok();
     }
 
