@@ -32,7 +32,7 @@ jobs:
           echo "RABBIT_HOST=${{ secrets.RABBIT_HOST }}" >> $GITHUB_ENV
           echo "RABBIT_USER=${{ secrets.RABBIT_USER }}" >> $GITHUB_ENV
           echo "RABBIT_PASS=${{ secrets.RABBIT_PASS }}" >> $GITHUB_ENV
-          echo "FIREBASE_ADMIN_KEY=${{ secrets.FIREBASE_ADMIN_KEY }} >> $GITHUB_ENV
+          echo "FIREBASE_ADMIN_KEY=${{ secrets.FIREBASE_ADMIN_KEY }}" >> $GITHUB_ENV
         # 환경 변수 설정
 
       - name: Start RabbitMQ service
