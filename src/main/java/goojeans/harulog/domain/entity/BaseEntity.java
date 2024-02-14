@@ -28,4 +28,11 @@ public abstract class BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ActiveStatus activeStatus = ActiveStatus.ACTIVE;
+
+    //softdelete 된 후 다시 활성 상태로 업데이트
+    public void updateActiveStatus() {
+        if (this.activeStatus == ActiveStatus.DELETED) {
+            this.activeStatus = ActiveStatus.ACTIVE;
+        }
+    }
 }
