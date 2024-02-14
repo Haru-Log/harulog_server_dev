@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
@@ -147,16 +148,16 @@ public class FollowServiceTest {
                 .build();
 
         doReturn(jwtUserDetail).when(securityUtils).getCurrentUserInfo();
-        doReturn(List.of(follow2, follow3)).when(followRepository).findFollowerByUserId(testId3);
+        doReturn(List.of(follow2, follow3)).when(followRepository).findFollowerByUserId(eq(testId3), any(Pageable.class));
 
         //When
-        Response<List<FollowInfo>> followerList = followService.getMyFollowerList();
+        Response<List<FollowInfo>> followerList = followService.getMyFollowerList(0);
 
         //Then
         assertThat(followerList.getData().size()).isEqualTo(2);
 
         verify(securityUtils, times(1)).getCurrentUserInfo();
-        verify(followRepository, times(1)).findFollowerByUserId(testId3);
+        verify(followRepository, times(1)).findFollowerByUserId(eq(testId3), any(Pageable.class));
 
     }
 
@@ -195,16 +196,16 @@ public class FollowServiceTest {
                 .build();
 
         doReturn(jwtUserDetail).when(securityUtils).getCurrentUserInfo();
-        doReturn(List.of(follow1, follow3)).when(followRepository).findFollowingByUserId(testId1);
+        doReturn(List.of(follow1, follow3)).when(followRepository).findFollowingByUserId(eq(testId1), any(Pageable.class));
 
         //When
-        Response<List<FollowInfo>> followingList = followService.getMyFollowingList();
+        Response<List<FollowInfo>> followingList = followService.getMyFollowingList(0);
 
         //Then
         assertThat(followingList.getData().size()).isEqualTo(2);
 
         verify(securityUtils, times(1)).getCurrentUserInfo();
-        verify(followRepository, times(1)).findFollowingByUserId(testId1);
+        verify(followRepository, times(1)).findFollowingByUserId(eq(testId1), any(Pageable.class));
 
     }
 
