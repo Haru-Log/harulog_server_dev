@@ -18,13 +18,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
 
-    @Transactional
+
     public CommentResponseDto createComment(Long postId, Long commentId, CommentRequestDto requestDto, Long userId) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new BusinessException(ResponseCode.CMT_POST_NOT_FOUND));
@@ -49,7 +50,7 @@ public class CommentService {
 
 
 
-    @Transactional
+
     public CommentResponseDto updateComment(Long id, CommentRequestDto requestDto, Long userId) {
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new BusinessException(ResponseCode.CMT_NOT_FOUND)
@@ -63,7 +64,7 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-    @Transactional
+
     public CommentResponseDto deleteComment(Long id, Long userId) {
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new BusinessException(ResponseCode.CMT_NOT_FOUND)
