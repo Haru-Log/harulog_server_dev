@@ -21,8 +21,6 @@ public interface ChatRoomUserService {
     // 채팅방에 유저 삭제
     Response<Void> deleteUser(String roomId, String userNickname);
 
-    Response<Void> deleteUser(ChatRoom room, Users user);
-
     // 채팅방에 참여하고 있는 유저 조회
     Response<List<ChatUserDTO>> getUsers(String roomId);
 

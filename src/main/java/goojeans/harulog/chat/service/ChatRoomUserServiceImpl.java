@@ -128,37 +128,31 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     @Override
     public Response<Void> deleteUser(String roomId, String userNickname) {
 
-        ChatRoomUser chatRoomUser = findChatRoomUser(roomId, userNickname);
+        ChatRoomUser cru = findChatRoomUser(roomId, userNickname);
+        ChatRoom room = cru.getChatRoom();
+        Users user = cru.getUser();
 
-        ChatRoom chatRoom = chatRoomUser.getChatRoom();
-        Users user = chatRoomUser.getUser();
+        log.trace("채팅방: {}에서 유저: {} 삭제", room.getId(), user.getNickname());
 
-        // 채팅방 퇴장
-        deleteUser(chatRoom, user);
-
-        return Response.ok();
-    }
-
-    @Override
-    public Response<Void> deleteUser(ChatRoom room, Users user) {
+        int remain = room.getChatRoomUsers().size();
 
         // 퇴장 메세지 전송
         sendExitMessage(room, user);
 
-        // 채팅방에 유저 삭제
-        chatRoomUserRepository.delete(ChatRoomUser.create(room, user));
+        // 채팅방에서 유저 삭제
+        chatRoomUserRepository.delete(cru);
 
         // 채팅방에 유저가 없으면 채팅방 삭제
-        if (room.getUsers().isEmpty()) {
+        if (remain-1<=0) {
             log.info("채팅방에 사람이 없습니다.");
             // 채팅방 exchange 삭제
             rabbitMQConfig.deleteExchange(room.getId());
             // 채팅방 삭제
-            chatRoomRepository.deleteById(room.getId());
+            chatRoomRepository.delete(room);
         }
 
         // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
-        if (room.getType() == GROUP && room.getUsers().size() - 1 <= 2) {
+        if (room.getType() == GROUP && remain - 1 <= 2) {
             room.setType(DM);
             chatRoomRepository.save(room);
         }
