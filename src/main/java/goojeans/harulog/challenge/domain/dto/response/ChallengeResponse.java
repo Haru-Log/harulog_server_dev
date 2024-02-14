@@ -25,8 +25,11 @@ public class ChallengeResponse {
         private String categoryName;
         private String chatRoomId;
         private List<ChallengeUsersResponse> challengeUserList;
+        private boolean isParticipate;
+        private boolean isChallengeLeader;
 
-        public static ChallengeResponse of(Challenge challenge, List<ChallengeUsersResponse> challengeUsers) {
+
+        public static ChallengeResponse of(Challenge challenge, List<ChallengeUsersResponse> challengeUsers, Boolean isParticipate, Boolean isLeader) {
             return new ChallengeResponse(
                     challenge.getChallengeId(),
                     challenge.getChallengeTitle(),
@@ -38,6 +41,8 @@ public class ChallengeResponse {
                     challenge.getEndDate(),
                     challenge.getCategory().getCategoryName(),
                     challenge.getChatroom().getId(),
-                    challengeUsers);
+                    challengeUsers,
+                    isParticipate,
+                    isLeader);
         }
 }

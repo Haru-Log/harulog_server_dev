@@ -24,7 +24,7 @@ public interface ChallengeService {
     Response<Void> deleteChallenge(Long userId, Long ChallengeId);
 
     //챌린지 단건 조회
-    Response<ChallengeResponse> getChallenge(Long ChallengeId);
+    Response<ChallengeResponse> getChallenge(Long userId, Long ChallengeId);
 
     //모든 챌린지 조회
     Response<List<ChallengeAllResponse>> getAllChallenge();
