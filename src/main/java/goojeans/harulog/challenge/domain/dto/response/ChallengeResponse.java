@@ -1,7 +1,6 @@
 package goojeans.harulog.challenge.domain.dto.response;
 
 import goojeans.harulog.challenge.domain.entity.Challenge;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,27 +14,16 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChallengeResponse {
 
-        @NotNull
         private Long challengeId;
-        @NotNull
         private String challengeTitle;
-        @NotNull
         private String challengeContent;
-        @NotNull
         private int challengeGoal;
-        @NotNull
         private String submission;
-        @NotNull
         private String imageUrl;
-        @NotNull
         private LocalDateTime startDate;
-        @NotNull
         private LocalDateTime endDate;
-        @NotNull
         private String categoryName;
-        @NotNull
         private String chatRoomId;
-        @NotNull
         private List<ChallengeUsersResponse> challengeUserList;
 
         public static ChallengeResponse of(Challenge challenge, List<ChallengeUsersResponse> challengeUsers) {
