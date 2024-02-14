@@ -71,7 +71,10 @@ public enum ResponseCode {
     CHALLENGE_CANNOT_KICKOUT_SELF(400, "CHL-006","자신을 강퇴할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     //카테고리 : CAT
-    CATEGORY_NOT_FOUND(400, "CAT-001", "카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+    CATEGORY_NOT_FOUND(400, "CAT-001", "카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+
+    //구글 파이어베이스: GFB
+    FIREBASE_ERROR(500, "GFB-001", "이미지 업로드 중 문제가 생겼습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     final Integer status;
     final String code;

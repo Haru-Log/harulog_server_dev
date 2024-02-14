@@ -8,8 +8,10 @@ spring:
         - jwt
         - oauth
         - rabbitmq
+        - firebase
       prod:
         - prod
         - jwt
         - oauth
         - rabbitmq
+        - firebase
