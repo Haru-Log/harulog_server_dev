@@ -68,6 +68,7 @@ public enum ResponseCode {
     CHALLENGE_NO_PERMISSION(400, "CHL-003", "챌린지에 참여하지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
     CHALLENGE_UNAUTHORIZED_ACCESS(400, "CHL-004", "권한이 없습니다.", HttpStatus.BAD_REQUEST),
     CHALLENGE_CAT_ALREADY_PARTICIPATE(400, "CHL-005", "이미 해당 카테고리의 챌린지에 참여 중입니다.", HttpStatus.BAD_REQUEST),
+    CHALLENGE_CANNOT_KICKOUT_SELF(400, "CHL-006","자신을 강퇴할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     //카테고리 : CAT
     CATEGORY_NOT_FOUND(400, "CAT-001", "카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);

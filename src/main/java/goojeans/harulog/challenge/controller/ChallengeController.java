@@ -33,7 +33,7 @@ public class ChallengeController {
     }
 
     @PostMapping("/challenge/join")
-    public ResponseEntity<Response<ChallengeResponse>> joinChallenge(@RequestBody ChallengeJoinRequest request) {
+    public ResponseEntity<Response<ChallengeResponse>> joinChallenge(@Validated @RequestBody ChallengeJoinRequest request) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<ChallengeResponse> response = challengeService.joinChallenge(userId, request);
 
@@ -41,7 +41,7 @@ public class ChallengeController {
     }
 
     @PostMapping("/challenge/leave")
-    public ResponseEntity<Response<Void>> leaveChallenge(@RequestBody ChallengeLeaveRequest request) {
+    public ResponseEntity<Response<Void>> leaveChallenge(@Validated @RequestBody ChallengeLeaveRequest request) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<Void> response = challengeService.leaveChallenge(userId, request);
 
@@ -71,10 +71,19 @@ public class ChallengeController {
     }
 
     @PostMapping("/challenge/{challengeId}")
-    public ResponseEntity<Response<ChallengeResponse>> updateChallenge(@PathVariable("challengeId") Long challengeId, @RequestBody ChallengeRequest request) {
+    public ResponseEntity<Response<ChallengeResponse>> updateChallenge(@PathVariable("challengeId") Long challengeId,@Validated @RequestBody ChallengeRequest request) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
 
         Response<ChallengeResponse> response = challengeService.updateChallenge(userId, challengeId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/challenge/kickout/{challengeId}/{nickname}")
+    public ResponseEntity<Response<Void>> kickoutChallengeUser(@PathVariable("challengeId") Long challengeId, @PathVariable("nickname") String nickname) {
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+
+        Response<Void> response = challengeService.kickout(userId, challengeId, nickname);
 
         return ResponseEntity.ok(response);
     }
