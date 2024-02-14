@@ -8,8 +8,22 @@ spring:
         - jwt
         - oauth
         - rabbitmq
+        - firebase
       dev:
         - dev
         - jwt
         - oauth
         - rabbitmq
+        - firebase
+      test:
+        - test
+        - jwt
+        - oauth
+        - rabbitmq
+        - firebase
+      ops:
+        - ops
+        - jwt
+        - oauth
+        - rabbitmq
+        - firebase
