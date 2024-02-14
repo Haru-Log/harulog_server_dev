@@ -2,6 +2,7 @@ package goojeans.harulog.user.repository;
 
 
 import goojeans.harulog.category.domain.entity.Category;
+import goojeans.harulog.config.QuerydslConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.user.domain.entity.UserGoal;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 @Slf4j
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(QuerydslConfig.class)
 public class UserGoalRepositoryTest {
 
     @Autowired
