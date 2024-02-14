@@ -15,6 +15,7 @@ import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,6 +31,7 @@ import static goojeans.harulog.chat.util.MessageType.EXIT;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
@@ -56,16 +58,8 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         ChatRoom chatRoom = findChatRoom(roomId);
         Users user = findUser(userNickname);
 
-        chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user));
-
-        // DM방 일때 유저가 1명 추가되어, 2명 초과가 되면 Group 채팅방으로 변경
-        if(chatRoom.getType() == DM && chatRoom.getUsers().size()+1 > 2){
-            chatRoom.setType(GROUP);
-            chatRoomRepository.save(chatRoom);
-        }
-
-        // 입장 메세지 전송
-        sendEnterMessage(chatRoom, user);
+        // 채팅방에 유저 추가
+        addUser(chatRoom, user);
 
         return Response.ok();
     }
@@ -82,15 +76,45 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
                 .map(this::findUser)
                 .toList();
 
-        users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user)));
+        // 채팅방에 유저 추가
+        addUser(chatRoom, users);
+
+        return Response.ok();
+    }
+
+    @Override
+    public Response<Void> addUser(ChatRoom room, Users user) {
+        log.trace("채팅방: {}에 유저: {} 추가", room.getId(), user.getNickname());
+
+        // 채팅방에 유저 추가
+        chatRoomUserRepository.save(ChatRoomUser.create(room, user));
 
         // 입장 메세지 전송
-        users.forEach(user -> sendEnterMessage(chatRoom, user));
+        sendEnterMessage(room, user);
 
         // DM방 일때 유저가 추가되어 2명 초과이면 Group 채팅방으로 변경
-        if (chatRoom.getType() == DM && chatRoom.getUsers().size() + users.size() > 2) {
-            chatRoom.setType(GROUP);
-            chatRoomRepository.save(chatRoom);
+        if (room.getType() == DM && room.getUsers().size() + 1 > 2) {
+            room.setType(GROUP);
+            chatRoomRepository.save(room);
+        }
+
+        return Response.ok();
+    }
+
+    @Override
+    public Response<Void> addUser(ChatRoom room, List<Users> users) {
+        log.trace("채팅방: {}에 유저 여러 명 추가", room.getId());
+
+        // 채팅방에 유저 추가
+        users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(room, user)));
+
+        // 입장 메세지 전송
+        users.forEach(user -> sendEnterMessage(room, user));
+
+        // DM방 일때 유저가 추가되어 2명 초과이면 Group 채팅방으로 변경
+        if (room.getType() == DM && room.getUsers().size() + users.size() > 2) {
+            room.setType(GROUP);
+            chatRoomRepository.save(room);
         }
 
         return Response.ok();
@@ -98,19 +122,22 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
 
     /**
      * 채팅방에 유저 삭제
-     *  - 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
-     *  - 채팅방에 유저가 없으면 채팅방 삭제
+     * - 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
+     * - 채팅방에 유저가 없으면 채팅방 삭제
      */
     @Override
     public Response<Void> deleteUser(String roomId, String userNickname) {
 
         ChatRoomUser chatRoomUser = findChatRoomUser(roomId, userNickname);
-        chatRoomUserRepository.delete(chatRoomUser);
 
         ChatRoom chatRoom = chatRoomUser.getChatRoom();
+        Users user = chatRoomUser.getUser();
+
+        // 채팅방 퇴장
+        deleteUser(chatRoom, user);
 
         // 채팅방에 유저가 없으면 채팅방 삭제
-        if(chatRoom.getUsers().isEmpty()){
+        if (chatRoom.getUsers().isEmpty()) {
             log.info("채팅방에 사람이 없습니다.");
             // 채팅방 exchange 삭제
             rabbitMQConfig.deleteExchange(chatRoom.getId());
@@ -118,22 +145,30 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             chatRoomRepository.deleteById(chatRoom.getId());
         }
 
-        // 채팅방 Type 변경 및 퇴장 메세지 전송
-        else {
-            // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
-            if(chatRoom.getType() == GROUP && chatRoom.getUsers().size()-1 <= 2) {
-                chatRoom.setType(DM);
-                chatRoomRepository.save(chatRoom);
-            }
-            // 퇴장 메세지 전송
-            sendExitMessage(chatRoom, chatRoomUser.getUser());
+        // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
+        if (chatRoom.getType() == GROUP && chatRoom.getUsers().size() - 1 <= 2) {
+            chatRoom.setType(DM);
+            chatRoomRepository.save(chatRoom);
         }
+
+        return Response.ok();
+    }
+
+    @Override
+    public Response<Void> deleteUser(ChatRoom room, Users user) {
+
+        // 퇴장 메세지 전송
+        sendExitMessage(room, user);
+
+        // 채팅방에 유저 삭제
+        chatRoomUserRepository.delete(ChatRoomUser.create(room, user));
 
         return Response.ok();
     }
 
     /**
      * 채팅방에 참여하고 있는 유저 조회
+     *
      * @return [유저 닉네임, 이미지url] 리스트
      */
     @Override
@@ -172,7 +207,7 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         messageRepository.save(message);
 
         // 채팅방 Exchange에 입장 메세지 전송
-        rabbitTemplate.convertAndSend("chatroom."+room.getId(),"", MessageDTO.of(message));
+        rabbitTemplate.convertAndSend("chatroom." + room.getId(), "", MessageDTO.of(message));
     }
 
     /**
@@ -181,13 +216,13 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     @Override
     public void sendExitMessage(ChatRoom room, Users user) {
 
-            // 퇴장 메세지 생성 및 저장
-            String content = user.getNickname() + "님이 나가셨습니다.";
-            Message message = Message.create(room, user, EXIT, content);
-            messageRepository.save(message);
+        // 퇴장 메세지 생성 및 저장
+        String content = user.getNickname() + "님이 나가셨습니다.";
+        Message message = Message.create(room, user, EXIT, content);
+        messageRepository.save(message);
 
-            // 채팅방 Exchange에 퇴장 메세지 전송
-            rabbitTemplate.convertAndSend("chatroom."+room.getId(),"", MessageDTO.of(message));
+        // 채팅방 Exchange에 퇴장 메세지 전송
+        rabbitTemplate.convertAndSend("chatroom." + room.getId(), "", MessageDTO.of(message));
     }
 
     /**
