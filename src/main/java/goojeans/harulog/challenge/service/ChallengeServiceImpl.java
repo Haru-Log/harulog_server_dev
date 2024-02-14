@@ -99,8 +99,18 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new BusinessException(ResponseCode.CHALLENGE_CAT_ALREADY_PARTICIPATE);
         }
 
-        ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
-        challenge.addChallengeUser(challengeUser);
+        //재가입인지 검사
+        //재가입이면 활성 상태만 업데이트
+        ChallengeUser deletedChallengeUser = challengeUserRepository.findDeletedChallengeUser(userId, challenge.getChallengeId()).orElse(null);
+
+        if (deletedChallengeUser == null) {
+            ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
+            challenge.addChallengeUser(challengeUser);
+
+        } else {
+            deletedChallengeUser.updateActiveStatus();
+            challenge.addChallengeUser(deletedChallengeUser);
+        }
 
         List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
         ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList, true, false);
