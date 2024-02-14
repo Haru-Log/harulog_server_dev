@@ -1,6 +1,7 @@
 package goojeans.harulog.chat.controller;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
+import goojeans.harulog.chat.domain.dto.request.LastMessageRequest;
 import goojeans.harulog.chat.domain.dto.request.MessageRequest;
 import goojeans.harulog.chat.service.MessageService;
 import goojeans.harulog.domain.dto.Response;
@@ -12,15 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/chats")
 public class MessageController {
 
     private final MessageService messageService;
@@ -28,9 +27,36 @@ public class MessageController {
     private final SecurityUtils securityUtils;
 
     /**
-     * 채팅방 in (= 바인딩, 메세지 조회) (!= 채팅방 입장)
+     * scroll up : 이전 메세지 조회
      */
-    @GetMapping("/chats/{roomId}/in")
+    @PostMapping("/{roomId}/scroll-up")
+    public ResponseEntity<?> scrollUp(
+            @PathVariable("roomId") String roomId,
+            @Validated @RequestBody LastMessageRequest lastMessageRequest
+    ) {
+        log.info("scroll up: {}", roomId);
+
+        return ResponseEntity.ok(messageService.getMessagesBeforeResponse(roomId, lastMessageRequest.getMessageId()));
+    }
+
+    /**
+     * scroll down : 이후 메세지 조회
+     */
+    @PostMapping("/{roomId}/scroll-down")
+    public ResponseEntity<?> scrollDown(
+            @PathVariable("roomId") String roomId,
+            @Validated @RequestBody LastMessageRequest lastMessageRequest
+    ) {
+        log.info("scroll down: {}", roomId);
+
+        return ResponseEntity.ok(messageService.getMessagesAfterResponse(roomId, lastMessageRequest.getMessageId()));
+    }
+
+    /**
+     * 채팅방 in (= 바인딩, 메세지 조회) (!= 채팅방 입장)
+     * 마지막 읽었던 메세지 기준으로 메세지 조회
+     */
+    @GetMapping("/{roomId}/in")
     public ResponseEntity<?> roomIn(
             @PathVariable("roomId") String roomId
     ) {
@@ -43,7 +69,7 @@ public class MessageController {
     /**
      * 채팅방 out (= 언바인딩)
      */
-    @GetMapping("/chats/{roomId}/out")
+    @GetMapping("/{roomId}/out")
     public ResponseEntity<?> roomOut(
             @PathVariable("roomId") String roomId
     ) {

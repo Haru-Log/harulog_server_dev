@@ -1,5 +1,6 @@
 package goojeans.harulog.user.repository;
 
+import goojeans.harulog.config.QuerydslConfig;
 import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.util.SocialType;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Slf4j
+@Import(QuerydslConfig.class)
 public class FollowRepositoryTest {
 
     @Autowired

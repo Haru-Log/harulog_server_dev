@@ -4,6 +4,7 @@ import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.challenge.domain.entity.Challenge;
 import goojeans.harulog.challenge.domain.entity.ChallengeUser;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.config.QuerydslConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.user.domain.entity.Follow;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -29,6 +31,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 @Slf4j
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(QuerydslConfig.class)
 class UserRepositoryTest {
 
     @Autowired
