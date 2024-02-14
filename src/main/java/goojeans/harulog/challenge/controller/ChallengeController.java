@@ -58,7 +58,8 @@ public class ChallengeController {
 
     @GetMapping("/challenge/{challengeId}")
     public ResponseEntity<Response<ChallengeResponse>> getChallenge(@PathVariable("challengeId") Long challengeId) {
-        Response<ChallengeResponse> response = challengeService.getChallenge(challengeId);
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+        Response<ChallengeResponse> response = challengeService.getChallenge(userId, challengeId);
 
         return ResponseEntity.ok(response);
     }

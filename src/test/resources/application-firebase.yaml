@@ -1,0 +1,2 @@
+firebase:
+  key: ${FIREBASE_ADMIN_KEY}

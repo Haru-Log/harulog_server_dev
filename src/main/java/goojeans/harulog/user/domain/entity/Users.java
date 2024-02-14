@@ -134,4 +134,8 @@ public class Users extends BaseEntity {
     public void updateIntroduction(String introduction) {
         this.introduction = introduction;
     }
+
+    public void updateImageUrl(String imageUrl){
+        this.imageUrl = imageUrl;
+    }
 }

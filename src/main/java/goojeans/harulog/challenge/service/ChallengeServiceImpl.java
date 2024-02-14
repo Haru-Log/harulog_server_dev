@@ -92,7 +92,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
-        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
+        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList, true, true);
         return Response.ok(challengeResponse);
     }
 
@@ -110,15 +110,24 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new BusinessException(ResponseCode.CHALLENGE_CAT_ALREADY_PARTICIPATE);
         }
 
-        // 챌린지 참여자 추가
-        ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
-        challenge.addChallengeUser(challengeUser);
+        //재가입인지 검사
+        //재가입이면 활성 상태만 업데이트
+        ChallengeUser deletedChallengeUser = challengeUserRepository.findDeletedChallengeUser(userId, challenge.getChallengeId()).orElse(null);
 
-        // 채팅방 참여자 추가
-        chatRoomUserService.addUser(challenge.getChatroom(), user);
+        if (deletedChallengeUser == null) {
+            ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
+            challenge.addChallengeUser(challengeUser);
+
+            // 채팅방 참여자 추가
+            chatRoomUserService.addUser(challenge.getChatroom(), user);
+
+        } else {
+            deletedChallengeUser.updateActiveStatus();
+            challenge.addChallengeUser(deletedChallengeUser);
+        }
 
         List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
-        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
+        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList, true, false);
         return Response.ok(challengeResponse);
     }
 
@@ -144,13 +153,11 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
-    public Response<Void> deleteChallenge(Long userId, Long ChallengeId) {
-        Challenge challenge = challengeRepository.findByChallengeId(ChallengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
+    public Response<Void> deleteChallenge(Long userId, Long challengeId) {
+        Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
 
         //챌린지 리더인지 확인
-        boolean isChallengeLeader = challenge.getChallengeUserList().stream()
-                .anyMatch(challengeUser -> challengeUser.getChallengeUserPK().getUserId().equals(userId)
-                        && challengeUser.getRole().equals(ChallengeRole.LEADER));
+        boolean isChallengeLeader = isChallengeLeader(userId, challengeId);
 
         if (isChallengeLeader) {
             challengeRepository.delete(challenge);
@@ -163,12 +170,23 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
-    public Response<ChallengeResponse> getChallenge(Long ChallengeId) {
+    public Response<ChallengeResponse> getChallenge(Long userId, Long challengeId) {
 
-        Challenge challenge = challengeRepository.findByChallengeId(ChallengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
+        Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
+
+        boolean isParticipate = isAlreadyJoin(userId, challenge.getChallengeId());
+
+        //리더인지 검사
+        boolean isChallengeLeader = false;
+        if (isParticipate) {
+            isChallengeLeader = isChallengeLeader(userId, challengeId);
+        } else {
+            ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByRole(challengeId, ChallengeRole.LEADER);
+            isChallengeLeader = challengeUser.getChallengeUserPK().getUserId().equals(userId);
+        }
 
         List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
-        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
+        ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList, isParticipate, isChallengeLeader);
 
         return Response.ok(challengeResponse);
     }
@@ -213,8 +231,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
 
         //챌린지 리더인지 확인
-        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
-        boolean isChallengeLeader = challengeUser.getRole().equals(ChallengeRole.LEADER);
+        boolean isChallengeLeader = isChallengeLeader(userId, challengeId);
 
         if (isChallengeLeader) {
             challenge.updateChallengeTitle(request.getChallengeTitle());
@@ -227,7 +244,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             Challenge updatedChallenge = challengeRepository.save(challenge);
 
             List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(updatedChallenge);
-            ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList);
+            ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList, true, true);
 
             return Response.ok(challengeResponse);
         } else {
@@ -262,8 +279,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
 
         //챌린지 리더인지 확인
-        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
-        boolean isChallengeLeader = challengeUser.getRole().equals(ChallengeRole.LEADER);
+        boolean isChallengeLeader = isChallengeLeader(userId, challengeId);
 
         if (isChallengeLeader) {
 
@@ -288,6 +304,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
     }
 
+    //첼린지에 참여 중인지 검사
     public boolean isAlreadyJoin(Long userId, Long ChallengeId) {
         Optional<ChallengeUser> challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, ChallengeId);
 
@@ -304,6 +321,12 @@ public class ChallengeServiceImpl implements ChallengeService {
             }
         }
         return true;
+    }
+
+    public boolean isChallengeLeader(Long userId, Long challengeId) {
+
+        ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
+        return challengeUser.getRole().equals(ChallengeRole.LEADER);
     }
 
     //ChallengeUser 정보를 담은 ChallengeUsersResponse 리스트 생성

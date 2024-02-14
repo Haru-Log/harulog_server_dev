@@ -100,6 +100,9 @@ class ChallengeServiceTest {
         ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
         List<Post> posts = new ArrayList<>();
 
+        ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
+        challengeUser.updateRole();
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.save(any(Challenge.class))).thenReturn(challenge);
@@ -179,10 +182,12 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("챌린지 단건 조회")
     void getChallenge() {
+        ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
 
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+        when(challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId)).thenReturn(Optional.of(challengeUser));
 
-        Response<ChallengeResponse> response = challengeService.getChallenge(challenge.getChallengeId());
+        Response<ChallengeResponse> response = challengeService.getChallenge(userId, challenge.getChallengeId());
         Assertions.assertThat(response.getData().getChallengeTitle()).isEqualTo("test challenge");
     }
 
@@ -218,6 +223,7 @@ class ChallengeServiceTest {
         challenge.getChallengeUserList().add(challengeUser);
 
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
+        when(challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId)).thenReturn(Optional.of(challengeUser));
 
         Response<Void> response = challengeService.deleteChallenge(userId, challengeId);
         Assertions.assertThat(response.getStatus()).isEqualTo(200);

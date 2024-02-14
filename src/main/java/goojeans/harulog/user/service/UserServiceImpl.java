@@ -45,6 +45,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response<Void> signUp(SignUpRequest request) {
 
+        String imageDefault = "image/profile/default";
+
         boolean nicknameDuplication = checkNicknameDuplication(request.getNickname());
         boolean emailDuplication = checkEmailDuplication(request.getEmail());
 
@@ -57,6 +59,8 @@ public class UserServiceImpl implements UserService {
         }
 
         Users entity = request.toEntity();
+
+        entity.updateImageUrl(imageDefault);
         entity.updatePassword(passwordEncoder.encode(entity.getPassword()));
 
         userRepository.save(entity);
