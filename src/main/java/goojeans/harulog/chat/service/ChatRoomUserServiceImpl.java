@@ -47,46 +47,32 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     // 채팅방 - 유저 binding, unbinding
     private final RabbitMQConfig rabbitMQConfig;
 
-    /**
-     * 채팅방에 유저 1명 추가
-     * + DM방 일때 유저가 1명 추가되어, 2명 초과가 되면 Group 채팅방으로 변경
-     */
+
+    // 기본형
+    // 채팅방id, 유저 닉네임으로 채팅방-유저 조회
     @Override
-    public Response<Void> addUser(String roomId, String userNickname) {
+    public ChatRoomUser findChatRoomUser(String roomId, Long userId) {
+        return chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NO_PERMISSION));
+    }
 
-        ChatRoom chatRoom = findChatRoom(roomId);
-        Users user = findUser(userNickname);
-
-        // 채팅방에 유저 추가
-        addUser(chatRoom, user);
-
-        return Response.ok();
+    // 채팅방, 유저로 채팅방-유저 조회
+    @Override
+    public ChatRoomUser findChatRoomUser(ChatRoom room, Users user) {
+        return chatRoomUserRepository.findByChatRoomAndUser(room, user)
+                .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NO_PERMISSION));
     }
 
     /**
-     * 채팅방에 유저 여러명 추가
-     * + DM방 일때 유저가 추가되어 2명 초과이면 Group 채팅방으로 변경
+     * 채팅방에 유저 추가
+     * 1. 유저 추가
+     * 2. 입장 메세지 전송
+     * 3. DM방 일때 유저가 추가되어, 2명 초과가 되면 Group 채팅방으로 변경
      */
     @Override
-    public Response<Void> addUser(String roomId, List<String> usersNickname) {
-
-        ChatRoom chatRoom = findChatRoom(roomId);
-        List<Users> users = usersNickname.stream()
-                .map(this::findUser)
-                .toList();
-
-        // 채팅방에 유저 추가
-        addUser(chatRoom, users);
-
-        return Response.ok();
-    }
-
-    @Override
-    public Response<Void> addUser(ChatRoom room, Users user) {
-        log.trace("채팅방: {}에 유저: {} 추가", room.getId(), user.getNickname());
-
-        // 채팅방에 유저 추가
-        chatRoomUserRepository.save(ChatRoomUser.create(room, user));
+    public void addUser(ChatRoom room, Users user){
+        ChatRoomUser cru = ChatRoomUser.create(room, user);
+        chatRoomUserRepository.save(cru);
 
         // 입장 메세지 전송
         sendEnterMessage(room, user);
@@ -96,15 +82,16 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             room.setType(GROUP);
             chatRoomRepository.save(room);
         }
-
-        return Response.ok();
     }
 
+    /**
+     * 채팅방에 유저 여러명 추가
+     * 1. 유저 추가
+     * 2. 입장 메세지 전송
+     * 3. DM방 일때 유저가 추가 ->  2명 초과이면 Group 채팅방으로 변경
+     */
     @Override
-    public Response<Void> addUser(ChatRoom room, List<Users> users) {
-        log.trace("채팅방: {}에 유저 여러 명 추가", room.getId());
-
-        // 채팅방에 유저 추가
+    public void addUsers(ChatRoom room, List<Users> users) {
         users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(room, user)));
 
         // 입장 메세지 전송
@@ -115,20 +102,6 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             room.setType(GROUP);
             chatRoomRepository.save(room);
         }
-
-        return Response.ok();
-    }
-
-    @Override
-    public Response<Void> deleteUserRequest(String roomId, String userNickname) {
-        ChatRoom chatRoom = findChatRoom(roomId);
-
-        // 채팅방이 Challenge이면, Challenge 채팅방에서는 유저가 나가지 못하도록 함
-        if (chatRoom.getType() == CHALLENGE) {
-            throw new BusinessException(ResponseCode.CHALLENGE_CHATROOM_USER_CANNOT_LEAVE);
-        }
-
-        return deleteUser(roomId, userNickname);
     }
 
     /**
@@ -137,14 +110,13 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
      * - 채팅방에 유저가 없으면 채팅방 삭제
      */
     @Override
-    public Response<Void> deleteUser(String roomId, String userNickname) {
-
-        ChatRoomUser cru = findChatRoomUser(roomId, userNickname);
+    public void deleteUser(ChatRoomUser cru) {
         ChatRoom room = cru.getChatRoom();
         Users user = cru.getUser();
 
         log.trace("채팅방: {}에서 유저: {} 삭제", room.getId(), user.getNickname());
 
+        // 채팅방에 참여하고 있는 유저 수
         int remain = room.getChatRoomUsers().size();
 
         // 퇴장 메세지 전송
@@ -161,19 +133,72 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             // 채팅방 삭제
             chatRoomRepository.delete(room);
         }
-
         // 그룹 채팅방이면서 유저가 1명 빠져서, 2명 이하로 되면 DM 채팅방으로 변경
         if (room.getType() == GROUP && remain - 1 <= 2) {
             room.setType(DM);
             chatRoomRepository.save(room);
         }
+    }
+
+
+    // 채팅방에 유저 1명 추가
+    @Override
+    public Response<Void> addUser(String roomId, String userNickname) {
+
+        ChatRoom chatRoom = findChatRoom(roomId);
+        Users user = findUser(userNickname);
+
+        // 채팅방에 유저 추가
+        addUser(chatRoom, user);
+
+        return Response.ok();
+    }
+
+    // 채팅방에 유저 여러명 추가
+    @Override
+    public Response<Void> addUsers(String roomId, List<String> usersNickname) {
+
+        ChatRoom chatRoom = findChatRoom(roomId);
+        List<Users> users = usersNickname.stream()
+                .map(this::findUser)
+                .toList();
+
+        // 채팅방에 유저 추가
+        addUsers(chatRoom, users);
+
+        return Response.ok();
+    }
+
+    @Override
+    public Response<Void> deleteUserRequest(String roomId, String userNickname) {
+        ChatRoom chatRoom = findChatRoom(roomId);
+
+        // 채팅방이 Challenge이면, Challenge 채팅방에서는 유저가 나가지 못하도록 함
+        if (chatRoom.getType() == CHALLENGE) {
+            throw new BusinessException(ResponseCode.CHALLENGE_CHATROOM_USER_CANNOT_LEAVE);
+        }
+        return deleteUser(roomId, userNickname);
+    }
+
+
+
+    @Override
+    public Response<Void> deleteUser(String roomId, String userNickname) {
+
+        // 유저 닉네임으로 유저 조회
+        Users user = findUser(userNickname);
+
+        // 채팅방-유저 조회
+        ChatRoomUser cru = findChatRoomUser(roomId, user.getId());
+
+        // 채팅방에 유저 삭제
+        deleteUser(cru);
 
         return Response.ok();
     }
 
     /**
      * 채팅방에 참여하고 있는 유저 조회
-     *
      * @return [유저 닉네임, 이미지url] 리스트
      */
     @Override
@@ -241,12 +266,5 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
     private ChatRoom findChatRoom(String roomId) {
         return chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.CHATROOM_NOT_FOUND));
-    }
-
-    private ChatRoomUser findChatRoomUser(String roomId, String userNickname) {
-        Users user = findUser(userNickname);
-        findChatRoom(roomId);
-        return chatRoomUserRepository.findByChatRoomIdAndUserId(roomId, user.getId())
-                .orElseThrow(() -> new BusinessException(ResponseCode.CHAT_NO_PERMISSION));
     }
 }
