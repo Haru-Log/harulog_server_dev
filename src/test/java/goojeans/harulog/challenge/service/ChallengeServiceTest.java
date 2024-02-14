@@ -15,6 +15,8 @@ import goojeans.harulog.challenge.util.ChallengeRole;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.dto.Response;
+import goojeans.harulog.post.domain.entity.Post;
+import goojeans.harulog.post.repository.PostRepository;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.util.SocialType;
@@ -29,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +53,7 @@ class ChallengeServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private CategoryRepository categoryRepository;
     @Mock private ChallengeUserRepository challengeUserRepository;
+    @Mock private PostRepository postRepository;
 
     private Users user;
     private Category category;
@@ -94,10 +98,12 @@ class ChallengeServiceTest {
     void createChallenge() {
 
         ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
+        List<Post> posts = new ArrayList<>();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.save(any(Challenge.class))).thenReturn(challenge);
+        when(postRepository.findByUserIdAndToday(userId, LocalDate.now().atStartOfDay())).thenReturn(posts);
 
         Response<ChallengeResponse> response = challengeService.registerChallenge(user.getId(), request);
 
@@ -126,10 +132,12 @@ class ChallengeServiceTest {
 
         ChallengeJoinRequest request = new ChallengeJoinRequest(challengeId);
         List<Challenge> userChallenges = new ArrayList<>(Arrays.asList());
+        List<Post> posts = new ArrayList<>();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(challengeRepository.findByChallengeId(challengeId)).thenReturn(Optional.of(challenge));
         when(challengeRepository.findAllByUserId(userId)).thenReturn(userChallenges);
+        when(postRepository.findByUserIdAndToday(userId, LocalDate.now().atStartOfDay())).thenReturn(posts);
 
         Response<ChallengeResponse> response = challengeService.joinChallenge(user.getId(), request);
         Assertions.assertThat(response.getData().getChallengeUserList().get(0).getNickname()).isEqualTo("tester");
