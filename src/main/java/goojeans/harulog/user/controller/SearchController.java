@@ -20,21 +20,21 @@ public class SearchController {
     private final SearchService searchService;
 
     @GetMapping("/all")
-    ResponseEntity<Response<SearchResponse>> searchOnAll(@RequestParam String content,
+    ResponseEntity<Response<SearchResponse>> searchOnAll(@RequestParam(defaultValue = "") String content,
                                                          @RequestParam(defaultValue = "0") Integer pageNumber) {
 
         return ResponseEntity.ok(searchService.searchOnAll(content, pageNumber));
     }
 
     @GetMapping("/followers")
-    ResponseEntity<Response<SearchResponse>> searchOnFollowers(@RequestParam String content,
+    ResponseEntity<Response<SearchResponse>> searchOnFollowers(@RequestParam(defaultValue = "") String content,
                                                          @RequestParam(defaultValue = "0") Integer pageNumber) {
 
         return ResponseEntity.ok(searchService.searchOnFollowers(content, pageNumber));
     }
 
     @GetMapping("/followings")
-    ResponseEntity<Response<SearchResponse>> searchOnFollowings(@RequestParam String content,
+    ResponseEntity<Response<SearchResponse>> searchOnFollowings(@RequestParam(defaultValue = "") String content,
                                                          @RequestParam(defaultValue = "0") Integer pageNumber) {
 
         return ResponseEntity.ok(searchService.searchOnFollowings(content, pageNumber));
