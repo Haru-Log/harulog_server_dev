@@ -9,13 +9,13 @@ import goojeans.harulog.user.domain.dto.CustomOAuth2User;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -57,11 +57,16 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
             }
 
             String refreshToken = jwtTokenProvider.generateRefreshToken();
-            Cookie cookie = new Cookie("refreshToken", refreshToken);
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(COOKIE_EXPIRATION);
-            response.addCookie(cookie);
+
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                    .path("/")
+                    .httpOnly(true)
+                    .maxAge(COOKIE_EXPIRATION)
+                    .secure(true)
+                    .sameSite("None")
+                    .build();
+
+            response.setHeader("Set-Cookie", cookie.toString());
 
             Users findUser = userRepository.findUsersByEmail(oAuth2User.getUser().getEmail())
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
