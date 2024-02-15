@@ -2,24 +2,22 @@ package goojeans.harulog.likes.service;
 
 import goojeans.harulog.likes.repository.LikesRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class LikesService {
 
     private static final Logger logger = LoggerFactory.getLogger(LikesService.class);
 
     private final LikesRepository likesRepository;
 
-    @Autowired
-    public LikesService(LikesRepository likesRepository) {
-        this.likesRepository = likesRepository;
-    }
 
-    @Transactional
+
     public void saveLikes(Long postId, Long userId) {
         try {
             if (userId == null) {
@@ -33,7 +31,7 @@ public class LikesService {
         }
     }
 
-    @Transactional
+
     public void deleteLikes(Long postId, Long userId) {
         try {
             if (userId == null) {
