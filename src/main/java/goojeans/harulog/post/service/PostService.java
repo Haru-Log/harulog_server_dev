@@ -212,6 +212,20 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
+    public List<PostResponseDto> userLikePost(Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL));
+
+        List<Post> postList = postRepository.findPostsByUserOrderByCreatedAtDesc(userId);
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+        for (Post post : postList) {
+            int likeCount = likesRepository.countLikesByPostId(post.getId());
+            int commentCount = commentRepository.countCommentsByPostId(post.getId());
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
+        }
+
+        return postResponseDtoList;
+    }
 
 
 }

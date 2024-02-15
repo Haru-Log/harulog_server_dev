@@ -63,5 +63,17 @@ public class PostResponseDto {
         this.goal = post.getGoal();
     }
 
+    public PostResponseDto(Post post, int commentCount, int likeCount){
+        this.id = post.getId();
+        this.content = post.getContent();
+        this.imgUrl = post.getImgUrl();
+        this.activityTime = post.getActivityTime();
+        this.nickname= post.getUser().getNickname();
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
+        this.goal = post.getGoal();
+        this.createdAt = post.getCreatedAt();
+    }
+
 
 }

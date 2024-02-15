@@ -10,11 +10,11 @@ public interface FollowService {
 
     Response<List<FollowInfo>> getFollowerList(String nickname);
 
-    Response<List<FollowInfo>> getMyFollowerList();
+    Response<List<FollowInfo>> getMyFollowerList(Integer pageNumber);
 
     Response<List<FollowInfo>> getFollowingList(String nickname);
 
-    Response<List<FollowInfo>> getMyFollowingList();
+    Response<List<FollowInfo>> getMyFollowingList(Integer pageNumber);
 
     Response<Void> follow(FollowRequest request);
 

@@ -138,6 +138,10 @@ public class ChallengeServiceImpl implements ChallengeService {
         Challenge challenge = challengeRepository.findByChallengeId(request.getChallengeId()).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
         ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(user.getId(), challenge.getChallengeId()).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
 
+        if (challengeUser.getRole().equals(ChallengeRole.LEADER)) {
+            throw new BusinessException(ResponseCode.CHALLENGE_LEADER_CANNOT_LEAVE);
+        }
+      
         // 채팅방 퇴장 (챌린지 삭제 전)
         chatRoomUserService.deleteUser(challenge.getChatroom().getId(), user.getNickname());
 
@@ -297,6 +301,25 @@ public class ChallengeServiceImpl implements ChallengeService {
 
             // 채팅방에서도 강퇴
             chatRoomUserService.deleteUser(challenge.getChatroom().getId(), kickoutUser.getNickname());
+
+            return Response.ok();
+        } else {
+            throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    @Override
+    public Response<Void> assignLeader(Long userId, Long challengeId, String nickname) {
+
+        boolean isChallengeLeader = isChallengeLeader(userId, challengeId);
+
+        if (isChallengeLeader) {
+            Users user = userRepository.findByNickname(nickname).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+            ChallengeUser challengeUser = challengeUserRepository.findChallengeUserByUserAndChallenge(user.getId(), challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));
+            ChallengeUser challengeLeader = challengeUserRepository.findChallengeUserByUserAndChallenge(userId, challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NO_PERMISSION));;
+
+            challengeLeader.updateRole();
+            challengeUser.updateRole();
 
             return Response.ok();
         } else {

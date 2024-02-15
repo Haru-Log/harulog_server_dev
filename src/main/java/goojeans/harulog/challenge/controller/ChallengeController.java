@@ -89,6 +89,15 @@ public class ChallengeController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/challenge/assign-leader/{challengeId}/{nickname}")
+    public ResponseEntity<Response<Void>> assignChallengeLeader(@PathVariable("challengeId") Long challengeId, @PathVariable("nickname") String nickname) {
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+
+        Response<Void> response = challengeService.assignLeader(userId, challengeId, nickname);
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/main/challenge")
     public ResponseEntity<Response<List<ChallengeAllResponse>>> getRandomChallenge() {
         Response<List<ChallengeAllResponse>> response = challengeService.getRandomChallenge();

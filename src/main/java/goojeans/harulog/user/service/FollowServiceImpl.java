@@ -15,6 +15,7 @@ import goojeans.harulog.user.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public class FollowServiceImpl implements FollowService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final SecurityUtils securityUtils;
+
+    private final static Integer PAGE_SIZE = 10;
 
     @Override
     public Response<List<FollowInfo>> getFollowerList(String nickname) {
@@ -45,11 +48,13 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public Response<List<FollowInfo>> getMyFollowerList() {
+    public Response<List<FollowInfo>> getMyFollowerList(Integer pageNumber) {
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, PAGE_SIZE);
 
         JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
 
-        List<FollowInfo> list = followRepository.findFollowerByUserId(currentUserInfo.getId()).stream()
+        List<FollowInfo> list = followRepository.findFollowerByUserId(currentUserInfo.getId(), pageRequest).stream()
                 .map(follow -> FollowInfo.entityToResponse(follow.getFollower()))
                 .toList();
 
@@ -73,11 +78,13 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public Response<List<FollowInfo>> getMyFollowingList() {
+    public Response<List<FollowInfo>> getMyFollowingList(Integer pageNumber) {
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, PAGE_SIZE);
 
         JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
 
-        List<FollowInfo> list = followRepository.findFollowingByUserId(currentUserInfo.getId()).stream()
+        List<FollowInfo> list = followRepository.findFollowingByUserId(currentUserInfo.getId(), pageRequest).stream()
                 .map(follow -> FollowInfo.entityToResponse(follow.getFollowing()))
                 .toList();
 
