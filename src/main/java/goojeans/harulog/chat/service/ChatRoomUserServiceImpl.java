@@ -114,16 +114,8 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
         ChatRoom room = cru.getChatRoom();
         Users user = cru.getUser();
 
-        log.trace("채팅방: {}에서 유저: {} 삭제", room.getId(), user.getNickname());
-
         // 채팅방에 참여하고 있는 유저 수
-        int remain = room.getChatRoomUsers().size();
-
-        // 퇴장 메세지 전송
-        sendExitMessage(room, user);
-
-        // 채팅방에서 유저 삭제
-        chatRoomUserRepository.delete(cru);
+        int remain = chatRoomUserRepository.findUserByChatroomId(room.getId()).size();
 
         // 채팅방에 유저가 없으면 채팅방 삭제
         if (remain - 1 <= 0) {
@@ -138,6 +130,12 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
             room.setType(DM);
             chatRoomRepository.save(room);
         }
+
+        // 퇴장 메세지 전송
+        sendExitMessage(room, user);
+
+        // 채팅방에서 유저 삭제
+        chatRoomUserRepository.delete(cru);
     }
 
 

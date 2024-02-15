@@ -31,7 +31,7 @@ public class ChatRoomUserController {
             @PathVariable("roomId") String roomId,
             @Validated @RequestBody AddUserRequest addUserRequest
     ){
-        chatRoomUserService.addUser(roomId, addUserRequest.getUserNicknames());
+        chatRoomUserService.addUsers(roomId, addUserRequest.getUserNicknames());
         return ResponseEntity.ok(Response.ok("채팅방에 유저가 추가되었습니다."));
     }
 
