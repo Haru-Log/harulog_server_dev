@@ -82,7 +82,8 @@ public class PostController {
 
     //팔로우 중인 사람들의 feed 보기
     @GetMapping("/feed/follow/user")
-    public ResponseEntity<List<PostResponseDto>> userFollowPost(@RequestParam Long userId){
+    public ResponseEntity<List<PostResponseDto>> userFollowPost(){
+        Long userId = securityUtils.getCurrentUserInfo().getId();
         return ResponseEntity.ok(postService.userFollowPost(userId));
     }
 
