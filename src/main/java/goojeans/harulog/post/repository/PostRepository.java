@@ -22,6 +22,9 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     @Query("select p from post p where p.user.id =:userId and p.createdAt >= :today")
     List<Post> findByUserIdAndToday(@Param("userId") Long userId, @Param("today") LocalDateTime today);
 
+    @Query("SELECT p FROM post p LEFT JOIN p.likes l WHERE l.user.id = :userId ORDER BY p.createdAt DESC")
+    List<Post> findPostsByUserOrderByCreatedAtDesc(@Param("userId") Long userId);
+
 }
 
 

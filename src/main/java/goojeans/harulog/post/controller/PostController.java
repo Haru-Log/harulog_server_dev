@@ -72,4 +72,13 @@ public class PostController {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         return ResponseEntity.ok(postService.deletePost(post_id, userId));
     }
+
+    //좋아요 누른 Feed 보기
+    @GetMapping("/feed/like/user")
+    public ResponseEntity<List<PostResponseDto>> userLikePost(){
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+        return ResponseEntity.ok(postService.userLikePost(userId));
+    }
+
+
 }
