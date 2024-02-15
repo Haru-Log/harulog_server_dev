@@ -13,7 +13,7 @@ import java.util.List;
 public class CommentResponseDto extends CommentRequestDto {
     private Long id;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime updateAt;
     private String content;
     private String nickname;
     private Long parentId;
@@ -28,6 +28,7 @@ public class CommentResponseDto extends CommentRequestDto {
         this.depth          = comment.getDepth();
         this.createdAt      = comment.getCreatedAt();
         this.children       = commentResponseDtoList;
+        this.updateAt       = comment.getUpdatedAt();
     }
 
     public CommentResponseDto(Comment comment, Long id){
@@ -37,6 +38,7 @@ public class CommentResponseDto extends CommentRequestDto {
         this.parentId       = id;
         this.depth          = comment.getDepth();
         this.createdAt      = comment.getCreatedAt();
+        this.updateAt       = comment.getUpdatedAt();
 
     }
 
@@ -46,7 +48,7 @@ public class CommentResponseDto extends CommentRequestDto {
         this.content        = comment.getContent();
         this.depth          = comment.getDepth();
         this.createdAt      = comment.getCreatedAt();
-
+        this.updateAt       = comment.getUpdatedAt();
     }
 
 }
