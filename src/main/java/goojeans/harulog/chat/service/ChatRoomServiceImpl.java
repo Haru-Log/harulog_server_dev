@@ -2,9 +2,7 @@ package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.ChatRoomDTO;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
-import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
-import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.util.ChatRoomType;
 import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
@@ -27,8 +25,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
-    private final ChatRoomUserRepository chatRoomUserRepository;
     private final RabbitMQConfig rabbitMQConfig;
+
+    private final ChatRoomUserService chatRoomUserService;
 
     /**
      * 채팅방 생성
@@ -41,6 +40,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         ChatRoom chatRoom = ChatRoom.createDM();
         chatRoomRepository.save(chatRoom);
 
+        // 채팅방 생성 시 exchange 생성
+        rabbitMQConfig.createFanoutExchange(chatRoom.getId());
+
         // 닉네임이 2개 미만이면 채팅방 생성 불가 (자기 자신만 있는 채팅방 생성 불가)
         if(nicknames.size() < 2){
             throw new BusinessException(ResponseCode.CHATROOM_USER_NOT_ENOUGH);
@@ -52,7 +54,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .toList();
 
         // 채팅방에 유저 추가
-        users.forEach(user -> chatRoomUserRepository.save(ChatRoomUser.create(chatRoom, user)));
+        chatRoomUserService.addUsers(chatRoom, users);
 
         // 채팅방에 참여한 유저가 2명이상이면 Group 채팅방으로 변경
         if(users.size()>2){
@@ -60,10 +62,21 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
         chatRoomRepository.save(chatRoom);
 
-        // 채팅방 생성 시 exchange 생성
-        rabbitMQConfig.createFanoutExchange(chatRoom.getId());
-
         return Response.ok(ChatRoomDTO.of(chatRoom));
+    }
+
+    @Override
+    public ChatRoom createChallengeChatRoom(String challengeName, String imageUrl) {
+        log.trace("createChallengeChatRoom() execute");
+
+        // 채팅방 생성
+        ChatRoom room = ChatRoom.createChallenge(challengeName, imageUrl);
+
+        // 채팅방 생성 시 exchange 생성
+        rabbitMQConfig.createFanoutExchange(room.getId());
+
+        // 채팅방 저장
+        return chatRoomRepository.save(room);
     }
 
     /**
@@ -89,7 +102,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         // 채팅방 삭제 시 exchange 삭제
         rabbitMQConfig.deleteExchange(roomId);
 
+        // 채팅방 삭제
         chatRoomRepository.deleteById(roomId);
+
         return Response.ok();
     }
 

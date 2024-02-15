@@ -79,6 +79,25 @@ class MessageServiceTest {
     }
 
     @Test
+    @DisplayName("채팅방 이전 메세지 조회 - 실패 (더 이상 메세지가 없음)")
+    void getMessagesBeforeResponseFail() {
+        // given
+        when(messageRepository.findBeforeMessagesWithPagination(chatRoom.getId(), message5.getId(), 30))
+                .thenReturn(List.of());
+
+        // when
+        BusinessException exception = Assertions.catchThrowableOfType(
+                () -> messageService.getMessagesBeforeResponse(chatRoom.getId(), message5.getId()),
+                BusinessException.class
+        );
+
+        // then
+        Assertions.assertThat(exception).isNotNull();
+        Assertions.assertThat(exception).isInstanceOf(BusinessException.class);
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.NO_MORE_MESSAGE);
+    }
+
+    @Test
     @DisplayName("채팅방 이후 메세지 조회")
     void getMessagesAfterResponse() {
         // given
@@ -94,6 +113,25 @@ class MessageServiceTest {
         Assertions.assertThat(response.getData()).isNotNull();
         Assertions.assertThat(response.getData().getMessages()).isNotNull();
         Assertions.assertThat(response.getData().getMessages().size()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("채팅방 이후 메세지 조회 - 실패 (더 이상 메세지가 없음)")
+    void getMessagesAfterResponseFail() {
+        // given
+        when(messageRepository.findAfterMessagesWithPagination(chatRoom.getId(), message1.getId(), 30))
+                .thenReturn(List.of());
+
+        // when
+        BusinessException exception = Assertions.catchThrowableOfType(
+                () -> messageService.getMessagesAfterResponse(chatRoom.getId(), message1.getId()),
+                BusinessException.class
+        );
+
+        // then
+        Assertions.assertThat(exception).isNotNull();
+        Assertions.assertThat(exception).isInstanceOf(BusinessException.class);
+        Assertions.assertThat(exception.getErrorCode()).isEqualTo(ResponseCode.NO_MORE_MESSAGE);
     }
 
     @Test

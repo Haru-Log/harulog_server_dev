@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static goojeans.harulog.chat.util.MessageType.*;
+import static goojeans.harulog.chat.util.MessageType.TALK;
 
 /**
  * 메세지 조회
@@ -60,7 +60,8 @@ public class MessageServiceImpl implements MessageService{
 
     /**
      * 채팅방 메세지 조회 : 스크롤 올릴 때
-     * todo: 더이상 조회할 메세지가 없을 때 처리
+     * 1. 채팅방 찾기
+     * 2. 프론트에게 받은 메세지 id로부터 이전 메세지 30개씩 조회
      */
     @Override
     public Response<MessageListDTO> getMessagesBeforeResponse(String roomId, Long lastReadMessageId) {
@@ -70,6 +71,10 @@ public class MessageServiceImpl implements MessageService{
 
         // 마지막으로 읽은 메세지부터 30개씩 조회
         List<Message> messages = getMessagesBefore(chatRoom, lastReadMessageId);
+
+        // 더이상 조회할 메세지가 없을 때 에러 처리 (but 200)
+        checkMessageList(messages);
+
         List<MessageDTO> result = messages.stream()
                 .map(MessageDTO::of)
                 .toList();
@@ -82,7 +87,8 @@ public class MessageServiceImpl implements MessageService{
 
     /**
      * 채팅방 메세지 조회 : 스크롤 내릴 때
-     * todo: 더이상 조회할 메세지가 없을 때 처리
+     * 1. 채팅방 찾기
+     * 2. 프론트에게 받은 메세지 id로부터 이후 메세지 30개씩 조회
      */
     @Override
     public Response<MessageListDTO> getMessagesAfterResponse(String roomId, Long lastReadMessageId) {
@@ -92,6 +98,10 @@ public class MessageServiceImpl implements MessageService{
 
         // 마지막으로 읽은 메세지부터 30개씩 조회
         List<Message> messages = getMessagesAfter(chatRoom, lastReadMessageId);
+
+        // 더이상 조회할 메세지가 없을 때 에러 처리 (but 200)
+        checkMessageList(messages);
+
         List<MessageDTO> result = messages.stream()
                 .map(MessageDTO::of)
                 .toList();
@@ -102,9 +112,17 @@ public class MessageServiceImpl implements MessageService{
         return Response.ok(MessageListDTO.of(roomId, userCount, result));
     }
 
+    // 조회한 메세지가 없으면 에러 (but 200)
+    @Override
+    public void checkMessageList(List<Message> messages) {
+
+        if(messages.isEmpty()){
+            throw new BusinessException(ResponseCode.NO_MORE_MESSAGE);
+        }
+    }
+
     /**
      * 채팅방 들어가기
-     *
      * 1. 참여 유저인지 확인
      * 2. 채팅방 - 유저 binding
      * 3. 마지막으로 읽은 메세지부터 30개씩 조회

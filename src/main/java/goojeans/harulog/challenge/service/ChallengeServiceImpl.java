@@ -14,6 +14,8 @@ import goojeans.harulog.challenge.repository.ChallengeRepository;
 import goojeans.harulog.challenge.repository.ChallengeUserRepository;
 import goojeans.harulog.challenge.util.ChallengeRole;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.chat.service.ChatRoomService;
+import goojeans.harulog.chat.service.ChatRoomUserService;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
@@ -43,6 +45,11 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final CategoryRepository categoryRepository;
     private final PostRepository postRepository;
 
+    // 채팅
+    private final ChatRoomService chatRoomService;
+    private final ChatRoomUserService chatRoomUserService;
+
+
 
     @Override
     public Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRequest request) {
@@ -55,7 +62,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         //Challenge 생성에 필요한 ChatRoom 생성
-        ChatRoom chatRoom = ChatRoom.createChallenge(request.getChallengeTitle(), null);
+        // todo: 채팅방 이미지 넣기
+        ChatRoom chatRoom = chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), null);
+
+        // 채팅방에 리더 추가
+        chatRoomUserService.addUser(chatRoom, user);
 
         //Challenge 생성
         Challenge challenge = Challenge.builder()
@@ -107,6 +118,9 @@ public class ChallengeServiceImpl implements ChallengeService {
             ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
             challenge.addChallengeUser(challengeUser);
 
+            // 채팅방 참여자 추가
+            chatRoomUserService.addUser(challenge.getChatroom(), user);
+
         } else {
             deletedChallengeUser.updateActiveStatus();
             challenge.addChallengeUser(deletedChallengeUser);
@@ -127,6 +141,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         if (challengeUser.getRole().equals(ChallengeRole.LEADER)) {
             throw new BusinessException(ResponseCode.CHALLENGE_LEADER_CANNOT_LEAVE);
         }
+      
+        // 채팅방 퇴장 (챌린지 삭제 전)
+        chatRoomUserService.deleteUser(challenge.getChatroom().getId(), user.getNickname());
 
         challenge.removeChallengeUser(challengeUser);
         challengeUserRepository.delete(challengeUser);
@@ -148,6 +165,8 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         if (isChallengeLeader) {
             challengeRepository.delete(challenge);
+            chatRoomService.deleteChatRoom(challenge.getChatroom().getId()); // soft-delete 때문에 채팅방을 챌린지 이후에 삭제
+
             return Response.ok();
         } else {
             throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
@@ -280,6 +299,9 @@ public class ChallengeServiceImpl implements ChallengeService {
             challenge.removeChallengeUser(kickoutChallengeUser);
             challengeUserRepository.delete(kickoutChallengeUser);
 
+            // 채팅방에서도 강퇴
+            chatRoomUserService.deleteUser(challenge.getChatroom().getId(), kickoutUser.getNickname());
+
             return Response.ok();
         } else {
             throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
@@ -346,7 +368,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         .collect(Collectors.toList());
     }
 
-    //오늘 하루 챌린지 목표 달성했는지 여부 검사
     public boolean isSuccess(ChallengeUser challengeUser, Challenge challenge) {
         LocalDate today = LocalDate.now();
         List<Post> posts = postRepository.findByUserIdAndToday(challengeUser.getUser().getId(), today.atStartOfDay());

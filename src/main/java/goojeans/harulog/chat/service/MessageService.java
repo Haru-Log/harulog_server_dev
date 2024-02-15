@@ -22,6 +22,9 @@ public interface MessageService {
     // 채팅방 메세지 조회 : 스크롤 내릴 때
     Response<MessageListDTO> getMessagesAfterResponse(String roomId, Long lastReadMessageId);
 
+    // 스크롤 up/down 시 메세지 더이상 없는 경우 Exception 처리
+    void checkMessageList(List<Message> messages);
+
     // 채팅방 들어가기 + 마지막으로 읽은 메세지부터 30개씩 조회
     Response<MessageListDTO> roomIn(String roomId, String userNickname);
 

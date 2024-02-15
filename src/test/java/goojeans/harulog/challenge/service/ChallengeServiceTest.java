@@ -13,6 +13,8 @@ import goojeans.harulog.challenge.repository.ChallengeRepository;
 import goojeans.harulog.challenge.repository.ChallengeUserRepository;
 import goojeans.harulog.challenge.util.ChallengeRole;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.chat.service.ChatRoomServiceImpl;
+import goojeans.harulog.chat.service.ChatRoomUserServiceImpl;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.post.domain.entity.Post;
@@ -33,10 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -54,6 +53,8 @@ class ChallengeServiceTest {
     @Mock private CategoryRepository categoryRepository;
     @Mock private ChallengeUserRepository challengeUserRepository;
     @Mock private PostRepository postRepository;
+    @Mock private ChatRoomServiceImpl chatRoomService;
+    @Mock private ChatRoomUserServiceImpl chatRoomUserService;
 
     private Users user;
     private Category category;
@@ -96,17 +97,19 @@ class ChallengeServiceTest {
     @Test
     @DisplayName("새 챌린지 생성 후 첫 참여하기")
     void createChallenge() {
-
         ChallengeRequest request = new ChallengeRequest("tester", "test challenge", 3, "test", LocalDateTime.now(), LocalDateTime.now().plusDays(1), "운동");
         List<Post> posts = new ArrayList<>();
 
         ChallengeUser challengeUser = ChallengeUser.create(user, challenge);
         challengeUser.updateRole();
 
+        ChatRoom room = ChatRoom.builder().id(UUID.randomUUID().toString()).build();
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.save(any(Challenge.class))).thenReturn(challenge);
         when(postRepository.findByUserIdAndToday(userId, LocalDate.now().atStartOfDay())).thenReturn(posts);
+        when(chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), null)).thenReturn(room);
 
         Response<ChallengeResponse> response = challengeService.registerChallenge(user.getId(), request);
 
