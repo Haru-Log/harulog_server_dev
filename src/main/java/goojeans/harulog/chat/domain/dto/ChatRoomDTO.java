@@ -18,7 +18,7 @@ public class ChatRoomDTO {
     private ChatRoomType roomType;
     private String challengeName;
     private String challengeImageUrl;
-    private int unreadCount;
+    private Integer unreadCount;
     private LocalDateTime updatedAt;
     private List<ChatUserDTO> users;
 
@@ -49,7 +49,7 @@ public class ChatRoomDTO {
                 chatRoom.getType(),
                 chatRoom.getName(),
                 chatRoom.getImageUrl(),
-                0,
+                null,
                 chatRoom.getUpdatedAt(),
                 userDTOs
         );
