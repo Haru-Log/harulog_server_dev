@@ -208,6 +208,7 @@ class ChatRoomUserServiceTest {
     }
 
     @Test
+    @DisplayName("입장 메세지 생성, 저장 및 전송")
     void sendEnterMessage() {
         // given
         ChatRoomUser chatRoomUser = ChatRoomUser.create(room, user1);
@@ -225,6 +226,19 @@ class ChatRoomUserServiceTest {
     }
 
     @Test
+    @DisplayName("퇴장 메세지 생성, 저장 및 전송")
     void sendExitMessage() {
+        // given
+        ChatRoomUser chatRoomUser = ChatRoomUser.create(room, user1);
+
+        // when
+        chatRoomUserService.sendExitMessage(room, user1);
+
+        // then
+        verify(messageRepository).save(messageCaptor.capture()); // Message 객체 캡처
+        Message captoredMessage = messageCaptor.getValue();
+        Assertions.assertThat(captoredMessage.getType()).isEqualTo(MessageType.EXIT); // 퇴장 메세지가 만들어진 것인지 확인.
+
+        verify(rabbitTemplate).convertAndSend(eq("chatroom." + room.getId()), eq(""), any(MessageDTO.class));
     }
 }
