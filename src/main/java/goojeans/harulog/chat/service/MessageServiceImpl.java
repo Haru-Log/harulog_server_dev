@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static goojeans.harulog.chat.util.MessageType.TALK;
@@ -138,14 +137,14 @@ public class MessageServiceImpl implements MessageService{
         // 채팅방 - 유저 binding
         rabbitMQConfig.binding(roomId, userNickname);
 
-        // 채팅방 메세지 조회
+        // 채팅방 메세지 조회 : 마지막으로 읽은 메세지부터 30개씩 조회
         List<Message> messages = getMessagesAfter(cru.getChatRoom(), cru.getLastReadMessageId());
         List<MessageDTO> result = messages.stream()
                 .map(MessageDTO::of)
                 .toList();
 
         // 채팅방에 참여하고 있는 유저 수
-        int userCount = cru.getChatRoom().getUsers().size();
+        int userCount = chatRoomUserRepository.findByChatRoomId(roomId).size();
 
         return Response.ok(MessageListDTO.of(roomId, userCount, result));
     }
@@ -166,6 +165,7 @@ public class MessageServiceImpl implements MessageService{
 
         // 마지막 메세지 id 저장
         cru.setLastReadMessageId(messageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId).getId());
+        cru.setUnreadMessageCount(0);    // 읽지 않은 메세지 개수 초기화
         chatRoomUserRepository.save(cru);
 
         // 채팅방-유저 UNBINDING
@@ -189,9 +189,20 @@ public class MessageServiceImpl implements MessageService{
         Message message = Message.create(find.getChatRoom(), find.getUser(), TALK, content);
         messageRepository.save(message);
 
-        // 채팅방 업데이트 시간 변경 : 오로지 "채팅 메세지"에 한정. enter, exit 메세지는 제외
-        find.getChatRoom().setUpdatedAt(LocalDateTime.now());
+        /**
+         * 채팅방에 마지막 메세지 id 변경 : 오로지 "채팅 메세지"에 한정. enter, exit 메세지는 제외
+         * 1. 채팅방에 마지막 메세지 id 변경
+         * 2. 채팅방에 참여하고 있는 모든 ChatRoomUser의 lastReadMessageId를 기준으로 쌓인 메세지 개수 +1
+         */
+        find.getChatRoom().setLastMessageId(message.getId());
         chatRoomRepository.save(find.getChatRoom());
+
+        // 채팅방에 참여하고 있는 모든 ChatRoomUser의 lastReadMessageId를 기준으로 쌓인 메세지 개수 +1
+        List<ChatRoomUser> cruList = chatRoomUserRepository.findByChatRoomId(roomId);
+        cruList.forEach(cru -> {
+            cru.setUnreadMessageCount(cru.getUnreadMessageCount() + 1);
+            chatRoomUserRepository.save(cru);
+        });
 
         return MessageDTO.of(message);
     }
