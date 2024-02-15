@@ -35,6 +35,8 @@ class ChatRoomServiceTest {
     @Mock private ChatRoomUserRepository chatRoomUserRepository;
     @Mock private RabbitMQConfig rabbitMQConfig;
 
+    @Mock private ChatRoomUserService chatRoomUserService;
+
     @InjectMocks
     private ChatRoomServiceImpl chatRoomService;
 
@@ -58,8 +60,8 @@ class ChatRoomServiceTest {
         Response<ChatRoomDTO> created = chatRoomService.createChatRoom(List.of(userNickname1, userNickname2));
 
         // then
-        Assertions.assertThat(created).isNotNull(); // response가 null이 아닌지 확인
-        Assertions.assertThat(created.getData()).isNotNull(); // response의 data(ChatRoomDTO)가 null이 아닌지 확인
+        Assertions.assertThat(created).isNotNull();
+        Assertions.assertThat(created.getData()).isNotNull();
         verify(chatRoomRepository,times(2)).save(any(ChatRoom.class));
     }
 

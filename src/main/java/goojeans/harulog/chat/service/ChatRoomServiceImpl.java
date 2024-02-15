@@ -54,7 +54,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .toList();
 
         // 채팅방에 유저 추가
-        chatRoomUserService.addUser(chatRoom, users);
+        chatRoomUserService.addUsers(chatRoom, users);
 
         // 채팅방에 참여한 유저가 2명이상이면 Group 채팅방으로 변경
         if(users.size()>2){
