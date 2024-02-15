@@ -40,4 +40,7 @@ public interface ChallengeService {
 
     //챌린지 강퇴하기
     Response<Void> kickout(Long userId, Long challengeId, String nickname);
+
+    //방장 넘겨주기
+    Response<Void> assignLeader(Long userId, Long challengeId, String nickname);
 }
