@@ -75,13 +75,14 @@ class ChatRoomUserRepositoryTest {
         chatRoomUserRepository.save(chatRoomUser1);
         chatRoomUserRepository.save(chatRoomUser2);
 
-
         // when
-        List<ChatRoom> findRooms = chatRoomUserRepository.findChatRoomsByUserNickName(user1.getNickname());
+        List<ChatRoomUser> finds = chatRoomUserRepository.findByUserId(user1.getId());
 
         // then
-        Assertions.assertThat(findRooms.size()).isEqualTo(2);
+        Assertions.assertThat(finds.size()).isEqualTo(2);
 
+        // 순서가 최신순으로 정렬되어 있는지 확인
+        Assertions.assertThat(finds.get(0).getChatRoom().getId()).isEqualTo(chatRoom2.getId());
     }
 
     @Test

@@ -23,7 +23,7 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Chat
     List<ChatRoomUser> findByChatRoomId(String chatRoomId);
 
     // 유저 ID 기반으로 ChatRoomUser 리스트 조회
-    @EntityGraph(attributePaths = {"chatRoom, user"})
+    @EntityGraph(attributePaths = {"chatRoom", "user"})
     @Query("SELECT cru FROM ChatRoomUser cru WHERE cru.user.id = :userId AND cru.activeStatus = 'ACTIVE' ORDER BY cru.chatRoom.updatedAt DESC")
     List<ChatRoomUser> findByUserId(@Param("userId") Long userId);
 
