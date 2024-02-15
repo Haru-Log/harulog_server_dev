@@ -12,7 +12,7 @@ public class LikesService {
 
     private static final Logger logger = LoggerFactory.getLogger(LikesService.class);
 
-    private LikesRepository likesRepository;
+    private final LikesRepository likesRepository;
 
     @Autowired
     public LikesService(LikesRepository likesRepository) {
