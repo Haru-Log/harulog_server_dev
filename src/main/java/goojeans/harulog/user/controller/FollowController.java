@@ -27,9 +27,9 @@ public class FollowController {
     }
 
     @GetMapping("/followers")
-    ResponseEntity<Response<List<FollowInfo>>> getCurrentUserFollower() {
+    ResponseEntity<Response<List<FollowInfo>>> getCurrentUserFollower(@RequestParam(defaultValue = "0") Integer pageNumber) {
 
-        return ResponseEntity.ok(followService.getMyFollowerList());
+        return ResponseEntity.ok(followService.getMyFollowerList(pageNumber));
     }
 
     @GetMapping("/followings/{nickname}")
@@ -39,9 +39,9 @@ public class FollowController {
     }
 
     @GetMapping("/followings")
-    ResponseEntity<Response<List<FollowInfo>>> getCurrentUserFollowings() {
+    ResponseEntity<Response<List<FollowInfo>>> getCurrentUserFollowings(@RequestParam(defaultValue = "0") Integer pageNumber) {
 
-        return ResponseEntity.ok(followService.getMyFollowingList());
+        return ResponseEntity.ok(followService.getMyFollowingList(pageNumber));
     }
 
     @PostMapping("/follow")

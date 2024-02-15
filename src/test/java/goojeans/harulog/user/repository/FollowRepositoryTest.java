@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -93,11 +94,13 @@ public class FollowRepositoryTest {
     @Test
     @DisplayName("팔로워 찾기")
     void findFollower() {
+        //Given
+        PageRequest pageRequest = PageRequest.of(0, 5);
 
         //When
-        List<Follow> user1Follower = repository.findFollowerByUserId(user1.getId());
-        List<Follow> user2Follower = repository.findFollowerByUserId(user2.getId());
-        List<Follow> user3Follower = repository.findFollowerByUserId(user3.getId());
+        List<Follow> user1Follower = repository.findFollowerByUserId(user1.getId(), pageRequest);
+        List<Follow> user2Follower = repository.findFollowerByUserId(user2.getId(), pageRequest);
+        List<Follow> user3Follower = repository.findFollowerByUserId(user3.getId(), pageRequest);
 
         //Then
         assertThat(user1Follower).hasSize(2);
@@ -108,11 +111,13 @@ public class FollowRepositoryTest {
     @Test
     @DisplayName("팔로잉 찾기")
     void findFollow() {
+        //Given
+        PageRequest pageRequest = PageRequest.of(0, 5);
 
         //When
-        List<Follow> user1Following = repository.findFollowingByUserId(user1.getId());
-        List<Follow> user2Following = repository.findFollowingByUserId(user2.getId());
-        List<Follow> user3Following = repository.findFollowingByUserId(user3.getId());
+        List<Follow> user1Following = repository.findFollowingByUserId(user1.getId(), pageRequest);
+        List<Follow> user2Following = repository.findFollowingByUserId(user2.getId(), pageRequest);
+        List<Follow> user3Following = repository.findFollowingByUserId(user3.getId(), pageRequest);
 
         //Then
         assertThat(user1Following).hasSize(1);
