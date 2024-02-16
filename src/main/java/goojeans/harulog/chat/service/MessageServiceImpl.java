@@ -2,12 +2,14 @@ package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
 import goojeans.harulog.chat.domain.dto.MessageListDTO;
+import goojeans.harulog.chat.domain.dto.request.MessageRequest;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.domain.entity.Message;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.repository.MessageRepository;
+import goojeans.harulog.chat.util.MessageType;
 import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
@@ -20,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static goojeans.harulog.chat.util.MessageType.TALK;
 
 /**
  * 메세지 조회
@@ -180,13 +180,17 @@ public class MessageServiceImpl implements MessageService{
      */
     @Transactional // 메세지 전송 시, 채팅방 업데이트 시간 변경
     @Override
-    public MessageDTO sendMessage(String roomId, String userNickname, String content) {
+    public MessageDTO sendMessage(String roomId, MessageRequest messageRequest) {
+        String userNickname = messageRequest.getSender();
+        MessageType messageType = messageRequest.getMessageType();
+        String content = messageRequest.getContent();
+
         log.trace("MessageServiceImpl.sendMessage : " + content + ", [" + roomId + " : " + userNickname + "]");
 
         // 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
         ChatRoomUser find = checkPermission(roomId, userNickname);
 
-        Message message = Message.create(find.getChatRoom(), find.getUser(), TALK, content);
+        Message message = Message.create(find.getChatRoom(), find.getUser(), messageType, content);
         messageRepository.save(message);
 
         /**
