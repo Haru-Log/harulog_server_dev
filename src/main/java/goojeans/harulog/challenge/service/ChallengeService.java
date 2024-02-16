@@ -5,7 +5,9 @@ import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeRequest;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.domain.dto.Response;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,6 +15,9 @@ public interface ChallengeService {
 
     //새 챌린지 생성 후 첫 참여
     Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRequest request);
+
+    //챌린지에 이미지 등록
+    Response<ImageUrlString> registerChallengeImage(Long userId, Long challengeId, MultipartFile image);
 
     //기존 챌린지에 참여
     Response<ChallengeResponse> joinChallenge(Long userId, ChallengeJoinRequest request);

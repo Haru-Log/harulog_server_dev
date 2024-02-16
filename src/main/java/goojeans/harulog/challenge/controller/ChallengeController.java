@@ -1,19 +1,24 @@
 package goojeans.harulog.challenge.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeLeaveRequest;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeRequest;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeAllResponse;
 import goojeans.harulog.challenge.domain.dto.response.ChallengeResponse;
 import goojeans.harulog.challenge.service.ChallengeService;
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.util.SecurityUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -29,6 +34,14 @@ public class ChallengeController {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<ChallengeResponse> response = challengeService.registerChallenge(userId, request);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/challenge/image/{challengeId}")
+    ResponseEntity<Response<ImageUrlString>> uploadUserImage(@PathVariable("challengeId") Long challengeId, @RequestParam("image") MultipartFile image) throws IOException {
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+
+        Response<ImageUrlString> response = challengeService.registerChallengeImage(userId, challengeId, image);
         return ResponseEntity.ok(response);
     }
 
