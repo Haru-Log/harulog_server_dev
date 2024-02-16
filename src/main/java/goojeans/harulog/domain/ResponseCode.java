@@ -20,6 +20,7 @@ public enum ResponseCode {
     SUCCESS(200, "COM-000", "OK", HttpStatus.OK),
     VALIDATION_FAIL(400, "COM-001", "형식이 맞지 않습니다.", HttpStatus.BAD_REQUEST),
     CONNECT_FAIL(500, "COM-002", "웹소켓 연결에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILTER_FAIL(500, "COM-101", "필터에서 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 유저 : USR
     USER_NOT_FOUND(400, "USR-001", "유저를 찾을 수 없습니다.",HttpStatus.BAD_REQUEST),

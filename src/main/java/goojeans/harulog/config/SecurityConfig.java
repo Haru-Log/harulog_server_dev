@@ -1,6 +1,7 @@
 package goojeans.harulog.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goojeans.harulog.filter.ExceptionHandlerFilter;
 import goojeans.harulog.filter.JsonAuthenticationFilter;
 import goojeans.harulog.filter.JwtAuthenticationFilter;
 import goojeans.harulog.user.repository.UserRepository;
@@ -76,6 +77,7 @@ public class SecurityConfig {
                 );
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
         http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonAuthenticationFilter.class);
+        http.addFilterBefore(exceptionHandlerFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
     }
@@ -145,6 +147,11 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationProcessingFilter() {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider, userRepository, loginService);
         return jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public ExceptionHandlerFilter exceptionHandlerFilter() {
+        return new ExceptionHandlerFilter();
     }
 
 }
