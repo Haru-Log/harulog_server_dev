@@ -76,7 +76,11 @@ public enum ResponseCode {
     CATEGORY_NOT_FOUND(400, "CAT-001", "카테고리를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     //구글 파이어베이스: GFB
-    FIREBASE_ERROR(500, "GFB-001", "이미지 업로드 중 문제가 생겼습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    FIREBASE_ERROR(500, "GFB-001", "이미지 업로드 중 문제가 생겼습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    //어드민 : ADM
+    ADMIN_CANNOT_DELETE(400, "ADM-001", "계정을 삭제할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    ONLY_ADMIN_CAN_ACCESS(401, "ADM-011", "권한이 없습니다.", HttpStatus.UNAUTHORIZED);
 
     final Integer status;
     final String code;
