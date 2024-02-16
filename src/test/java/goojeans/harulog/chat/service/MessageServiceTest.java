@@ -2,12 +2,14 @@ package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
 import goojeans.harulog.chat.domain.dto.MessageListDTO;
+import goojeans.harulog.chat.domain.dto.request.MessageRequest;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.domain.entity.Message;
 import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.repository.ChatRoomUserRepository;
 import goojeans.harulog.chat.repository.MessageRepository;
+import goojeans.harulog.chat.util.MessageType;
 import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
@@ -221,8 +223,10 @@ class MessageServiceTest {
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.of(ChatRoomUser.create(chatRoom, user)));
 
+        MessageRequest messageRequest = new MessageRequest(user.getNickname(), MessageType.TALK, test);
+
         // when
-        MessageDTO message = messageService.sendMessage(chatRoom.getId(), user.getNickname(), test);
+        MessageDTO message = messageService.sendMessage(chatRoom.getId(), messageRequest);
 
         // then
         verify(messageRepository).save(any(Message.class));
@@ -231,7 +235,7 @@ class MessageServiceTest {
     }
 
     @Test
-    @DisplayName("메세지 전송 - 실패")
+    @DisplayName("메세지 전송 - 실패 (참여중인 채팅방이 아닐 때)")
     void sendMessageFail() {
         // given
         when(userRepository.findUsersByNickname(user.getNickname())).thenReturn(Optional.of(user));
@@ -239,9 +243,11 @@ class MessageServiceTest {
         when(chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoom.getId(), user.getId()))
                 .thenReturn(Optional.empty());
 
+        MessageRequest messageRequest = new MessageRequest(user.getNickname(), MessageType.TALK, test);
+
         // when
         BusinessException exception = Assertions.catchThrowableOfType(
-                () -> messageService.sendMessage(chatRoom.getId(), user.getNickname(), test),
+                () -> messageService.sendMessage(chatRoom.getId(), messageRequest),
                 BusinessException.class
         );
 

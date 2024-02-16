@@ -89,7 +89,7 @@ public class MessageController {
             @Payload MessageRequest messageRequest
     ) {
         log.trace("sendMessage: {}", messageRequest);
-        MessageDTO dto = messageService.sendMessage(roomId, messageRequest.getSender(), messageRequest.getContent());
+        MessageDTO dto = messageService.sendMessage(roomId, messageRequest);
 
         // 메세지 전송
         rabbitTemplate.convertAndSend("chatroom."+roomId,"", dto);

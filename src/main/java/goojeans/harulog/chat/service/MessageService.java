@@ -2,6 +2,7 @@ package goojeans.harulog.chat.service;
 
 import goojeans.harulog.chat.domain.dto.MessageDTO;
 import goojeans.harulog.chat.domain.dto.MessageListDTO;
+import goojeans.harulog.chat.domain.dto.request.MessageRequest;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
 import goojeans.harulog.chat.domain.entity.Message;
 import goojeans.harulog.domain.dto.Response;
@@ -32,5 +33,5 @@ public interface MessageService {
     Response<Void> roomOut(String roomId, String userNickname);
 
     // 채팅 메세지 전송
-    MessageDTO sendMessage(String roomId, String userNickname, String content);
+    MessageDTO sendMessage(String roomId, MessageRequest messageRequest);
 }
