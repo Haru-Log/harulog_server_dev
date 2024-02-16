@@ -3,6 +3,8 @@ package goojeans.harulog.user.domain.dto.response;
 import goojeans.harulog.user.domain.entity.Users;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,6 +17,9 @@ public class MyPageInfoResponse {
     private String introduction;
     private Integer followerCount;
     private Integer followingCount;
+    private LocalDateTime createdAt;
+    private String contactNumber;
+    private String email;
 
     public static MyPageInfoResponse entityToResponse(Users user) {
 
@@ -25,6 +30,9 @@ public class MyPageInfoResponse {
                 .introduction(user.getIntroduction())
                 .followerCount(user.getFollowers().size())
                 .followingCount(user.getFollowings().size())
+                .createdAt(user.getCreatedAt())
+                .email(user.getEmail())
+                .contactNumber(user.getUserName())
                 .build();
     }
 
