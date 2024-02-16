@@ -2,6 +2,7 @@ package goojeans.harulog.chat.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.chat.domain.entity.ChatRoomUser;
 import goojeans.harulog.chat.util.ChatRoomType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,21 +18,27 @@ public class ChatRoomDTO {
     private ChatRoomType roomType;
     private String challengeName;
     private String challengeImageUrl;
-    private List<ChatUserDTO> users;
+    private Integer unreadCount;
     private LocalDateTime updatedAt;
+    private List<ChatUserDTO> users;
+
+    public static ChatRoomDTO of(ChatRoomUser cru){
+        ChatRoom chatRoom = cru.getChatRoom();
+
+        return new ChatRoomDTO(
+                chatRoom.getId(),
+                chatRoom.getType(),
+                chatRoom.getName(),
+                chatRoom.getImageUrl(),
+                cru.getUnreadMessageCount(),
+                chatRoom.getUpdatedAt(),
+                chatRoom.getUsers().stream()
+                        .map(ChatUserDTO::of)
+                        .toList()
+        );
+    }
 
     public static ChatRoomDTO of(ChatRoom chatRoom) {
-        // 생성되자마자는 유저가 없을 수 있음
-        if(chatRoom.getChatRoomUsers().isEmpty()){
-            return new ChatRoomDTO(
-                    chatRoom.getId(),
-                    chatRoom.getType(),
-                    chatRoom.getName(),
-                    chatRoom.getImageUrl(),
-                    null,
-                    chatRoom.getUpdatedAt()
-            );
-        }
 
         List<ChatUserDTO> userDTOs = chatRoom.getUsers().stream()
                 .map(ChatUserDTO::of)
@@ -42,8 +49,9 @@ public class ChatRoomDTO {
                 chatRoom.getType(),
                 chatRoom.getName(),
                 chatRoom.getImageUrl(),
-                userDTOs,
-                chatRoom.getUpdatedAt()
+                null,
+                chatRoom.getUpdatedAt(),
+                userDTOs
         );
     }
 }

@@ -227,5 +227,18 @@ public class PostService {
         return postResponseDtoList;
     }
 
+    public List<PostResponseDto> userFollowPost(Long userId){
+        Users users = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.CMT_AUTHENTICATION_FAIL));
+        List<Post> postList = postRepository.findPostsByFollowersOrderByCreatedAtDesc(userId);
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+        for(Post post : postList){
+            int likeCount = likesRepository.countLikesByPostId(post.getId());
+            int commentCount = commentRepository.countCommentsByPostId(post.getId());
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
+        }
+        return postResponseDtoList;
+    }
+
 
 }
