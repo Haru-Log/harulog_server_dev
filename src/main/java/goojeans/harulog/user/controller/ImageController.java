@@ -1,7 +1,7 @@
 package goojeans.harulog.user.controller;
 
 import goojeans.harulog.domain.dto.Response;
-import goojeans.harulog.user.domain.dto.response.ImageUrlString;
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.user.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

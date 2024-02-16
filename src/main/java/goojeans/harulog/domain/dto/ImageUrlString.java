@@ -1,4 +1,4 @@
-package goojeans.harulog.user.domain.dto.response;
+package goojeans.harulog.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

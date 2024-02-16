@@ -7,7 +7,7 @@ import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.dto.JwtUserDetail;
-import goojeans.harulog.user.domain.dto.response.ImageUrlString;
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.util.SecurityUtils;
