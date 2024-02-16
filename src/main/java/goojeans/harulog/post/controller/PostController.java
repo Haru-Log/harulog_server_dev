@@ -80,5 +80,11 @@ public class PostController {
         return ResponseEntity.ok(postService.userLikePost(userId));
     }
 
+    //팔로우 중인 사람들의 feed 보기
+    @GetMapping("/feed/follow/user")
+    public ResponseEntity<List<PostResponseDto>> userFollowPost(){
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+        return ResponseEntity.ok(postService.userFollowPost(userId));
+    }
 
 }

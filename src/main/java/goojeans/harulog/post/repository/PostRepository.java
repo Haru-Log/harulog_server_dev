@@ -25,6 +25,12 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     @Query("SELECT p FROM post p LEFT JOIN p.likes l WHERE l.user.id = :userId ORDER BY p.createdAt DESC")
     List<Post> findPostsByUserOrderByCreatedAtDesc(@Param("userId") Long userId);
 
+    @Query("SELECT p FROM post p " +
+            "JOIN Follow f ON p.user.id = f.following.id " +
+            "WHERE f.follower.id = :userId " +
+            "ORDER BY p.createdAt DESC")
+    List<Post> findPostsByFollowersOrderByCreatedAtDesc(@Param("userId") Long userId);
+
 }
 
 
