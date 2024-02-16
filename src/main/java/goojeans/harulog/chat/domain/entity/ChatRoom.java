@@ -44,6 +44,10 @@ public class ChatRoom extends BaseEntity implements Comparable<ChatRoom>{
     @Builder.Default
     private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
+    public void updateImage(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     // 마지막 채팅 메세지 Id
     @Column(name = "chatroom_last_message_id")
     @Builder.Default
