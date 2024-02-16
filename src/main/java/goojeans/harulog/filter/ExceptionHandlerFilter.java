@@ -34,7 +34,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         ObjectMapper objectMapper = new ObjectMapper();
 
         response.setStatus(errorCode.getHttpStatus().value());
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         Response<Object> errorResponse = Response.fail(errorCode);
@@ -53,6 +53,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
 
         Response<Object> errorResponse = Response.fail(ResponseCode.FILTER_FAIL);
 

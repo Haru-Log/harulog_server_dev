@@ -109,7 +109,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .httpOnly(true)
                 .maxAge(COOKIE_EXPIRATION)
                 .secure(true)
-                .sameSite("ㅣㅁㅌ")
+                .sameSite("None")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
