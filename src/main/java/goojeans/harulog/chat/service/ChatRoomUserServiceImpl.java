@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 import static goojeans.harulog.chat.util.ChatRoomType.*;
@@ -212,14 +211,13 @@ public class ChatRoomUserServiceImpl implements ChatRoomUserService {
      * 유저가 참여하고 있는 채팅방 조회
      */
     @Override
-    public Response<List<ChatRoomDTO>> getChatRooms(String userNickname) {
+    public Response<List<ChatRoomDTO>> getChatRooms(Long userId) {
 
-        List<ChatRoom> chatRoomList = chatRoomUserRepository.findChatRoomsByUserNickName(userNickname);
-        List<ChatRoomDTO> chatRoomDTOList = chatRoomList.stream()
-                .sorted(Comparator.naturalOrder()) // Comparable에 의한 정렬
+        // 유저 id로 채팅방-유저 조회 (최신순)
+        List<ChatRoomUser> cruList = chatRoomUserRepository.findByUserId(userId);
+        List<ChatRoomDTO> chatRoomDTOList = cruList.stream()
                 .map(ChatRoomDTO::of)
                 .toList();
-
         return Response.ok(chatRoomDTOList);
     }
 

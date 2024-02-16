@@ -58,10 +58,11 @@ class ChatRoomUserServiceTest {
     private ArgumentCaptor<Message> messageCaptor; // 저장되는 Message 캡처를 위한 ArgumentCaptor
 
     String roomId = "roomId";
+    String roomId2 = "roomId2";
     Long userId = 1L;
     Long userId2 = 2L;
 
-    ChatRoom room;
+    ChatRoom room, room2;
     Users user1, user2;
 
     @BeforeEach
@@ -69,6 +70,7 @@ class ChatRoomUserServiceTest {
         user1 = Users.builder().id(userId).nickname("user1").build();
         user2 = Users.builder().id(userId2).nickname("user2").build();
         room = ChatRoom.builder().id(roomId).build();
+        room2 = ChatRoom.builder().id(roomId2).build();
     }
 
     @Test
@@ -196,15 +198,17 @@ class ChatRoomUserServiceTest {
     @DisplayName("유저가 참여하고 있는 채팅방 조회 - 응답")
     void getChatRooms() {
         // given
-        when(chatRoomUserRepository.findChatRoomsByUserNickName(user1.getNickname())).thenReturn(List.of(new ChatRoom(), new ChatRoom()));
+        ChatRoomUser chatRoomUser1 = ChatRoomUser.create(room, user1);
+        ChatRoomUser chatRoomUser2 = ChatRoomUser.create(room2, user1);
+        when(chatRoomUserRepository.findByUserId(user1.getId())).thenReturn(List.of(chatRoomUser1, chatRoomUser2));
 
         // when
-        Response<List<ChatRoomDTO>> response = chatRoomUserService.getChatRooms(user1.getNickname());
+        Response<List<ChatRoomDTO>> response = chatRoomUserService.getChatRooms(user1.getId());
 
         // then
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getData()).hasSize(2);
-        verify(chatRoomUserRepository).findChatRoomsByUserNickName(user1.getNickname());
+        verify(chatRoomUserRepository).findByUserId(user1.getId());
     }
 
     @Test

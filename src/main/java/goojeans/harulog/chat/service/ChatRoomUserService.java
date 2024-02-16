@@ -40,7 +40,7 @@ public interface ChatRoomUserService {
     Response<List<ChatUserDTO>> getUsers(String roomId);
 
     // 유저가 참여하고 있는 채팅방 조회
-    Response<List<ChatRoomDTO>> getChatRooms(String userNickname);
+    Response<List<ChatRoomDTO>> getChatRooms(Long userId);
 
     // 입장 메세지 생성, 저장 및 전송
     void sendEnterMessage(ChatRoom room, Users user);

@@ -55,7 +55,7 @@ public class ChatRoomUserController {
     // 채팅방의 마지막 메세지를 기준으로 최신순으로 정렬해서 반환.
     @GetMapping("/user/chats")
     public ResponseEntity<?> getChatRooms(){
-        String userNickname = securityUtils.getCurrentUserInfo().getNickname();
-        return ResponseEntity.ok(chatRoomUserService.getChatRooms(userNickname));
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+        return ResponseEntity.ok(chatRoomUserService.getChatRooms(userId));
     }
 }

@@ -38,7 +38,13 @@ public class ChatRoomUser extends BaseEntity {
 
     @Builder.Default
     @Setter
+    @NotNull
     private Long lastReadMessageId = 0L; // 마지막으로 읽은 메세지 ID
+
+    @Builder.Default
+    @Setter
+    @NotNull
+    private Integer unreadMessageCount = 0; // 읽지 않은 메세지 개수
 
     // 정적 팩토리 메서드
     public static ChatRoomUser create(ChatRoom chatRoom, Users user) {

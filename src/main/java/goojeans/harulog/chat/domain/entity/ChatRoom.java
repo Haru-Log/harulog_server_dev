@@ -44,6 +44,12 @@ public class ChatRoom extends BaseEntity implements Comparable<ChatRoom>{
     @Builder.Default
     private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
+    // 마지막 채팅 메세지 Id
+    @Column(name = "chatroom_last_message_id")
+    @Builder.Default
+    @Setter
+    private Long lastMessageId = 0L;
+
     // 채팅방 생성 - 정적 팩토리 메서드
     public static ChatRoom createChallenge(String name, String imageUrl) {
         return ChatRoom.builder()
