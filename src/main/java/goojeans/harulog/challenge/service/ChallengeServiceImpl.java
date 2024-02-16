@@ -1,5 +1,8 @@
 package goojeans.harulog.challenge.service;
 
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.cloud.StorageClient;
 import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.challenge.domain.dto.request.ChallengeJoinRequest;
@@ -14,20 +17,27 @@ import goojeans.harulog.challenge.repository.ChallengeRepository;
 import goojeans.harulog.challenge.repository.ChallengeUserRepository;
 import goojeans.harulog.challenge.util.ChallengeRole;
 import goojeans.harulog.chat.domain.entity.ChatRoom;
+import goojeans.harulog.chat.repository.ChatRoomRepository;
 import goojeans.harulog.chat.service.ChatRoomService;
 import goojeans.harulog.chat.service.ChatRoomUserService;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.post.repository.PostRepository;
+import goojeans.harulog.user.domain.dto.JwtUserDetail;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -48,8 +58,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     // 채팅
     private final ChatRoomService chatRoomService;
     private final ChatRoomUserService chatRoomUserService;
+    private final ChatRoomRepository chatRoomRepository;
 
-
+    private final FirebaseApp firebaseApp;
 
     @Override
     public Response<ChallengeResponse> registerChallenge(Long userId, ChallengeRequest request) {
@@ -62,7 +73,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         //Challenge 생성에 필요한 ChatRoom 생성
-        // todo: 채팅방 이미지 넣기
         ChatRoom chatRoom = chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), null);
 
         // 채팅방에 리더 추가
@@ -74,7 +84,6 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .challengeContent(request.getChallengeContent())
                 .challengeGoal(request.getChallengeGoal())
                 .submission(request.getSubmission())
-//                .imageUrl(request.getImageUrl())
                 .chatroom(chatRoom)
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
@@ -94,6 +103,37 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<ChallengeUsersResponse> challengeUserList = createChallengeUserList(challenge);
         ChallengeResponse challengeResponse = ChallengeResponse.of(challenge, challengeUserList, true, true);
         return Response.ok(challengeResponse);
+    }
+
+    @Override
+    public Response<ImageUrlString> registerChallengeImage(Long userId, Long challengeId, MultipartFile image) {
+
+        if (isChallengeLeader(userId, challengeId)) {
+            Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));
+
+            Bucket bucket = StorageClient.getInstance(firebaseApp).bucket();
+
+            String blob = "image/challenge/" + challengeId;
+            InputStream streamImageFile;
+            try {
+                streamImageFile = new ByteArrayInputStream(image.getBytes());
+
+                bucket.create(blob, streamImageFile, image.getContentType());
+
+            } catch (IOException | RuntimeException e) {
+                log.error(e.getMessage());
+                throw new BusinessException(ResponseCode.FIREBASE_ERROR);
+            }
+
+            ChatRoom chatRoom = chatRoomRepository.findById(challenge.getChatroom().getId()).orElseThrow(() -> new BusinessException(ResponseCode.CHATROOM_NOT_FOUND));
+
+            challenge.updateImage(blob);
+            chatRoom.updateImage(blob);
+
+            return Response.ok(new ImageUrlString(blob));
+        } else {
+            throw new BusinessException(ResponseCode.CHALLENGE_UNAUTHORIZED_ACCESS);
+        }
     }
 
     @Override
