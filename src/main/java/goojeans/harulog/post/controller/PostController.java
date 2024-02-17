@@ -32,9 +32,9 @@ public class PostController {
 
 
     //게시글 상세 보기
-    @GetMapping("/feed")
-    public ResponseEntity<Response<PostResponseDto>> getPost(@RequestParam Long postId){
-        return ResponseEntity.ok(Response.ok(postService.getPost(postId)));
+    @GetMapping("/feed/{feedId}")
+    public ResponseEntity<Response<PostResponseDto>> getPost(@PathVariable Long feedId){
+        return ResponseEntity.ok(Response.ok(postService.getPost(feedId)));
     }
 
     //게시글 좋아요 순으로 정렬
