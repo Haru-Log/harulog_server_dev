@@ -7,6 +7,7 @@ import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.comment.repository.CommentRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.likes.repository.LikesRepository;
 import goojeans.harulog.post.domain.dto.PostRequestDto;
 import goojeans.harulog.post.domain.dto.PostResponseDto;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -103,19 +103,7 @@ public class PostService {
             int likeCount = likesRepository.countLikesByPostId(post.getId());
             int commentCount = commentRepository.countCommentsByPostId(post.getId());
 
-            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-            for (Comment comment : post.getComments()) {
-                List<CommentResponseDto> childCommentList = new ArrayList<>();
-                if (comment.getParent() == null) {
-                    for (Comment childComment : comment.getChildren()) {
-                        if (id.equals(childComment.getPost().getUser().getId())) {
-                            childCommentList.add(new CommentResponseDto(childComment));
-                        }
-                    }
-                    commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));
-                }
-            }
-            postResponseDtoList.add(new PostResponseDto(post, commentResponseDtoList,commentCount, likeCount));
+            postResponseDtoList.add(new PostResponseDto(post,commentCount, likeCount));
         }
 
         return postResponseDtoList;
@@ -126,24 +114,12 @@ public class PostService {
     public List<PostResponseDto> getPostsOrderByLikes() {
         // 좋아요가 높은 순서대로 게시물 가져오기
         List<Post> postList = postRepository.findPostsOrderByLikes();
-
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
             int likeCount = likesRepository.countLikesByPostId(post.getId());
             int commentCount = commentRepository.countCommentsByPostId(post.getId());
-
-            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-            for (Comment comment : post.getComments()) {
-                List<CommentResponseDto> childCommentList = new ArrayList<>();
-                if (comment.getParent() == null) {
-                    for (Comment childComment : comment.getChildren()) {
-                        childCommentList.add(new CommentResponseDto(childComment));
-                    }
-                    commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));
-                }
-            }
-            postResponseDtoList.add(new PostResponseDto(post, commentResponseDtoList, commentCount, likeCount));
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
         }
 
         return postResponseDtoList;
@@ -162,17 +138,8 @@ public class PostService {
             int likeCount = likesRepository.countLikesByPostId(post.getId());
             int commentCount = commentRepository.countCommentsByPostId(post.getId());
 
-            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-            for (Comment comment : post.getComments()) {
-                List<CommentResponseDto> childCommentList = new ArrayList<>();
-                if (comment.getParent() == null) {
-                    for (Comment childComment : comment.getChildren()) {
-                        childCommentList.add(new CommentResponseDto(childComment));
-                    }
-                    commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));
-                }
-            }
-            postResponseDtoList.add(new PostResponseDto(post, commentResponseDtoList, commentCount, likeCount));
+
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
         }
         return postResponseDtoList;
     }
@@ -199,7 +166,7 @@ public class PostService {
 
 
 
-    public PostResponseDto deletePost(Long postId, Long userId) {
+    public Response<Void> deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
         );
@@ -209,7 +176,7 @@ public class PostService {
         } else {
             throw new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL);
         }
-        return new PostResponseDto(post);
+        return Response.ok();
     }
 
     public List<PostResponseDto> userLikePost(Long userId) {
@@ -239,6 +206,18 @@ public class PostService {
         }
         return postResponseDtoList;
     }
+
+    public List<PostResponseDto> getAllPost(){
+        List<Post> postList = postRepository.findAll();
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+        for(Post post : postList){
+            int likeCount = likesRepository.countLikesByPostId(post.getId());
+            int commentCount = commentRepository.countCommentsByPostId(post.getId());
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
+        }
+        return postResponseDtoList;
+    }
+
 
 
 }
