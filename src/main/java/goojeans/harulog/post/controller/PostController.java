@@ -71,9 +71,9 @@ public class PostController {
     }
 
     @DeleteMapping("/feed/{feedId}")
-    public ResponseEntity<Response<PostResponseDto>> deletePost(@PathVariable Long feedId) {
+    public ResponseEntity<Response<Void>> deletePost(@PathVariable Long feedId) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
-        return ResponseEntity.ok(Response.ok(postService.deletePost(feedId, userId)));
+        return ResponseEntity.ok(postService.deletePost(feedId, userId));
     }
 
     //좋아요 누른 Feed 보기

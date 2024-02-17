@@ -7,6 +7,7 @@ import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.comment.repository.CommentRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.likes.repository.LikesRepository;
 import goojeans.harulog.post.domain.dto.PostRequestDto;
 import goojeans.harulog.post.domain.dto.PostResponseDto;
@@ -165,7 +166,7 @@ public class PostService {
 
 
 
-    public PostResponseDto deletePost(Long postId, Long userId) {
+    public Response<Void> deletePost(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
         );
@@ -175,7 +176,7 @@ public class PostService {
         } else {
             throw new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL);
         }
-        return new PostResponseDto(post);
+        return Response.ok();
     }
 
     public List<PostResponseDto> userLikePost(Long userId) {
