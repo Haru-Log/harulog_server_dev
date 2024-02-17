@@ -1,10 +1,8 @@
 package goojeans.harulog.post.domain.dto;
 
-import goojeans.harulog.category.domain.entity.Category;
+
 import goojeans.harulog.comment.domain.dto.CommentResponseDto;
 import goojeans.harulog.post.domain.entity.Post;
-import goojeans.harulog.user.domain.entity.UserGoal;
-import goojeans.harulog.user.domain.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,25 +25,17 @@ public class PostResponseDto {
     private String nickname;
     private int goal;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime updateAt;
     private List<CommentResponseDto> commentList = new ArrayList<>();
     private int likeCount;
     private int commentCount;
 
-    public PostResponseDto(Post post, List<CommentResponseDto> commentResponseDtos){
-        this.id = post.getId();
-        this.content = post.getContent();
-        this.imgUrl = post.getImgUrl();
-        this.activityTime = post.getActivityTime();;
-        this.nickname = post.getUser().getNickname();
-        this.commentList = commentResponseDtos;
-        this.goal =post.getGoal();
-    }
     public PostResponseDto(Post post){
         this.id = post.getId();
         this.content = post.getContent();
         this.activityTime = post.getActivityTime();
         this.createdAt = post.getCreatedAt();
+        this.updateAt = post.getUpdatedAt();
         this.goal = post.getGoal();
         this.nickname = post.getUser().getNickname();
     }
@@ -59,6 +49,7 @@ public class PostResponseDto {
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.createdAt = post.getCreatedAt();
+        this.updateAt = post.getUpdatedAt();
         this.commentList = commentResponseDtos;
         this.goal = post.getGoal();
     }
@@ -73,6 +64,7 @@ public class PostResponseDto {
         this.commentCount = commentCount;
         this.goal = post.getGoal();
         this.createdAt = post.getCreatedAt();
+        this.updateAt = post.getUpdatedAt();
     }
 
 

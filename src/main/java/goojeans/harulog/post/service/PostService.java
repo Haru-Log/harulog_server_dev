@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -103,19 +102,7 @@ public class PostService {
             int likeCount = likesRepository.countLikesByPostId(post.getId());
             int commentCount = commentRepository.countCommentsByPostId(post.getId());
 
-            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-            for (Comment comment : post.getComments()) {
-                List<CommentResponseDto> childCommentList = new ArrayList<>();
-                if (comment.getParent() == null) {
-                    for (Comment childComment : comment.getChildren()) {
-                        if (id.equals(childComment.getPost().getUser().getId())) {
-                            childCommentList.add(new CommentResponseDto(childComment));
-                        }
-                    }
-                    commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));
-                }
-            }
-            postResponseDtoList.add(new PostResponseDto(post, commentResponseDtoList,commentCount, likeCount));
+            postResponseDtoList.add(new PostResponseDto(post,commentCount, likeCount));
         }
 
         return postResponseDtoList;
@@ -126,24 +113,12 @@ public class PostService {
     public List<PostResponseDto> getPostsOrderByLikes() {
         // 좋아요가 높은 순서대로 게시물 가져오기
         List<Post> postList = postRepository.findPostsOrderByLikes();
-
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
             int likeCount = likesRepository.countLikesByPostId(post.getId());
             int commentCount = commentRepository.countCommentsByPostId(post.getId());
-
-            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-            for (Comment comment : post.getComments()) {
-                List<CommentResponseDto> childCommentList = new ArrayList<>();
-                if (comment.getParent() == null) {
-                    for (Comment childComment : comment.getChildren()) {
-                        childCommentList.add(new CommentResponseDto(childComment));
-                    }
-                    commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));
-                }
-            }
-            postResponseDtoList.add(new PostResponseDto(post, commentResponseDtoList, commentCount, likeCount));
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
         }
 
         return postResponseDtoList;
@@ -162,17 +137,8 @@ public class PostService {
             int likeCount = likesRepository.countLikesByPostId(post.getId());
             int commentCount = commentRepository.countCommentsByPostId(post.getId());
 
-            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-            for (Comment comment : post.getComments()) {
-                List<CommentResponseDto> childCommentList = new ArrayList<>();
-                if (comment.getParent() == null) {
-                    for (Comment childComment : comment.getChildren()) {
-                        childCommentList.add(new CommentResponseDto(childComment));
-                    }
-                    commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));
-                }
-            }
-            postResponseDtoList.add(new PostResponseDto(post, commentResponseDtoList, commentCount, likeCount));
+
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
         }
         return postResponseDtoList;
     }
@@ -239,6 +205,18 @@ public class PostService {
         }
         return postResponseDtoList;
     }
+
+    public List<PostResponseDto> getAllPost(){
+        List<Post> postList = postRepository.findAll();
+        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+        for(Post post : postList){
+            int likeCount = likesRepository.countLikesByPostId(post.getId());
+            int commentCount = commentRepository.countCommentsByPostId(post.getId());
+            postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
+        }
+        return postResponseDtoList;
+    }
+
 
 
 }
