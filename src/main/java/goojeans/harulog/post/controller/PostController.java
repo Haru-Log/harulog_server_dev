@@ -63,17 +63,17 @@ public class PostController {
     }
 
 
-    @PutMapping("/feed/{post_id}")
-    public ResponseEntity<Response<PostResponseDto>> updatePost(@Validated @PathVariable Long post_id,
+    @PutMapping("/feed/{feedId}")
+    public ResponseEntity<Response<PostResponseDto>> updatePost(@Validated @PathVariable Long feedId,
                                                       @RequestBody PostRequestDto requestDto){
         Long userId = securityUtils.getCurrentUserInfo().getId();
-        return ResponseEntity.ok(Response.ok(postService.updatePost(post_id, requestDto, userId)));
+        return ResponseEntity.ok(Response.ok(postService.updatePost(feedId, requestDto, userId)));
     }
 
-    @DeleteMapping("/feed/{post_id}")
-    public ResponseEntity<Response<PostResponseDto>> deletePost(@PathVariable Long post_id) {
+    @DeleteMapping("/feed/{feedId}")
+    public ResponseEntity<Response<PostResponseDto>> deletePost(@PathVariable Long feedId) {
         Long userId = securityUtils.getCurrentUserInfo().getId();
-        return ResponseEntity.ok(Response.ok(postService.deletePost(post_id, userId)));
+        return ResponseEntity.ok(Response.ok(postService.deletePost(feedId, userId)));
     }
 
     //좋아요 누른 Feed 보기
