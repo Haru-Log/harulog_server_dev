@@ -24,7 +24,7 @@ import java.util.Map;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
-    private final RestOperations restTemplate;
+
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -32,7 +32,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         log.info("oauth service activate");
 
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-        delegate.setRestOperations(restTemplate);
+
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
         String userNameAttributeName = userRequest.getClientRegistration()
