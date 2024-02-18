@@ -23,6 +23,7 @@ public class PostResponseDto {
     private String imgUrl;
     private int activityTime;
     private String nickname;
+    private String categoryName;
     private int goal;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
@@ -33,6 +34,7 @@ public class PostResponseDto {
     public PostResponseDto(Post post){
         this.id = post.getId();
         this.content = post.getContent();
+        this.categoryName = post.getCategory().getCategoryName();
         this.activityTime = post.getActivityTime();
         this.createdAt = post.getCreatedAt();
         this.updateAt = post.getUpdatedAt();
@@ -44,6 +46,7 @@ public class PostResponseDto {
         this.id = post.getId();
         this.content = post.getContent();
         this.imgUrl = post.getImgUrl();
+        this.categoryName = post.getCategory().getCategoryName();
         this.activityTime = post.getActivityTime();
         this.nickname = post.getUser().getNickname();
         this.likeCount = likeCount;
@@ -58,6 +61,7 @@ public class PostResponseDto {
         this.id = post.getId();
         this.content = post.getContent();
         this.imgUrl = post.getImgUrl();
+        this.categoryName = post.getCategory().getCategoryName();
         this.activityTime = post.getActivityTime();
         this.nickname= post.getUser().getNickname();
         this.likeCount = likeCount;
