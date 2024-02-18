@@ -20,6 +20,7 @@ public class PostResponseDto {
 
     private Long id;
     private String content;
+    private String profileImg;
     private String imgUrl;
     private int activityTime;
     private String nickname;
@@ -45,6 +46,7 @@ public class PostResponseDto {
     public PostResponseDto(Post post, List<CommentResponseDto> commentResponseDtos, int commentCount, int likeCount) {
         this.id = post.getId();
         this.content = post.getContent();
+        this.profileImg = post.getUser().getImageUrl();
         this.imgUrl = post.getImgUrl();
         this.categoryName = post.getCategory().getCategoryName();
         this.activityTime = post.getActivityTime();
