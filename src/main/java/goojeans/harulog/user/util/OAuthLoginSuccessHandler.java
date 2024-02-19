@@ -37,6 +37,9 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Value("${jwt.cookie.expiration}")
     private Integer COOKIE_EXPIRATION;
 
+    @Value("${spring.deploy.url}")
+    private String DEPLOY_URL;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         try{
@@ -71,6 +74,7 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             response.setHeader("Set-Cookie", cookie.toString());
+            response.sendRedirect(DEPLOY_URL);
 
             Users findUser = userRepository.findUsersByEmail(user.getEmail())
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
