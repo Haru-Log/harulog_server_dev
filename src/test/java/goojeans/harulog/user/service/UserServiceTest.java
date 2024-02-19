@@ -236,12 +236,14 @@ public class UserServiceTest {
         testUser.getFollowers().add(new Follow());
 
         doReturn(Optional.of(testUser)).when(userRepository).findByNickname(testUser.getNickname());
+        doReturn(jwtUserDetail).when(securityUtils).getCurrentUserInfo();
 
         //When
         Response<MyPageInfoResponse> response = userService.getMyPageUserInfo(testUser.getNickname());
 
         //Then
         assertThat(response.getData()).isEqualTo(MyPageInfoResponse.entityToResponse(testUser));
+        assertThat(response.getData().getFollowing()).isFalse();
         verify(userRepository, times(1)).findByNickname(testUser.getNickname());
 
     }

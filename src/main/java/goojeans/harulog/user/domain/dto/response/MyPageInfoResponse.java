@@ -20,6 +20,8 @@ public class MyPageInfoResponse {
     private LocalDateTime createdAt;
     private String contactNumber;
     private String email;
+    @Builder.Default
+    private Boolean following = false;
 
     public static MyPageInfoResponse entityToResponse(Users user) {
 

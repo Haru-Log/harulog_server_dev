@@ -12,6 +12,7 @@ import goojeans.harulog.user.domain.dto.request.UpdatePasswordRequest;
 import goojeans.harulog.user.domain.dto.request.UpdateUserInfoRequest;
 import goojeans.harulog.user.domain.dto.response.MyPageInfoResponse;
 import goojeans.harulog.user.domain.dto.response.UserInfoEditResponse;
+import goojeans.harulog.user.domain.entity.Follow;
 import goojeans.harulog.user.domain.entity.UserGoal;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserGoalRepository;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -150,11 +152,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response<MyPageInfoResponse> getMyPageUserInfo(String nickname) {
 
+        JwtUserDetail currentUserInfo = securityUtils.getCurrentUserInfo();
+
         Users findUser = userRepository.findByNickname(nickname).stream()
                 .findAny()
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
-        return Response.ok(MyPageInfoResponse.entityToResponse(findUser));
+        Set<Follow> followers = findUser.getFollowers();
+        boolean present = followers != null && followers.stream()
+                .anyMatch(follow ->
+                        follow.getFollower() != null &&
+                                follow.getFollower().getId().equals(currentUserInfo.getId()));
+
+        MyPageInfoResponse response = MyPageInfoResponse.entityToResponse(findUser);
+        if (present){
+            response.setFollowing(true);
+        }
+
+        return Response.ok(response);
     }
 
     @Override
