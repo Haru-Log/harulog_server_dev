@@ -9,6 +9,7 @@ import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.likes.repository.LikesRepository;
+import goojeans.harulog.post.domain.dto.PostLikeResponseDto;
 import goojeans.harulog.post.domain.dto.PostRequestDto;
 import goojeans.harulog.post.domain.dto.PostResponseDto;
 import goojeans.harulog.post.domain.entity.Post;
@@ -88,6 +89,37 @@ public class PostService {
 
 
         return new PostResponseDto(post, commentResponseDtoList,commentCount, likeCount);
+    }
+
+    //하나의 피드 상세 유저가 좋아요 눌렀는지 여부도 포함
+    public PostLikeResponseDto getPostUser(Long postId, Long userId){
+        Users users = userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(ResponseCode.CMT_POST_NOT_FOUND)
+        );
+
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new BusinessException(ResponseCode.CMT_POST_NOT_FOUND)
+        );
+
+        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+        int likeCount = likesRepository.countLikesByPostId(post.getId());
+        int commentCount = commentRepository.countCommentsByPostId(post.getId());
+        boolean likedByCurrentUser = likesRepository.existsByPostIdAndUserId(postId, userId);
+        for (Comment comment : post.getComments()) {
+            List<CommentResponseDto> childCommentList = new ArrayList<>();
+            if (comment.getParent() == null) {
+                for (Comment childComment : comment.getChildren()) {
+                    if (postId.equals(childComment.getPost().getId())) {
+                        childCommentList.add(new CommentResponseDto(childComment));
+                    }
+                }
+                commentResponseDtoList.add(new CommentResponseDto(comment, childCommentList));   //저장된 데이터를 리스트에
+            }
+        }
+
+        return new PostLikeResponseDto(post, commentResponseDtoList, commentCount, likeCount,likedByCurrentUser);
+
+
     }
 
     //유저의 게시글 전체 조회
