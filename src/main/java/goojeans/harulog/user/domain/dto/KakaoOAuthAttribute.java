@@ -5,6 +5,7 @@ import goojeans.harulog.user.util.SocialType;
 import goojeans.harulog.user.util.UserRole;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Map;
@@ -15,7 +16,7 @@ public class KakaoOAuthAttribute {
 
     private String nameAttributeKey; // OAuth2 로그인 진행 시 키가 되는 필드 값, PK와 같은 의미
     private OAuth2UserInfo oauth2UserInfo;
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Builder
     private KakaoOAuthAttribute(String nameAttributeKey, OAuth2UserInfo oauth2UserInfo) {
