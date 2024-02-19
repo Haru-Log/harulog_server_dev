@@ -3,6 +3,7 @@ package goojeans.harulog.post.controller;
 
 
 import goojeans.harulog.domain.dto.Response;
+import goojeans.harulog.post.domain.dto.PostLikeResponseDto;
 import goojeans.harulog.post.domain.dto.PostRequestDto;
 import goojeans.harulog.post.domain.dto.PostResponseDto;
 import goojeans.harulog.post.service.PostService;
@@ -36,6 +37,15 @@ public class PostController {
     public ResponseEntity<Response<PostResponseDto>> getPost(@PathVariable Long feedId){
         return ResponseEntity.ok(Response.ok(postService.getPost(feedId)));
     }
+
+    @GetMapping("/feed/user/{feedId}")
+    public ResponseEntity<Response<PostLikeResponseDto>> getPostUser(@PathVariable Long feedId){
+        Long userId = securityUtils.getCurrentUserInfo().getId();
+        return ResponseEntity.ok(Response.ok(postService.getPostUser(feedId,userId)));
+
+    }
+
+
 
     //게시글 좋아요 순으로 정렬
     @GetMapping("/feed/like")
