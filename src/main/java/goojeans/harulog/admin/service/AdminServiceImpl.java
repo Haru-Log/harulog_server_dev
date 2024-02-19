@@ -72,7 +72,7 @@ public class AdminServiceImpl implements AdminService{
 
         authorityCheck();
 
-        if (securityUtils.getCurrentUserInfo().getRoles().equals(UserRole.ADMIN)){
+        if (!securityUtils.getCurrentUserInfo().getRoles().equals(UserRole.ADMIN)){
             throw new BusinessException(ResponseCode.ADMIN_CANNOT_DELETE);
         }
 
