@@ -54,6 +54,7 @@ public enum ResponseCode {
     CMT_PARENT_NOT_FOUND(400, "CMT-202", "부모 댓글을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     CMT_POST_NOT_FOUND(400, "CMT-203", "게시물을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     // 좋아요 : LIK
+    Lik_AUTHENTICATION_FAIL(400,"LIK-001", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
 
     // 채팅 : CHT
     CHAT_TRANSMISSION_FAIL(400, "CHT-001", "채팅 전송에 실패했습니다.", HttpStatus.BAD_REQUEST),
