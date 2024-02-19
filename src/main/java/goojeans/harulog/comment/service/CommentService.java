@@ -6,6 +6,7 @@ import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.comment.repository.CommentRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.post.domain.entity.Post;
 import goojeans.harulog.post.repository.PostRepository;
 import goojeans.harulog.user.domain.entity.Users;
@@ -84,7 +85,7 @@ public class CommentService {
     }
 
 
-    public CommentResponseDto deleteComment(Long id, Long userId) {
+    public Response<Void> deleteComment(Long id, Long userId) {
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new BusinessException(ResponseCode.CMT_NOT_FOUND)
         );
@@ -94,7 +95,7 @@ public class CommentService {
             throw new BusinessException(ResponseCode.CMT_AUTHENTICATION_FAIL);
         }
 
-        return new CommentResponseDto(comment);
+        return Response.ok();
     }
 
 

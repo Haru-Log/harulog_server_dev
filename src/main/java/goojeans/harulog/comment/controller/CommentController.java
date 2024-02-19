@@ -3,6 +3,7 @@ package goojeans.harulog.comment.controller;
 import goojeans.harulog.comment.domain.dto.CommentRequestDto;
 import goojeans.harulog.comment.domain.dto.CommentResponseDto;
 import goojeans.harulog.comment.service.CommentService;
+import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,27 +19,27 @@ public class CommentController {
     private final SecurityUtils securityUtils;
 
     @PostMapping("/{id}/comment/{comment_id}") // 뒤쪽 comment_id는 부모 댓글일 경우 0으로 입력
-    public ResponseEntity<CommentResponseDto> createComment(@Validated @PathVariable Long id, @PathVariable(required = false) Long comment_id,
-                                                            @RequestBody CommentRequestDto requestDto){
+    public ResponseEntity<Response<CommentResponseDto>> createComment(@Validated @PathVariable Long id, @PathVariable(required = false) Long comment_id,
+                                                                      @RequestBody CommentRequestDto requestDto){
         Long userId = securityUtils.getCurrentUserInfo().getId();
-        return ResponseEntity.ok(commentService.createComment(id, comment_id, requestDto, userId));
+        return ResponseEntity.ok(Response.ok(commentService.createComment(id, comment_id, requestDto, userId)));
     }
     @PutMapping("comments/{id}")
-    public ResponseEntity<CommentResponseDto> updateComment(@Validated @PathVariable Long id, @RequestBody CommentRequestDto requestDto){
+    public ResponseEntity<Response<CommentResponseDto>> updateComment(@Validated @PathVariable Long id, @RequestBody CommentRequestDto requestDto){
         Long userId = securityUtils.getCurrentUserInfo().getId();
-        return ResponseEntity.ok(commentService.updateComment(id, requestDto, userId));
+        return ResponseEntity.ok(Response.ok(commentService.updateComment(id, requestDto, userId)));
     }
 
     @DeleteMapping("comments/{id}")
-    public ResponseEntity<CommentResponseDto> deleteComment(@PathVariable  Long id){
+    public ResponseEntity<Response<Void>> deleteComment(@PathVariable  Long id){
     Long userId = securityUtils.getCurrentUserInfo().getId();
         return ResponseEntity.ok(commentService.deleteComment(id, userId));
     }
 
     //comment 상세
     @GetMapping("comments/{id}")
-    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long id) {
-        return ResponseEntity.ok(commentService.getComment(id));
+    public ResponseEntity<Response<CommentResponseDto>> getComment(@PathVariable Long id) {
+        return ResponseEntity.ok(Response.ok(commentService.getComment(id)));
 
 
     }
