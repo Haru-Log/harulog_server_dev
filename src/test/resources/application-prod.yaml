@@ -17,3 +17,6 @@ spring:
   sql:
     init:
       mode: always
+
+  deploy:
+    url: tetetette

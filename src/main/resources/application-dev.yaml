@@ -19,3 +19,6 @@ spring:
   sql:
     init:
       mode: always
+
+  deploy:
+    url: ${DEPLOY_URL}

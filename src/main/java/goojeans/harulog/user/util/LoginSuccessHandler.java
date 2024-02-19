@@ -5,6 +5,7 @@ import goojeans.harulog.config.RabbitMQConfig;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
+import goojeans.harulog.user.domain.dto.response.LoginSuccessResponse;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import goojeans.harulog.user.service.LoginService;
@@ -52,6 +53,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String accessToken = jwtTokenProvider.generateAccessToken(authenticate);
         String refreshToken = jwtTokenProvider.generateRefreshToken();
 
+        LoginSuccessResponse loginSuccessResponse = new LoginSuccessResponse(user.getNickname(), user.getUserRole());
+
         //TODO: 로그인 시 DB 접근 2 select
         user.updateRefreshToken(refreshToken);
         loginService.updateRefreshToken(user);
@@ -61,7 +64,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         response.setContentType("application/json");
 
         try {
-            String responseBody = objectMapper.writeValueAsString(Response.ok());
+            String responseBody = objectMapper.writeValueAsString(Response.ok(loginSuccessResponse));
             response.getWriter().write(responseBody);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -73,7 +76,6 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .httpOnly(true)
                 .maxAge(COOKIE_EXPIRATION)
                 .secure(true)
-                .sameSite("None")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());

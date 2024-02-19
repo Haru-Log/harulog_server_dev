@@ -6,6 +6,7 @@ import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.user.domain.dto.CustomOAuth2User;
+import goojeans.harulog.user.domain.dto.response.LoginSuccessResponse;
 import goojeans.harulog.user.domain.entity.Users;
 import goojeans.harulog.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
@@ -36,21 +37,28 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Value("${jwt.cookie.expiration}")
     private Integer COOKIE_EXPIRATION;
 
+    @Value("${spring.deploy.url}")
+    private String DEPLOY_URL;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         try{
 
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
-            Authentication authentication1 = jwtTokenProvider.createAuthentication(oAuth2User.getUser());
+            Users user = oAuth2User.getUser();
+
+            Authentication authentication1 = jwtTokenProvider.createAuthentication(user);
 
             String accessToken = jwtTokenProvider.generateAccessToken(authentication1);
             response.addHeader("Authorization", accessToken);
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
 
+            LoginSuccessResponse loginSuccessResponse = new LoginSuccessResponse(user.getNickname(), user.getUserRole());
+
             try {
-                String responseBody = objectMapper.writeValueAsString(Response.ok());
+                String responseBody = objectMapper.writeValueAsString(Response.ok(loginSuccessResponse));
                 response.getWriter().write(responseBody);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -63,19 +71,19 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
                     .httpOnly(true)
                     .maxAge(COOKIE_EXPIRATION)
                     .secure(true)
-                    .sameSite("None")
                     .build();
 
             response.setHeader("Set-Cookie", cookie.toString());
+            response.sendRedirect(DEPLOY_URL);
 
-            Users findUser = userRepository.findUsersByEmail(oAuth2User.getUser().getEmail())
+            Users findUser = userRepository.findUsersByEmail(user.getEmail())
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
 
             // 로그인에 성공했을 때, 유저에게 amqp Queue 할당
             rabbitMQConfig.createQueue(findUser.getNickname());
 
             // User 의 Role 이 GUEST 일 경우 처음 요청한 회원이므로 회원가입 페이지로 리다이렉트
-            if(oAuth2User.getUser().getUserRole() == UserRole.GUEST) {
+            if(user.getUserRole() == UserRole.GUEST) {
                 findUser.updateUserRole(UserRole.USER);
                 //TODO: redirect 추가
 //            response.sendRedirect("oauth2/sign-up");
