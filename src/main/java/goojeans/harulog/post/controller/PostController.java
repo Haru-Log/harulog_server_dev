@@ -31,6 +31,9 @@ public class PostController {
     }
 
 
+
+
+
     //게시글 상세 보기
     @GetMapping("/feed/{feedId}")
     public ResponseEntity<Response<PostResponseDto>> getPost(@PathVariable Long feedId){

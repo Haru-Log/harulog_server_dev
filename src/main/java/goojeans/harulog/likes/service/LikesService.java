@@ -1,10 +1,13 @@
 package goojeans.harulog.likes.service;
 
+import goojeans.harulog.domain.BusinessException;
+import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.likes.domain.dto.LikesResponseDto;
 import goojeans.harulog.likes.repository.LikesRepository;
+import goojeans.harulog.user.domain.entity.Users;
+import goojeans.harulog.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,36 +15,30 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class LikesService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LikesService.class);
 
     private final LikesRepository likesRepository;
+    private final UserRepository userRepository;
 
 
 
-    public void saveLikes(Long postId, Long userId) {
-        try {
-            if (userId == null) {
-                logger.warn("userId is null for postId: {}", postId);
-                return;
-            }
-            likesRepository.insertLikes(postId, userId);
-        } catch (Exception e) {
-            logger.error("Error occurred while saving likes for postId: {}", postId, e);
-            throw new RuntimeException("좋아요 저장 중 오류 발생", e);
-        }
+
+    public LikesResponseDto saveLikes(Long postId, Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.Lik_AUTHENTICATION_FAIL));
+        likesRepository.insertLikes(postId, userId);
+        int updatedLikeCount = likesRepository.countLikesByPostId(postId);
+
+        return new LikesResponseDto(updatedLikeCount);
     }
 
 
-    public void deleteLikes(Long postId, Long userId) {
-        try {
-            if (userId == null) {
-                logger.warn("userId is null for postId: {}", postId);
-                return;
-            }
-            likesRepository.unLike(postId, userId);
-        } catch (Exception e) {
-            logger.error("Error occurred while deleting likes for postId: {}", postId, e);
-            throw new RuntimeException("좋아요 삭제 중 오류 발생", e);
-        }
+    public LikesResponseDto deleteLikes(Long postId, Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.Lik_AUTHENTICATION_FAIL));
+        likesRepository.unLike(postId, userId);
+        int updatedLikeCount = likesRepository.countLikesByPostId(postId);
+
+        return new LikesResponseDto(updatedLikeCount);
+
     }
 }
