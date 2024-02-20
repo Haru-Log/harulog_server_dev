@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Response<Void> signUp(SignUpRequest request) {
 
-        String imageDefault = "image/profile/default";
+        String imageDefault = "image/profile/default.png";
 
         boolean nicknameDuplication = checkNicknameDuplication(request.getNickname());
         boolean emailDuplication = checkEmailDuplication(request.getEmail());
