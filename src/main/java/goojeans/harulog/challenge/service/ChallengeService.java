@@ -37,6 +37,9 @@ public interface ChallengeService {
     //한 사용자가 참여하는 모든 챌린지 조회
     Response<List<ChallengeAllResponse>> getUserChallenge(Long userId);
 
+    //다른 사용자가 참여하는 모든 챌린지 조회
+    Response<List<ChallengeAllResponse>> getOthersChallenge(String nickname);
+
     //챌린지 수정
     Response<ChallengeResponse> updateChallenge(Long userId, Long challengeId, ChallengeRequest request);
 
