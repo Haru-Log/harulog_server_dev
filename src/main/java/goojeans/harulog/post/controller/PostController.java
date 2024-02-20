@@ -2,6 +2,7 @@ package goojeans.harulog.post.controller;
 
 
 
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.post.domain.dto.PostLikeResponseDto;
 import goojeans.harulog.post.domain.dto.PostRequestDto;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -31,7 +34,13 @@ public class PostController {
         return ResponseEntity.ok(Response.ok(postResponseDto));
     }
 
+    @PostMapping("/feed/image/{feedId}")
+    public ResponseEntity<Response<ImageUrlString>> uploadImage(@PathVariable Long feedId, @RequestParam("image") MultipartFile image) throws IOException {
+        Long userId = securityUtils.getCurrentUserInfo().getId();
 
+        Response<ImageUrlString> response = postService.postImage(userId, feedId, image);
+        return ResponseEntity.ok(response);
+    }
 
 
 
