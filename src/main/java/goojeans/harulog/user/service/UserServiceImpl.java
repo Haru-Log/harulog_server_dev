@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
 
         users.updateNickname(request.getNickname());
         users.updateIntroduction(request.getIntroduction());
-        users.updateContactNumber(request.getIntroduction());
+        users.updateContactNumber(request.getContactNumber());
 
         Authentication auth = jwtTokenProvider.createAuthentication(users);
 
