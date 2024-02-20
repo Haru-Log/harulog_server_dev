@@ -24,20 +24,20 @@ public class CommentController {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         return ResponseEntity.ok(Response.ok(commentService.createComment(id, comment_id, requestDto, userId)));
     }
-    @PutMapping("comments/{id}")
+    @PutMapping("comment/{id}")
     public ResponseEntity<Response<CommentResponseDto>> updateComment(@Validated @PathVariable Long id, @RequestBody CommentRequestDto requestDto){
         Long userId = securityUtils.getCurrentUserInfo().getId();
         return ResponseEntity.ok(Response.ok(commentService.updateComment(id, requestDto, userId)));
     }
 
-    @DeleteMapping("comments/{id}")
+    @DeleteMapping("comment/{id}")
     public ResponseEntity<Response<Void>> deleteComment(@PathVariable  Long id){
     Long userId = securityUtils.getCurrentUserInfo().getId();
         return ResponseEntity.ok(commentService.deleteComment(id, userId));
     }
 
     //comment 상세
-    @GetMapping("comments/{id}")
+    @GetMapping("comment/{id}")
     public ResponseEntity<Response<CommentResponseDto>> getComment(@PathVariable Long id) {
         return ResponseEntity.ok(Response.ok(commentService.getComment(id)));
 
