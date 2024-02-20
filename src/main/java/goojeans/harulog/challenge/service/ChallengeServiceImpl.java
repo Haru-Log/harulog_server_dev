@@ -270,6 +270,24 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
+    public Response<List<ChallengeAllResponse>> getOthersChallenge(String nickname) {
+
+        Users user = userRepository.findByNickname(nickname).orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
+        List<Challenge> challenges = challengeRepository.findAllByUserId(user.getId());
+
+        List<ChallengeAllResponse> challengeResponse = challenges.stream()
+                .map(challenge -> new ChallengeAllResponse(
+                        challenge.getChallengeId(),
+                        challenge.getChallengeTitle(),
+                        challenge.getCategory().getCategoryName(),
+                        challenge.getChallengeUserList().size(),
+                        challenge.getImageUrl()
+                )).collect(Collectors.toList());
+
+        return Response.ok(challengeResponse);
+    }
+
+    @Override
     public Response<ChallengeResponse> updateChallenge(Long userId, Long challengeId, ChallengeRequest request) {
 
         Challenge challenge = challengeRepository.findByChallengeId(challengeId).orElseThrow(() -> new BusinessException(ResponseCode.CHALLENGE_NOT_FOUND));

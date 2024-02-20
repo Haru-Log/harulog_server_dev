@@ -125,4 +125,11 @@ public class ChallengeController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/profile/challenge/{nickname}")
+    public ResponseEntity<Response<List<ChallengeAllResponse>>> getOthersChallenge(@PathVariable("nickname") String nickname) {
+        Response<List<ChallengeAllResponse>> response = challengeService.getOthersChallenge(nickname);
+
+        return ResponseEntity.ok(response);
+    }
 }
