@@ -76,12 +76,14 @@ public class PostService {
 
     //feed 이미지 추가
     public Response<ImageUrlString> postImage(Long userId, Long feedId, MultipartFile image) {
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ResponseCode.CMT_AUTHENTICATION_FAIL));
 
         Post post = postRepository.findById(feedId).orElseThrow(
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
         );
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL);
+        }
 
         Bucket bucket = StorageClient.getInstance(firebaseApp).bucket();
         String blob = "image/post/" + feedId;
