@@ -17,7 +17,8 @@ import java.util.Base64;
 public class FirebaseConfig {
 
     @Bean
-    public FirebaseApp firebaseApp(@Value("${firebase.key}")String envString) throws IOException {
+    public FirebaseApp firebaseApp(@Value("${firebase.key}")String envString,
+                                   @Value("${firebase.bucket}") String bucket) throws IOException {
 
         String auth = new String(Base64.getDecoder().decode(envString));
 
@@ -25,7 +26,7 @@ public class FirebaseConfig {
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(byteArrayInputStream))
-                .setStorageBucket("harulogtest.appspot.com")
+                .setStorageBucket(bucket)
                 .build();
 
         FirebaseApp app = FirebaseApp.initializeApp(options);

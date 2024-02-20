@@ -1,2 +1,3 @@
 firebase:
   key: ${FIREBASE_ADMIN_KEY}
+  bucket: ${FIREBASE_BUCKET_NAME}
