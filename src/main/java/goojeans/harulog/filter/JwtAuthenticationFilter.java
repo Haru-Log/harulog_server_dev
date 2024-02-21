@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String LOGIN_URI = "/api/login";
     private final String HOME_URI = "/api";
 
-    protected List<String> filterPassList = List.of(LOGIN_URI, HOME_URI, "/", "/ws", "/login", "/oauth2/authorization/kakao",
+    protected List<String> filterPassList = List.of(LOGIN_URI, HOME_URI, "/", "/ws", "/ws/info", "/login", "/oauth2/authorization/kakao",
             "/login/oauth2/code/kakao", "/favicon.ico", "/api/sign-up", "/api/main/challenge", "/api/feed/all");
 
     @Value("${jwt.cookie.expiration}")
