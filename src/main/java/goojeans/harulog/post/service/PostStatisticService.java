@@ -10,5 +10,7 @@ public interface PostStatisticService {
 
     Response<List<YearlyPostDto>> getYearlyStatistics(Long userId);
 
+    Response<List<YearlyPostDto>> getOthersYearlyStatistics(String nickname);
+
     Response<List<DailyPostDto>> getDailyStatistics(Long userId);
 }

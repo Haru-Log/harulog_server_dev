@@ -8,6 +8,7 @@ import goojeans.harulog.user.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +26,13 @@ public class PostStatisticController {
     public ResponseEntity<Response<List<YearlyPostDto>>> getYearlyStatistics() {
         Long userId = securityUtils.getCurrentUserInfo().getId();
         Response<List<YearlyPostDto>> response = postStatisticService.getYearlyStatistics(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/grow/yearly/{nickname}")
+    public ResponseEntity<Response<List<YearlyPostDto>>> getOthersYearlyStatistics(@PathVariable("nickname") String nickname) {
+        Response<List<YearlyPostDto>> response = postStatisticService.getOthersYearlyStatistics(nickname);
 
         return ResponseEntity.ok(response);
     }
