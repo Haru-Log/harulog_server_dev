@@ -1,8 +1,12 @@
 package goojeans.harulog.user.service;
 
+import goojeans.harulog.category.domain.entity.Category;
+import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.user.domain.dto.CustomOAuth2User;
 import goojeans.harulog.user.domain.dto.KakaoOAuthAttribute;
+import goojeans.harulog.user.domain.entity.UserGoal;
 import goojeans.harulog.user.domain.entity.Users;
+import goojeans.harulog.user.repository.UserGoalRepository;
 import goojeans.harulog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +19,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -23,6 +28,8 @@ import java.util.Map;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserGoalRepository userGoalRepository;
 
 
     @Override
@@ -54,7 +61,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Users findUser = userRepository.findUsersBySocialId(attributes.getOauth2UserInfo().getId()).orElse(null);
 
         if(findUser == null) {
-            return saveUser(attributes);
+            Users user = saveUser(attributes);
+
+            List<Category> allCategory = categoryRepository.findAll();
+            allCategory.forEach(category ->
+                    userGoalRepository.save(UserGoal.of(user, category, 0)));
+
+            return user;
         }
         return findUser;
     }
