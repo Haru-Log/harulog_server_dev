@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
@@ -62,7 +64,9 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
             String redirectUrl = DEPLOY_URL + "domain/oauth/callback" + "?token=" + accessToken +
                     "&nickname=" + user.getNickname() + "&role=" + user.getUserRole();
 
-            response.sendRedirect(redirectUrl);
+            String encodedUrl = URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8);
+
+            response.sendRedirect(encodedUrl);
 
             Users findUser = userRepository.findUsersByEmail(user.getEmail())
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
