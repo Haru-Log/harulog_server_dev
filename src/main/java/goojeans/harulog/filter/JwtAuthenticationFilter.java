@@ -49,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if(request.getRequestURI().contains("/ws")){
-            log.info("websocket connection : /ws");
+            log.info("websocket connection : {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
