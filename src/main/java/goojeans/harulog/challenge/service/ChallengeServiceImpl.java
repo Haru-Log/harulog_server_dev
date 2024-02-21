@@ -73,7 +73,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         //Challenge 생성에 필요한 ChatRoom 생성
-        ChatRoom chatRoom = chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), null);
+        ChatRoom chatRoom = chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), "image/challenge/default.png");
 
         // 채팅방에 리더 추가
         chatRoomUserService.addUser(chatRoom, user);
@@ -85,6 +85,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .challengeGoal(request.getChallengeGoal())
                 .submission(request.getSubmission())
                 .chatroom(chatRoom)
+                .imageUrl("image/challenge/default.png")
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .category(category)

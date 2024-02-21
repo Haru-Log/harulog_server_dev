@@ -109,7 +109,7 @@ class ChallengeServiceTest {
         when(categoryRepository.findByCategoryName("운동")).thenReturn(Optional.of(category));
         when(challengeRepository.save(any(Challenge.class))).thenReturn(challenge);
         when(postRepository.findByUserIdAndToday(userId, LocalDate.now().atStartOfDay())).thenReturn(posts);
-        when(chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), null)).thenReturn(room);
+        when(chatRoomService.createChallengeChatRoom(request.getChallengeTitle(), "image/challenge/default.png")).thenReturn(room);
 
         Response<ChallengeResponse> response = challengeService.registerChallenge(user.getId(), request);
 
