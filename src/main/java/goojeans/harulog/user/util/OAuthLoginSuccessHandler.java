@@ -62,11 +62,9 @@ public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
             response.setHeader("Set-Cookie", cookie.toString());
 
             String redirectUrl = DEPLOY_URL + "domain/oauth/callback" + "?token=" + accessToken +
-                    "&nickname=" + user.getNickname() + "&role=" + user.getUserRole();
+                    "&nickname=" + URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8) + "&role=" + user.getUserRole();
 
-            String encodedUrl = URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8);
-
-            response.sendRedirect(encodedUrl);
+            response.sendRedirect(redirectUrl);
 
             Users findUser = userRepository.findUsersByEmail(user.getEmail())
                     .orElseThrow(() -> new BusinessException(ResponseCode.USER_NOT_FOUND));
