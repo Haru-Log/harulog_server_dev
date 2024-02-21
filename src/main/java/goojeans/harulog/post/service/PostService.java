@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -228,9 +229,16 @@ public class PostService {
                 () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
         );
 
+        LocalDate postCreationDate = post.getCreatedAt().toLocalDate();
+        LocalDate currentDate = LocalDate.now();
+
         if (userId.equals(post.getUser().getId())) {
-            post.update(postRequestDto);
-            return new PostResponseDto(post);
+            if(!currentDate.isEqual(postCreationDate)) {
+                throw new BusinessException(ResponseCode.POS_UPDATE_TIME_FAIL);
+            }else {
+                post.update(postRequestDto);
+                return new PostResponseDto(post);
+            }
         } else {
             throw new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL);
         }
