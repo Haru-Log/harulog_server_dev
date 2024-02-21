@@ -9,6 +9,7 @@ import goojeans.harulog.user.util.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 // TODO: 리팩터링 필요 (로직 점검 및 중복 코드 제거)
 @RequiredArgsConstructor
@@ -109,13 +112,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         response.addHeader("Authorization", accessToken);
 
+        if (refreshToken == null){
+            Optional<Cookie> cookie = Arrays.stream(request.getCookies())
+                    .filter(cookies -> cookies.getName().equals("refreshToken"))
+                    .findFirst();
+            if (cookie.isEmpty()){
+                refreshToken = null;
+            } else {
+                refreshToken = cookie.get().getValue();
+            }
+        }
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .path("/")
                 .httpOnly(true)
                 .maxAge(COOKIE_EXPIRATION)
                 .secure(true)
-                .sameSite("None")
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
