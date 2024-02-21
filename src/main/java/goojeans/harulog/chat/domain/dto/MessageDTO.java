@@ -5,8 +5,6 @@ import goojeans.harulog.chat.util.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @AllArgsConstructor
 public class MessageDTO {
@@ -16,7 +14,7 @@ public class MessageDTO {
     private String imageUrl;
     private MessageType type;
     private String content;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public static MessageDTO of(Message message) {
         return new MessageDTO(
@@ -25,7 +23,7 @@ public class MessageDTO {
                 message.getSender().getImageUrl(),
                 message.getType(),
                 message.getContent(),
-                message.getCreatedAt()
+                message.getCreatedAt().toString()
         );
     }
 }
