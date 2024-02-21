@@ -47,6 +47,7 @@ public enum ResponseCode {
     POS_NOT_FOUND(400,"POS_001","피드를 찾을 수 없습니다. ",HttpStatus.BAD_REQUEST),
     POS_CATEGORY_NOT_FOUND(400, "POS-002", "해당하는 카테고리를 찾지 못했습니다.", HttpStatus.BAD_REQUEST),
     POS_AUTHENTICATION_FAIL(400,"POS-003", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    POS_UPDATE_TIME_FAIL(400,"POS-004", "수정할 수 있는 시간이 지났습니다.",HttpStatus.BAD_REQUEST),
 
     // 댓글 : CMT
     CMT_AUTHENTICATION_FAIL(400, " CMT-101", "유저 인증에 실패했습니다.", HttpStatus.BAD_REQUEST),
