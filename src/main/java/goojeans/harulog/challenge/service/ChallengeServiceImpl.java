@@ -85,6 +85,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .challengeGoal(request.getChallengeGoal())
                 .submission(request.getSubmission())
                 .chatroom(chatRoom)
+                .imageUrl("image/challenge/default.png")
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .category(category)
