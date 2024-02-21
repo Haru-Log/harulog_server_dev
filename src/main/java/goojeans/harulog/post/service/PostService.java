@@ -86,7 +86,9 @@ public class PostService {
         }
 
         Bucket bucket = StorageClient.getInstance(firebaseApp).bucket();
-        String blob = "image/post/" + feedId;
+
+
+        String blob = "image/feed/" + feedId;
         InputStream streamImageFile;
         try {
             streamImageFile = new ByteArrayInputStream(image.getBytes());
