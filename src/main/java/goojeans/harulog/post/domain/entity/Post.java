@@ -80,4 +80,8 @@ public class Post extends BaseEntity {
         this.content = postRequestDto.getContent();
     }
 
+    public void updateImage(String imageUrl) {
+        this.imgUrl = imageUrl;
+    }
+
 }

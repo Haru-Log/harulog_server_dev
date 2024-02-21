@@ -1,5 +1,8 @@
 package goojeans.harulog.post.service;
 
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.cloud.StorageClient;
 import goojeans.harulog.category.domain.entity.Category;
 import goojeans.harulog.category.repository.CategoryRepository;
 import goojeans.harulog.comment.domain.dto.CommentResponseDto;
@@ -7,6 +10,7 @@ import goojeans.harulog.comment.domain.entity.Comment;
 import goojeans.harulog.comment.repository.CommentRepository;
 import goojeans.harulog.domain.BusinessException;
 import goojeans.harulog.domain.ResponseCode;
+import goojeans.harulog.domain.dto.ImageUrlString;
 import goojeans.harulog.domain.dto.Response;
 import goojeans.harulog.likes.repository.LikesRepository;
 import goojeans.harulog.post.domain.dto.PostLikeResponseDto;
@@ -21,13 +25,19 @@ import goojeans.harulog.user.repository.UserGoalRepository;
 import goojeans.harulog.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class PostService {
 
@@ -37,6 +47,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final UserGoalRepository userGoalRepository;
     private final CategoryRepository categoryRepository;
+    private final FirebaseApp firebaseApp;
 
 
     public PostResponseDto createPost(PostRequestDto postRequestDto, Long userId) {
@@ -61,6 +72,33 @@ public class PostService {
         return userGoalRepository.findUserGoalByUserIdAndCategory(userId, category)
                 .map(UserGoal::getGoal)
                 .orElseThrow(() -> new BusinessException(ResponseCode.USER_GOAL_INVALID_DATA));
+    }
+
+    //feed 이미지 추가
+    public Response<ImageUrlString> postImage(Long userId, Long feedId, MultipartFile image) {
+
+        Post post = postRepository.findById(feedId).orElseThrow(
+                () -> new BusinessException(ResponseCode.POS_NOT_FOUND)
+        );
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new BusinessException(ResponseCode.POS_AUTHENTICATION_FAIL);
+        }
+
+        Bucket bucket = StorageClient.getInstance(firebaseApp).bucket();
+        String blob = "image/post/" + feedId;
+        InputStream streamImageFile;
+        try {
+            streamImageFile = new ByteArrayInputStream(image.getBytes());
+
+            bucket.create(blob, streamImageFile, image.getContentType());
+        } catch (IOException | RuntimeException e) {
+            log.error(e.getMessage());
+            throw new BusinessException(ResponseCode.FIREBASE_ERROR);
+        }
+        post.updateImage(blob);
+
+        return Response.ok(new ImageUrlString(blob));
     }
 
 
