@@ -75,7 +75,6 @@ public class Post extends BaseEntity {
 
 
     public void update(PostRequestDto postRequestDto){
-        this.imgUrl = postRequestDto.getImgUrl();
         this.activityTime = postRequestDto.getActivityTime();
         this.content = postRequestDto.getContent();
     }
