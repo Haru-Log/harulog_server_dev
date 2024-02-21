@@ -25,7 +25,11 @@ public class ChatInboundInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-        log.info("요청 : {}", accessor.getCommand() + " : " + accessor.getDestination());
+
+        // stomp command가 null이 아닐 때만 command, destination 출력
+        if(accessor.getCommand() != null){
+            log.info("요청 : {}", accessor.getCommand() + " : " + accessor.getDestination());
+        }
 
         /**
          * CONNECT
@@ -33,6 +37,7 @@ public class ChatInboundInterceptor implements ChannelInterceptor {
          */
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String token = accessor.getFirstNativeHeader("Authorization");
+            log.info("요청 : {}", accessor.getCommand() + " : " + accessor.getDestination());
             log.info("token : {}", token);
 
             // jwt 토큰 검증
@@ -40,11 +45,6 @@ public class ChatInboundInterceptor implements ChannelInterceptor {
             accessor.setUser(authentication);
         }
 
-        /**
-         * SEND
-         * 채팅방에 메세지 보내기 전,
-         * todo 1. 유저가 채팅방에 참여한 유저인지 확인 -> 권한 없으면 에러
-         */
 
         return message;
     }
