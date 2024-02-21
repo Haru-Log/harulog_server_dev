@@ -25,6 +25,7 @@ public class ChatInboundInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        log.info("요청 : {}", accessor.getCommand() + " : " + accessor.getDestination());
 
         /**
          * CONNECT
