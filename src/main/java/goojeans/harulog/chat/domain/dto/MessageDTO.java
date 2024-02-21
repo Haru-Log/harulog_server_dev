@@ -16,16 +16,18 @@ public class MessageDTO {
     private String imageUrl;
     private MessageType type;
     private String content;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public static MessageDTO of(Message message) {
+        String time = message.getCreatedAt() != null ? message.getCreatedAt().toString() : LocalDateTime.now().toString();
+
         return new MessageDTO(
                 message.getId(),
                 message.getSender().getNickname(),
                 message.getSender().getImageUrl(),
                 message.getType(),
                 message.getContent(),
-                message.getCreatedAt()
+                time
         );
     }
 }
