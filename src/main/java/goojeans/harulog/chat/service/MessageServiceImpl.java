@@ -21,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 메세지 조회
@@ -47,14 +49,20 @@ public class MessageServiceImpl implements MessageService{
 
     // 이전 메세지 조회 : 내림차순 (최신부터)
     @Override
-    public List<Message> getMessagesBefore(ChatRoom chatroom, Long lastReadMessageId) {
-        return messageRepository.findBeforeMessagesWithPagination(chatroom.getId(), lastReadMessageId, 30);
+    public List<Message> getMessagesBefore(ChatRoom chatroom, Long lastReadMessageId, int size) {
+        return messageRepository.findBeforeMessagesWithPagination(chatroom.getId(), lastReadMessageId, size);
     }
 
     // 이후 메세지 조회 : 오름차순 (과거부터)
     @Override
-    public List<Message> getMessagesAfter(ChatRoom chatroom, Long lastReadMessageId) {
-        return messageRepository.findAfterMessagesWithPagination(chatroom.getId(), lastReadMessageId, 30);
+    public List<Message> getMessagesAfter(ChatRoom chatroom, Long lastReadMessageId, int size) {
+        return messageRepository.findAfterMessagesWithPagination(chatroom.getId(), lastReadMessageId, size);
+    }
+
+    // 마지막 메세지 포함해서 이후 메세지 조회 : 오름차순 (과거부터)
+    @Override
+    public List<Message> getMessagesAfterIncludeLastMessage(ChatRoom chatroom, Long lastReadMessageId, int size) {
+        return messageRepository.findAfterMessagesWithPaginationIncludeLastMessage(chatroom.getId(), lastReadMessageId, size);
     }
 
     /**
@@ -68,8 +76,8 @@ public class MessageServiceImpl implements MessageService{
 
         ChatRoom chatRoom = findChatRoom(roomId);
 
-        // 마지막으로 읽은 메세지부터 30개씩 조회
-        List<Message> messages = getMessagesBefore(chatRoom, lastReadMessageId);
+        // 마지막으로 읽은 메세지부터 20개씩 조회
+        List<Message> messages = getMessagesBefore(chatRoom, lastReadMessageId, 20);
 
         // 더이상 조회할 메세지가 없을 때 에러 처리 (but 200)
         checkMessageList(messages);
@@ -96,7 +104,7 @@ public class MessageServiceImpl implements MessageService{
         ChatRoom chatRoom = findChatRoom(roomId);
 
         // 마지막으로 읽은 메세지부터 30개씩 조회
-        List<Message> messages = getMessagesAfter(chatRoom, lastReadMessageId);
+        List<Message> messages = getMessagesAfter(chatRoom, lastReadMessageId, 20);
 
         // 더이상 조회할 메세지가 없을 때 에러 처리 (but 200)
         checkMessageList(messages);
@@ -124,7 +132,8 @@ public class MessageServiceImpl implements MessageService{
      * 채팅방 들어가기
      * 1. 참여 유저인지 확인
      * 2. 채팅방 - 유저 binding
-     * 3. 마지막으로 읽은 메세지부터 30개씩 조회
+     * 3. 마지막으로 읽은 메세지 이전 20개 조회
+     * 4. 마지막으로 읽은 메세지부터 30개씩 조회
      * @return 마지막으로 읽었던 메세지부터 30개씩 조회
      */
     @Override
@@ -137,11 +146,18 @@ public class MessageServiceImpl implements MessageService{
         // 채팅방 - 유저 binding
         rabbitMQConfig.binding(roomId, userNickname);
 
-        // 채팅방 메세지 조회 : 마지막으로 읽은 메세지부터 30개씩 조회
-        List<Message> messages = getMessagesAfter(cru.getChatRoom(), cru.getLastReadMessageId());
-        List<MessageDTO> result = messages.stream()
+        // 채팅방 메세지 조회 : 마지막으로 읽은 메세지 이전 5개 조회
+        List<Message> beforeMessages = getMessagesBefore(cru.getChatRoom(), cru.getLastReadMessageId(), 5);
+        Collections.reverse(beforeMessages);
+        List<MessageDTO> result = beforeMessages.stream()
                 .map(MessageDTO::of)
-                .toList();
+                .collect(Collectors.toList()); // 변경 가능한 리스트를 만듭니다.
+
+        // 채팅방 메세지 조회 : 마지막으로 읽은 메세지부터 30개씩 조회
+        List<Message> messages = getMessagesAfterIncludeLastMessage(cru.getChatRoom(), cru.getLastReadMessageId(), 30);
+        result.addAll(messages.stream()
+                .map(MessageDTO::of)
+                .collect(Collectors.toList())); // 여기도 변경 가능한 리스트를 만듭니다.
 
         // 채팅방에 참여하고 있는 유저 수
         int userCount = chatRoomUserRepository.findByChatRoomId(roomId).size();
