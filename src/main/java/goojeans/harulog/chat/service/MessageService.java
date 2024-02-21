@@ -11,11 +11,14 @@ import java.util.List;
 
 public interface MessageService {
 
-    // 메세지 id로부터 이전 메세지 30개씩 조회
-    List<Message> getMessagesBefore(ChatRoom chatroom, Long lastReadMessageId);
+    // 메세지 id로부터 이전 메세지 조회
+    List<Message> getMessagesBefore(ChatRoom chatroom, Long lastReadMessageId, int size);
 
-    // 메세지 id로부터 이후 메세지 30개씩 조회
-    List<Message> getMessagesAfter(ChatRoom chatroom, Long lastReadMessageId);
+    // 메세지 id로부터 이후 메세지 조회
+    List<Message> getMessagesAfter(ChatRoom chatroom, Long lastReadMessageId, int size);
+
+    // 마지막 메세지 id 포함해서 이후 메세지 조회
+    List<Message> getMessagesAfterIncludeLastMessage(ChatRoom chatroom, Long lastReadMessageId, int size);
 
     // 채팅방 메세지 조회 : 스크롤 올릴 때
     Response<MessageListDTO> getMessagesBeforeResponse(String roomId, Long lastReadMessageId);

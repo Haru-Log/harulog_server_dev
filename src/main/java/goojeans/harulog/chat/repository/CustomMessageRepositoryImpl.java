@@ -37,4 +37,16 @@ public class CustomMessageRepositoryImpl implements CustomMessageRepository{
                 .limit(limit)
                 .fetch();
     }
+
+    // 채팅방 메세지 조회 (마지막 메세지 포함해서 이후 메세지) : 오름차순 (과거~최신)
+    @Override
+    public List<Message> findAfterMessagesWithPaginationIncludeLastMessage(String roomId, Long lastMessageId, int limit) {
+        QMessage qMessage = QMessage.message;
+        return queryFactory.selectFrom(qMessage)
+                .where(qMessage.chatRoom.id.eq(roomId),
+                        qMessage.id.goe(lastMessageId)) // 메시지의 ID가 주어진 lastMessageId보다 크거나 같은 경우만 조회합니다. (goe: greater than or equal)
+                .orderBy(qMessage.id.asc())
+                .limit(limit)
+                .fetch();
+    }
 }

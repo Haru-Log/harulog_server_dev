@@ -66,7 +66,7 @@ class MessageServiceTest {
     @DisplayName("채팅방 이전 메세지 조회")
     void getMessagesBeforeResponse() {
         // given
-        when(messageRepository.findBeforeMessagesWithPagination(chatRoom.getId(), message5.getId(), 30))
+        when(messageRepository.findBeforeMessagesWithPagination(chatRoom.getId(), message5.getId(), 20))
                 .thenReturn(List.of(message4, message3, message2, message1));
 
         // when
@@ -84,7 +84,7 @@ class MessageServiceTest {
     @DisplayName("채팅방 이전 메세지 조회 - 실패 (더 이상 메세지가 없음)")
     void getMessagesBeforeResponseFail() {
         // given
-        when(messageRepository.findBeforeMessagesWithPagination(chatRoom.getId(), message5.getId(), 30))
+        when(messageRepository.findBeforeMessagesWithPagination(chatRoom.getId(), message5.getId(), 20))
                 .thenReturn(List.of());
 
         // when
@@ -103,7 +103,7 @@ class MessageServiceTest {
     @DisplayName("채팅방 이후 메세지 조회")
     void getMessagesAfterResponse() {
         // given
-        when(messageRepository.findAfterMessagesWithPagination(chatRoom.getId(), message1.getId(), 30))
+        when(messageRepository.findAfterMessagesWithPagination(chatRoom.getId(), message1.getId(), 20))
                 .thenReturn(List.of(message2, message3, message4, message5));
 
         // when
@@ -121,7 +121,7 @@ class MessageServiceTest {
     @DisplayName("채팅방 이후 메세지 조회 - 실패 (더 이상 메세지가 없음)")
     void getMessagesAfterResponseFail() {
         // given
-        when(messageRepository.findAfterMessagesWithPagination(chatRoom.getId(), message1.getId(), 30))
+        when(messageRepository.findAfterMessagesWithPagination(chatRoom.getId(), message1.getId(), 20))
                 .thenReturn(List.of());
 
         // when
