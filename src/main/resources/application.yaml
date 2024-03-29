@@ -1,29 +1,22 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   profiles:
     active:
       - dev
     group:
       local:
         - local
-        - jwt
-        - oauth
-        - rabbitmq
-        - firebase
       dev:
         - dev
-        - jwt
-        - oauth
-        - rabbitmq
-        - firebase
       test:
         - test
-        - jwt
-        - oauth
-        - rabbitmq
-        - firebase
       ops:
         - ops
-        - jwt
-        - oauth
-        - rabbitmq
-        - firebase
+    include:
+      - jwt
+      - oauth
+      - rabbitmq
+      - firebase
