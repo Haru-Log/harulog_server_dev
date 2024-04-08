@@ -29,7 +29,7 @@ public class Comment extends BaseEntity {
     private Long id;
 
     @JoinColumn(name = "user_id", nullable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Users user;
 
     @Column(nullable = false)
