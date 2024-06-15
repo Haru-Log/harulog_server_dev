@@ -3,6 +3,7 @@ package goojeans.harulog.post.repository;
 import goojeans.harulog.post.domain.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +33,12 @@ public interface PostRepository extends JpaRepository<Post,Long> {
             "WHERE f.follower.id = :userId " +
             "ORDER BY p.createdAt DESC")
     List<Post> findPostsByFollowersOrderByCreatedAtDesc(@Param("userId") Long userId);
+
+    @Query("SELECT p FROM post p " +
+            "JOIN Follow f ON p.user.id = f.following.id " +
+            "WHERE f.follower.id = :userId")
+    List<Post> findPostsByFollowers(@Param("userId") Long userId, Sort sort);
+
 
     @Query("select p from post p join fetch p.category join fetch p.user")
     Page<Post> findAllWithCategoryAndUser(Pageable pageable);

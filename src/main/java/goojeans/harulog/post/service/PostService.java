@@ -26,6 +26,7 @@ import goojeans.harulog.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -208,9 +209,8 @@ public class PostService {
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
 
         for (Post post : postList) {
-            int likeCount = likesRepository.countLikesByPostId(post.getId());
-            int commentCount = commentRepository.countCommentsByPostId(post.getId());
-
+            int likeCount = post.getLikes().size();
+            int commentCount = post.getComments().size();
 
             postResponseDtoList.add(new PostResponseDto(post, commentCount, likeCount));
         }
@@ -277,7 +277,10 @@ public class PostService {
     public List<PostResponseDto> userFollowPost(Long userId){
         Users users = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.CMT_AUTHENTICATION_FAIL));
-        List<Post> postList = postRepository.findPostsByFollowersOrderByCreatedAtDesc(userId);
+
+        Sort sortByCreatedAtDesc = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<Post> postList = postRepository.findPostsByFollowers(userId, sortByCreatedAtDesc);
+
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         for(Post post : postList){
             int likeCount = likesRepository.countLikesByPostId(post.getId());
